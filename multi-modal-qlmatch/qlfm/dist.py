@@ -41,3 +41,17 @@ def all_reduce_mean(t):
 def barrier():
     if dist.is_initialized():
         dist.barrier()
+
+
+def all_reduce_keyed_mean(sums, counts, dev):
+    """Mean of per-key sums over all ranks; keys may differ between ranks (a key absent on a rank adds 0 / 0)."""
+    keys = set(sums)
+    if dist.is_initialized():
+        allk = [None] * dist.get_world_size()
+        dist.all_gather_object(allk, sorted(keys))
+        keys = set().union(*map(set, allk))
+    keys = sorted(keys)
+    t = torch.tensor([[sums.get(k, 0.0), counts.get(k, 0)] for k in keys], dtype=torch.float64, device=dev)
+    if dist.is_initialized() and len(keys):
+        dist.all_reduce(t)
+    return {k: float(t[i, 0] / t[i, 1]) for i, k in enumerate(keys) if t[i, 1] > 0}

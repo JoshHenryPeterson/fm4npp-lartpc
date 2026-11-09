@@ -1,5 +1,6 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::debug
+#PBS -A neutrinoGPU::WireCellDev
+#PBS -r y
 #PBS -l filesystems=home:eagle
 #PBS -j oe
 # Several 2-node pretraining runs in one allocation.

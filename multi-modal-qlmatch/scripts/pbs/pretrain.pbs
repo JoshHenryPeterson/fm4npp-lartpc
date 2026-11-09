@@ -1,5 +1,6 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::debug
+#PBS -A neutrinoGPU::WireCellDev
+#PBS -r y
 #PBS -l filesystems=home:eagle
 #PBS -j oe
 # qsub -q debug-scaling -l select=8:system=polaris -l walltime=01:00:00 -N pre_cl -v OUT=...,ARGS="..." pretrain.pbs

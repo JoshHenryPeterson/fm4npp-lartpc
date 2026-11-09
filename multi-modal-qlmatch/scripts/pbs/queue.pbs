@@ -1,8 +1,13 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::debug
+#PBS -A neutrinoGPU::WireCellDev
+#PBS -r y
 #PBS -l filesystems=home:eagle
 #PBS -j oe
 # qsub -q debug -l select=2:system=polaris -l walltime=01:00:00 -v TASKS=/path/tasks.txt queue.pbs
-DEADLINE=$(( $(date +%s) + $(qstat -f $PBS_JOBID | awk -F'= ' '/Resource_List.walltime/{split($2,a,":"); print a[1]*3600+a[2]*60+a[3]}') ))
+# qsub -q preemptable -l select=1:system=polaris -l walltime=24:00:00 -v TASKS=/path/tasks.txt queue.pbs
+# -r y: a preempted job is requeued and rerun; run_queue.sh then reclaims the task locks of the killed run (RUN_ID).
+T0=$(/bin/date +%s)
+DEADLINE=$(( T0 + $(qstat -f $PBS_JOBID | awk -F'= ' '/Resource_List.walltime/{split($2,a,":"); print a[1]*3600+a[2]*60+a[3]}') ))
 NN=$(wc -l < $PBS_NODEFILE)
-mpiexec -n $NN --ppn 1 --cpu-bind none bash /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/run_queue.sh $TASKS $DEADLINE
+mpiexec -n $NN --ppn 1 --cpu-bind none env RUN_ID="${PBS_JOBID%%.*}@$T0" \
+  bash /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/run_queue.sh $TASKS $DEADLINE
