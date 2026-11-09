@@ -169,6 +169,8 @@ class FM4NPPBackbone(nn.Module):
     def layer_id(self, name):
         if name.startswith("adapter_"):
             return self.n_layers
+        if name.startswith("net.norm."):                  # final RMSNorm sits after the last layer (audit #11)
+            return self.n_layers - 1
         return int(name.split("layers.")[1].split(".")[0]) + 1 if "layers." in name else 0
 
     def forward(self, b):

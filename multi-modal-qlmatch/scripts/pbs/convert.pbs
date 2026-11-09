@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::debug
+#PBS -A neutrinoGPU::WireCellDev
 #PBS -q debug
 #PBS -l select=2:system=polaris
 #PBS -l walltime=01:00:00

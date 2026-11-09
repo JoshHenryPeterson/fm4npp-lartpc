@@ -1,5 +1,6 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::debug
+#PBS -A neutrinoGPU::WireCellDev
+#PBS -r y
 #PBS -l filesystems=home:eagle
 #PBS -j oe
 # Run one shell command per node: CMDS_FILE lines "LOGFILE<TAB>command". Each command gets the whole node and

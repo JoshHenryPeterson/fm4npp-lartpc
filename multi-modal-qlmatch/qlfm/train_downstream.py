@@ -4,6 +4,7 @@ python -m qlfm.train_downstream --task evt_nu --mode frozen --fm RUN/fm.pt --lab
 Writes best-on-val head/model, test predictions (preds_test.npz) and metrics (metrics.json).
 """
 import argparse
+import contextlib
 import json
 import os
 import time
@@ -27,13 +28,15 @@ def get_args(argv=None):
     ap.add_argument("--task", required=True, choices=list(N_OUT))
     ap.add_argument("--mode", required=True, choices=["scratch", "frozen", "finetune", "linear"])
     ap.add_argument("--fm", default=None, help="pretrained checkpoint (frozen/finetune/linear)")
-    ap.add_argument("--backbone", default="qlfm", choices=["qlfm", "fm4npp", "panda", "polarmae"])
+    ap.add_argument("--backbone", default="qlfm", choices=["qlfm", "fm4npp", "fm4npp_l", "panda", "panda_l", "polarmae"])
     ap.add_argument("--late-light", type=int, default=0,
                     help="late-fused PMT light: 0 none, 1 PMT tokens in the pooled set (R2P), "
                          "2 strong fusion: 2 cross-attention layers (tokens <- PMT tokens) at a common width (round 3)")
     ap.add_argument("--hit-feat", default="native", choices=["native", "raw", "none"],
                     help="T1 per-hit input: backbone's own hit embedding (qlfm only), a common trainable raw-hit "
                          "adapter for every backbone, or none")
+    ap.add_argument("--pimm-prep", default="matched", choices=["matched", "legacy"],
+                    help="Panda/PTv3 input preprocessing: matched to the pretraining views (audit #6) or rounds 2-4")
     ap.add_argument("--max-hits", type=int, default=None, help="FM4NPP: per-event hit cap override (default: checkpoint)")
     ap.add_argument("--light", type=int, default=1, help="scratch only; otherwise taken from the FM")
     ap.add_argument("--label-frac", type=float, default=0.01)
@@ -50,8 +53,11 @@ def get_args(argv=None):
     ap.add_argument("--n-test", type=int, default=20000)
     ap.add_argument("--workers", type=int, default=6)
     ap.add_argument("--time-limit", type=float, default=50.0)
-    ap.add_argument("--resume", type=int, default=0,
-                    help="at the time limit save OUT/state.pt and exit without testing; a later call resumes from it")
+    ap.add_argument("--resume", type=int, default=1,
+                    help="at the time limit save OUT/state.pt and exit without testing; a later call resumes from it "
+                         "(0: test the best checkpoint so far; metrics.json then has truncated=true)")
+    ap.add_argument("--state-every", type=float, default=20.0,
+                    help="with --resume, also save OUT/state.pt at an eval step every this many minutes (preemptable jobs)")
     ap.add_argument("--layer-decay", type=float, default=0.75)
     # architecture (scratch); for pretrained models these come from the checkpoint
     ap.add_argument("--d", type=int, default=256)
@@ -61,7 +67,8 @@ def get_args(argv=None):
     ap.add_argument("--pos-freq", type=int, default=10)
     ap.add_argument("--cell-wires", type=int, default=16)
     ap.add_argument("--cell-ticks", type=int, default=64)
-    ap.add_argument("--max-tokens", type=int, default=8192)
+    ap.add_argument("--max-tokens", type=int, default=None,
+                    help="qlfm token cap; default: the pretraining value from the checkpoint (8192 for scratch)")
     return ap.parse_args(argv)
 
 
@@ -74,8 +81,8 @@ class DownstreamModel(nn.Module):
         late_light = int(late_light)
         if task == "light":                                # T5: charge only, also for light-pretrained encoders
             late_light = 0
-            if hasattr(backbone, "fm"):
-                backbone.fm.cfg.use_light = False
+            if getattr(backbone, "light_on", False):
+                backbone.light_on = False
         self.fusion = XFusion(backbone.d) if late_light == 2 else None
         d = self.fusion.d if self.fusion is not None else backbone.d
         self.light = LateLight(d) if late_light else None
@@ -98,10 +105,9 @@ class DownstreamModel(nn.Module):
         return self
 
     def forward(self, b):
-        if self.mode in ("frozen", "linear"):
-            with torch.no_grad():
-                o = self.backbone(b)
-        else:
+        # frozen: no graph through the backbone, unless it has trainable adapters (e.g. FM4NPP's layer mix)
+        frozen_all = self.mode in ("frozen", "linear") and not any(p.requires_grad for p in self.backbone.parameters())
+        with torch.no_grad() if frozen_all else contextlib.nullcontext():
             o = self.backbone(b)
         z, evt = o["z"], o["evt"]
         if self.light is not None:
@@ -252,6 +258,12 @@ def main(argv=None):
         opt.load_state_dict(s["opt"])
         step, best, best_step, logs = s["step"], s["best"], s["best_step"], s["logs"]
         print(f"resumed at step {step}", flush=True)
+    t_state = time.time()
+
+    def save_state():
+        torch.save(dict(model=model.state_dict(), opt=opt.state_dict(), step=step, best=best,
+                        best_step=best_step, logs=logs), st + ".tmp")
+        os.replace(st + ".tmp", st)
     model.train()
     if args.mode in ("frozen", "linear"):
         backbone.eval()
@@ -281,25 +293,35 @@ def main(argv=None):
                 m = metrics_for(args.task, predict(model, val, dev, args.task, labels_of))
                 logs.append({"step": step, "loss": float(loss), **m})
                 print(json.dumps(logs[-1]), flush=True)
-                if m["score"] > best:
-                    best, best_step = m["score"], step
+                # NaN scores (e.g. a one-class val batch) never count as best, but a first checkpoint always exists
+                if np.isfinite(m["score"]) and m["score"] > best or not os.path.exists(ck):
+                    if np.isfinite(m["score"]):
+                        best, best_step = m["score"], step
                     torch.save({k: v for k, v in model.state_dict().items()
                                 if args.mode not in ("frozen", "linear") or not k.startswith("backbone.") or "adapter_" in k}, ck)
+                if args.resume and step < steps and (time.time() - t_state) / 60 > args.state_every:
+                    save_state()
+                    t_state = time.time()
             if step >= steps or (time.time() - t0) / 60 > args.time_limit:
                 if args.resume and step < steps:
-                    torch.save(dict(model=model.state_dict(), opt=opt.state_dict(), step=step, best=best,
-                                    best_step=best_step, logs=logs), st)
+                    save_state()
                     print(f"time limit at step {step}/{steps}: state saved, exiting for resume", flush=True)
                     return
                 done = True
                 break
+    if not os.path.exists(ck):                        # stopped before the first evaluation: keep the last state
+        torch.save({k: v for k, v in model.state_dict().items()
+                    if args.mode not in ("frozen", "linear") or not k.startswith("backbone.") or "adapter_" in k}, ck)
     sd = torch.load(ck, map_location=dev)
     model.load_state_dict(sd, strict=False)
     res = predict(model, tel, dev, args.task, labels_of)
     m = metrics_for(args.task, res)
     np.savez_compressed(os.path.join(args.out, "preds_test.npz"), **{k: v for k, v in res.items() if v is not None})
-    out = dict(info, best_val=best, best_step=best_step, test=m, minutes=(time.time() - t0) / 60, val_log=logs)
+    out = dict(info, best_val=best, best_step=best_step, final_step=step, truncated=step < steps, test=m,
+               minutes=(time.time() - t0) / 60, val_log=logs)
     json.dump(out, open(os.path.join(args.out, "metrics.json"), "w"), indent=1)
+    if os.path.exists(st):      # resume state is no longer needed (fine-tune states are ~0.25 GB)
+        os.remove(st)
     print("TEST", json.dumps(m), flush=True)
 
 

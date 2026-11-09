@@ -57,8 +57,9 @@ def _load_state(model, ckpt_dir):
 
 
 class PandaBackbone(nn.Module):
-    def __init__(self, cfg, ckpt=None):
+    def __init__(self, cfg, ckpt=None, prep="matched"):
         super().__init__()
+        self.prep = prep
         import pimm.models  # noqa: F401
         from pimm.models.builder import build_model
         sonata = build_model(cfg.model)
@@ -80,11 +81,29 @@ class PandaBackbone(nn.Module):
         return self._cum[int(m.group(1))] + int(m.group(2)) + 1 if m else 0
 
     def forward(self, b):
-        from pimm.models.utils.structure import Point
         coord, e, cloud = planar_clouds(b)
+        z = self.encode_points(coord, e, cloud)               # per hit
+        idx = torch.arange(len(z), device=z.device)
+        return dict(z=z, evt=b["hit_evt"], h_hit=None, hit2tok=idx)
+
+    def encode_points(self, coord, e, cloud, extra=None):
+        """Normalized points (coord [N,3], energy [N], cloud id [N], optional extra features [N,F] taken from the
+        first point of each voxel) -> per-point features [N, d]."""
+        from pimm.models.utils.structure import Point
+        if self.prep == "matched":
+            # as the pretraining views (audit #6): voxel grid from each cloud's own minimum (GridSample), x/y
+            # centred on each cloud's bounding-box midpoint (CenterShift, z untouched), grid_coord left to Point
+            nc = int(cloud.max()) + 1
+            idx3 = cloud[:, None].expand(-1, 3)
+            cmin = torch.full((nc, 3), float("inf"), device=coord.device).scatter_reduce(0, idx3, coord, "amin")
+            cmax = torch.full((nc, 3), float("-inf"), device=coord.device).scatter_reduce(0, idx3, coord, "amax")
+            gc = torch.floor((coord - cmin[cloud]) / self.grid).long()
+            shift = (cmin + cmax) / 2
+            shift[:, 2] = 0
+        else:                                                # rounds 2-4: batch-global grid origin, no centring
+            gc = torch.floor((coord - coord.min(0).values) / self.grid).long()
         # grid sampling (sum energy per voxel), clouds kept separate via the cloud id in the key
-        gc = torch.floor((coord - coord.min(0).values) / self.grid).long()
-        key = ((cloud * 4096 + gc[:, 0]) * 4096 + gc[:, 1]) * 8 + gc[:, 2].clamp(0, 7)
+        key = ((cloud * 4096 + gc[:, 0]) * 4096 + gc[:, 1]) * 256 + gc[:, 2].clamp(0, 255)
         ukey, inv = torch.unique(key, return_inverse=True)
         nv = len(ukey)
         esum = torch.zeros(nv, device=coord.device).index_add_(0, inv, e)
@@ -95,9 +114,14 @@ class PandaBackbone(nn.Module):
         counts = torch.bincount(vcloud, minlength=int(cloud.max()) + 1)
         nonempty = counts > 0
         offset = torch.cumsum(counts[nonempty], 0)
-        vgc = gc[first]
-        data = dict(coord=vc, grid_coord=(vgc - vgc.min(0).values).int(),
-                    feat=torch.cat([vc, log_energy(esum)[:, None]], 1), offset=offset, grid_size=self.grid)
+        vx = [log_energy(esum)[:, None]] + ([extra[first]] if extra is not None else [])
+        if self.prep == "matched":
+            vc = vc - shift[vcloud]
+            data = dict(coord=vc, feat=torch.cat([vc] + vx, 1), offset=offset, grid_size=self.grid)
+        else:
+            vgc = gc[first]
+            data = dict(coord=vc, grid_coord=(vgc - vgc.min(0).values).int(),
+                        feat=torch.cat([vc] + vx, 1), offset=offset, grid_size=self.grid)
         point = self.backbone(Point(data))
         for _ in range(self.up_cast_level):
             parent, pinv = point.pop("pooling_parent"), point.pop("pooling_inverse")
@@ -107,8 +131,41 @@ class PandaBackbone(nn.Module):
             parent, pinv = point.pop("pooling_parent"), point.pop("pooling_inverse")
             parent.feat = point.feat[pinv]
             point = parent
-        z = point.feat[inv]                                  # per hit
-        idx = torch.arange(len(z), device=z.device)
+        return point.feat[inv]
+
+
+class PandaLightBackbone(PandaBackbone):
+    """PTv3 + Sonata + light (pretrained with pimm_configs/panda_l_uboone.py): one cloud per event with the hits of
+    all three planes and 32 PMT points, as MicroBooNEEventLightDataset. Tokens = hits, then the 32 PMTs per event.
+    light_on = False drops the PMT points (charge-only input, T5)."""
+
+    def __init__(self, cfg, ckpt=None, prep="matched"):
+        super().__init__(cfg, ckpt, prep)
+        from qlfm.ref.pimm_ext import pmt_coords
+        self.register_buffer("pmt_xyz", torch.as_tensor(pmt_coords()), persistent=False)
+        self.light_on = True
+
+    def forward(self, b):
+        from qlfm.tokenize import TokCfg, tokenize_light
+        dev = b["hit_q"].device
+        n = b["n_events"]
+        plane = b["hit_plane"]
+        hc = torch.stack([b["hit_wire"].float() * G.WIRE_PITCH_CM, (b["hit_time"] - G.TRIG_TICK) * G.TICK_TO_CM,
+                          plane.float() * PLANE_DZ], 1)
+        nh = len(hc)
+        coord, e, cloud = [hc], [b["hit_q"].clamp(min=1.0)], [b["hit_evt"]]
+        extra = [torch.zeros(nh, 18, device=dev)]
+        if self.light_on:
+            lt = tokenize_light(b["oph_ch"], b["oph_t"], b["oph_pe"], b["oph_evt"], n, TokCfg())
+            coord.append(self.pmt_xyz.to(dev).repeat(n, 1))
+            e.append(torch.expm1(lt.feat[:, -1]).clamp(min=1.0))
+            cloud.append(lt.evt)
+            extra.append(torch.cat([lt.feat, torch.ones(len(lt.evt), 1, device=dev)], 1))
+        coord = (torch.cat(coord) - CENTER.to(dev)) / SCALE
+        z = self.encode_points(coord, torch.cat(e), torch.cat(cloud), torch.cat(extra))
+        idx = torch.arange(nh, device=dev)
+        if self.light_on:
+            return dict(z=z, evt=torch.cat(cloud), h_hit=None, hit2tok=idx)
         return dict(z=z, evt=b["hit_evt"], h_hit=None, hit2tok=idx)
 
 
@@ -171,5 +228,10 @@ class PoLArMAEBackbone(nn.Module):
 def build(name, args, ckpt):
     from pimm.utils.config import Config
     import qlfm.ref.pimm_ext  # noqa: F401
-    cfg = Config.fromfile(os.path.join(CFG_DIR, f"{'panda' if name == 'panda' else 'polarmae'}_uboone.py"))
-    return PandaBackbone(cfg, ckpt) if name == "panda" else PoLArMAEBackbone(cfg, ckpt)
+    cfg = Config.fromfile(os.path.join(CFG_DIR, f"{name}_uboone.py"))
+    prep = getattr(args, "pimm_prep", "matched")
+    if name == "panda":
+        return PandaBackbone(cfg, ckpt, prep)
+    if name == "panda_l":
+        return PandaLightBackbone(cfg, ckpt, prep)
+    return PoLArMAEBackbone(cfg, ckpt)

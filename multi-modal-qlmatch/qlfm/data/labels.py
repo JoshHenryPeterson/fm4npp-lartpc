@@ -14,6 +14,11 @@ import numpy as np
 from qlfm.geometry import FV_MARGIN_CM, in_volume
 
 HIT_NU_EDEP_MEV = 0.05    # hit is "neutrino" if its MC deposit exceeds this
+# Two thresholds, on purpose (audit #10): the T1 per-hit target uses > HIT_NU_EDEP_MEV, while the event
+# visibility counts nu_nhits (T2 classes, T1/T3/T4 eligibility) count every hit with any MC deposit (> 0,
+# qlfm/data/convert.py). So a "visible" event can have a few of its counted hits labelled cosmic in T1, and a
+# T2 class-0 event can hold up to VIS_NEG_HITS hits with tiny deposits. Hits with 0 < deposit <= 0.05 MeV are
+# 0.12-0.15% of all test hits (qlfm/eval_perturb.py, frac_sim_below_label).
 VIS_POS_Y_HITS = 30       # T2 positive: >= this many collection-plane neutrino hits
 VIS_NEG_HITS = 5          # T2 negative: <= this many neutrino hits (all planes)
 

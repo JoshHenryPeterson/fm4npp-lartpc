@@ -96,7 +96,7 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
         "width": _alloc(outdir, "oph_width", (n_oph,), np.float16),
         "pe": _alloc(outdir, "oph_pe", (n_oph,), np.float16),
     }
-    stats = {"hit_id_mismatch": 0, "edep_rows": 0, "max_ophit_t": 0.0, "min_ophit_t": 1e9}
+    stats = {"hit_id_mismatch": 0, "edep_rows": 0, "max_ophit_t": 0.0, "min_ophit_t": 1e9, "neg_hit_time": 0}
 
     for lo in range(0, n, chunk):
         hi = min(n, lo + chunk)
@@ -107,6 +107,9 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
         if nh:
             local = np.arange(nh) - (hs[hevt] - r0)
             stats["hit_id_mismatch"] += int((h["hit_id"] != local).sum())
+            # per-hit truth and Pandora membership below are scattered by hit_id (audit #12)
+            assert stats["hit_id_mismatch"] == 0, f"{path}: hit_id != row index within the event"
+            stats["neg_hit_time"] += int((h["local_time"] < 0).sum())      # clipped to tick 0
             sl = slice(r0, r0 + nh)
             H["plane"][sl] = h["local_plane"]
             H["wire"][sl] = h["local_wire"]
@@ -165,6 +168,8 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
         # ---- optical hits ----
         o, oevt = rd("ophit_table", lo, hi, ["hit_channel", "peaktime", "width", "pe"])
         if len(oevt):
+            # tokenize_light bins PE by evt * 32 + channel (audit #12)
+            assert int(o["hit_channel"].max()) < 32, f"{path}: PMT channel >= 32"
             s0 = os_[lo]
             sl = slice(s0, s0 + len(oevt))
             O["ch"][sl] = o["hit_channel"]
