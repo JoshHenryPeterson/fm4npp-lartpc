@@ -13,6 +13,7 @@ import torch
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 from qlfm import dist
+from qlfm import geometry as G
 from qlfm.data.dataset import Corpus, EventDataset, collate, to_device
 from qlfm.models.fm import FM, MAE, FMCfg, MAECfg
 from qlfm.tokenize import TokCfg
@@ -192,7 +193,7 @@ def main(argv=None):
     if dist.is_main():
         print(f"params(FM)={n_params/1e6:.2f}M world={world} train={len(train_idx)} lr={base_lr:.2e} "
               f"start_step={step}", flush=True)
-        json.dump(vars(args) | {"n_params": n_params, "world": world, "n_train": len(train_idx)},
+        json.dump(vars(args) | {"n_params": n_params, "world": world, "n_train": len(train_idx), "detector": G.DETECTOR},
                   open(os.path.join(args.out, "args.json"), "w"), indent=1)
     logf = open(os.path.join(args.out, "log.jsonl"), "a") if dist.is_main() else None
 

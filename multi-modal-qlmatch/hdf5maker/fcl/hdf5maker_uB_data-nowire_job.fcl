@@ -1,0 +1,17 @@
+// HDF5Maker on MicroBooNE real data (BNB beam-on, EXT), MCC9.1 reco2, NoWire, matching the
+// open-data NoWire tables except the truth-only ones (event_table has event_id only; no
+// edep/particle tables). Needs patches/0001-data-mode.patch.
+#include "hdf5maker_uB_public_job.fcl"
+
+services.DetectorClocksService.TrigModuleName: "daq"
+
+physics.analyzers.hdf5maker.EventInfo:     "none"
+physics.analyzers.hdf5maker.HitTruthLabel: ""
+physics.analyzers.hdf5maker.WireLabel:     ""
+// Light from the optical re-reconstruction, the same stage the overlay files are read at
+// (OverlayStage1Optical is the latest optical process in the public overlay files).
+physics.analyzers.hdf5maker.OpHitLabel:    "ophitBeam::DataStage1Optical"
+physics.analyzers.hdf5maker.OpFlashLabel:  "simpleFlashBeam::DataStage1Optical"
+physics.analyzers.hdf5maker.OutputName:    "NeutrinoML_Data_NoWire"
+
+physics.analyzers.hdf5maker.IsData:        true

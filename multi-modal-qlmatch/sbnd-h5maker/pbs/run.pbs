@@ -1,0 +1,24 @@
+#!/bin/bash
+#PBS -N sbnd-h5
+#PBS -A neutrinoGPU::WireCell_aurora
+#PBS -q debug
+#PBS -l select=1
+#PBS -l walltime=00:30:00
+#PBS -l filesystems=flare:home
+#PBS -j oe
+# SBND HDF5 maker on Aurora (fm4npp-lartpc #11).  One converter process per units list, in the SL7 container.
+#   qsub -v "OUT=<out.h5>,UNITS=<units.txt>[,MAXN=10][,ARGS='--scan-offsets 5']" pbs/run.pbs
+# UNITS: one aurora-r2 unit directory per line (sbnd-wirecell-production dlspace/<species>/node<k>/<unit>).
+set -u
+Y=/lus/flare/projects/neutrinoGPU/yuhw
+H=$Y/fm4npp-lartpc/multi-modal-qlmatch/sbnd-h5maker
+OUT=${OUT:?}; UNITS=${UNITS:?}; MAXN=${MAXN:-0}; ARGS=${ARGS:-}
+mkdir -p "$(dirname "$OUT")"
+export SL7_SETUP=$H/env.sh
+WRAP=$Y/sbnd-wirecell-production/aurora/env/aurora/in-aurora-sl7.sh
+echo "$(/bin/date -u '+%F %T') START $(hostname) job ${PBS_JOBID:-} OUT=$OUT UNITS=$UNITS MAXN=$MAXN code $(git -C $H rev-parse --short HEAD)$(git -C $H diff --quiet -- . || echo +dirty)"
+cd "$H"
+/usr/bin/time -v -o "$OUT.time" "$WRAP" python sbnd_h5maker.py "$OUT" --units-file "$UNITS" --max-events "$MAXN" $ARGS > "$OUT.log" 2>&1
+rc=$?
+echo "$(/bin/date -u '+%F %T') rc $rc wall $(awk -F': ' '/Elapsed/{print $2}' $OUT.time) rss_kb $(awk -F': ' '/Maximum resident/{print $2}' $OUT.time)"
+tail -40 "$OUT.log"

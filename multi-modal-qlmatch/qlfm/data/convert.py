@@ -6,6 +6,21 @@ Output directory layout (one per shard):
   oph_<name>.npy   per-ophit columns (offset ev_oph_off)
 Truth columns are written to separate files so pretraining never reads them.
 
+SBND files (sbnd-h5maker, issue #11; set QLFM_DETECTOR=sbnd) differ in:
+  * hit_tpc is written, and hit_time is the virtual tick of qlfm.geometry.virtual_tick (TPC 1 mirrored);
+  * ophit / flash PMT OpChannels are mapped to light-token indices (geometry.PMT_CH);
+  * no Pandora: hit_pnd_nu holds the Wire-Cell nu-cluster hits (wc_hit_table.wc_nu_index >= 0) as the reco
+    baseline, and pnd_score / pnd_fm stay at their defaults;
+  * the event-level neutrino is the event_table one (largest collection-plane deposit, attribute nu_choice), while
+    the per-hit nu deposit and the visibility counts include every neutrino of the spill; n_nu is kept.
+
+MicroBooNE round-1 files (issue #10; datasets/uboone_round1/README.md) differ in:
+  * real data (beam_on, ext) has no truth columns: is_data = 1 and the truth fields keep neutral defaults
+    (nu_pdg 0, is_cc -1, energies 0, vertices NaN, no hit deposits), so every event reads as T2 class 0;
+  * Wire-Cell labels, copied when present: hit_wc_main (hit in WC's in-time main cluster) and the event columns
+    wc_generic_nu, wc_in_nusel, wc_in_checkout, ... as ev_wc_*. WC nu-hit label = hit_wc_main & ev_wc_generic_nu,
+    defined only where ev_wc_in_nusel == 1.
+
 Usage: python -m qlfm.data.convert IN.h5 OUTDIR [--chunk 2000]
 """
 import argparse
@@ -16,6 +31,7 @@ import time
 import numpy as np
 
 from qlfm.data.h5reader import OpenSampleFile
+from qlfm import geometry as G
 from qlfm.geometry import N_PMT
 
 TIME_SCALE = 8  # hit time stored as uint16(round(t * 8)) -> 1/8 tick precision
@@ -41,6 +57,12 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
     t0 = time.time()
     os.makedirs(outdir, exist_ok=True)
     f = OpenSampleFile(path)
+    sbnd = "detector" in f.f.attrs and json.loads(f.f.attrs["detector"]).get("detector") == "SBND"
+    if sbnd != (G.DETECTOR == "sbnd"):
+        raise ValueError(f"{path}: {'SBND' if sbnd else 'MicroBooNE'} file but QLFM_DETECTOR={G.DETECTOR}")
+    if sbnd:
+        pmt_index = np.full(int(G.PMT_CH.max()) + 1, -1, np.int64)
+        pmt_index[G.PMT_CH] = np.arange(G.N_PMT)
     ev_lo = f.n_events * part // nparts
     ev_hi = f.n_events * (part + 1) // nparts
     n = ev_hi - ev_lo
@@ -54,6 +76,13 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
 
     # ---------------- per-event truth ----------------
     ev, _ = rd("event_table", 0, n)
+    is_data = "nu_pdg" not in ev
+    if is_data:         # real data (round-1 beam_on / ext): neutral truth
+        nan3 = np.full((n, 3), np.nan, np.float32)
+        ev.update(nu_pdg=np.zeros(n), is_cc=np.full(n, -1), nu_energy=np.zeros(n), lep_energy=np.zeros(n),
+                  nu_vtx=nan3, nu_vtx_corr=nan3, nu_vtx_wire_time=np.full(n, np.nan))
+    wc_ev = sorted(k for k in ev if k.startswith("wc_"))
+    wc_hit = "wc_main" in f.columns("hit_table")
     out_ev = {
         "run": ev["event_id"][:, 0].astype(np.int32),
         "subrun": ev["event_id"][:, 1].astype(np.int32),
@@ -63,11 +92,17 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
         "nu_energy": ev["nu_energy"].astype(np.float32),
         "lep_energy": ev["lep_energy"].astype(np.float32),
         "nu_vtx": ev["nu_vtx"].astype(np.float32),
-        "nu_vtx_corr": ev["nu_vtx_corr"].astype(np.float32),
-        "nu_time": ev["nu_vtx_wire_time"].astype(np.float32),
+        "nu_vtx_corr": ev["nu_vtx_corr" if not sbnd else "nu_vtx"].astype(np.float32),
+        # ticks; SBND: from the generator time in ns (500 ns per tick, relative to the trigger)
+        "nu_time": (ev["nu_vtx_wire_time"] if not sbnd else G.TRIG_TICK + ev["nu_time_ns"] / 500.0).astype(np.float32),
         "hit_off": hs, "hit_cnt": hc.astype(np.int32),
         "oph_off": os_, "oph_cnt": oc.astype(np.int32),
     }
+    if sbnd:
+        out_ev["n_nu"] = ev["n_nu"].astype(np.int16)
+    out_ev["is_data"] = np.full(n, int(is_data), np.int8)
+    for k in wc_ev:
+        out_ev[k] = ev[k].astype(np.float32 if "score" in k or k == "wc_stm_clusterlength" else np.int16)
     nu_nhits = np.zeros((n, 3), np.int32)       # per plane, hits with nu edep above 0
     nu_q = np.zeros((n, 3), np.float32)         # per plane, sum integral of nu hits
     nu_edep = np.zeros(n, np.float32)           # sum MC energy (MeV) on collection-plane hits
@@ -90,6 +125,10 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
         "cat": _alloc(outdir, "hit_cat", (n_hits,), np.int8),
         "pnd_nu": _alloc(outdir, "hit_pnd_nu", (n_hits,), np.uint8),
     }
+    if sbnd:
+        H["tpc"] = _alloc(outdir, "hit_tpc", (n_hits,), np.uint8)
+    if wc_hit:
+        H["wc_main"] = _alloc(outdir, "hit_wc_main", (n_hits,), np.uint8)
     O = {
         "ch": _alloc(outdir, "oph_ch", (n_oph,), np.uint8),
         "t": _alloc(outdir, "oph_t", (n_oph,), np.float32),
@@ -102,7 +141,8 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
         hi = min(n, lo + chunk)
         r0 = hs[lo]
         h, hevt = rd("hit_table", lo, hi,
-                               ["hit_id", "local_plane", "local_wire", "local_time", "integral", "rms"])
+                     ["hit_id", "local_plane", "local_wire", "local_time", "integral", "rms"] + (["tpc"] if sbnd else [])
+                     + (["wc_main"] if wc_hit else []))
         nh = len(hevt)
         if nh:
             local = np.arange(nh) - (hs[hevt] - r0)
@@ -113,7 +153,12 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
             sl = slice(r0, r0 + nh)
             H["plane"][sl] = h["local_plane"]
             H["wire"][sl] = h["local_wire"]
-            H["time"][sl] = np.clip(np.round(h["local_time"] * TIME_SCALE), 0, 65535)
+            t = G.virtual_tick(h["local_time"], h["tpc"]) if sbnd else h["local_time"]
+            H["time"][sl] = np.clip(np.round(t * TIME_SCALE), 0, 65535)
+            if sbnd:
+                H["tpc"][sl] = h["tpc"]
+            if wc_hit:
+                H["wc_main"][sl] = h["wc_main"] > 0
             H["integral"][sl] = np.clip(h["integral"], 0, 65000)
             H["rms"][sl] = np.clip(h["rms"], 0, 65000)
 
@@ -147,29 +192,39 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
             m = isnu & (h["local_plane"] == 2)
             np.add.at(nu_edep, hevt[m], edep[m])
 
-            # ---- Pandora baseline: hits in the max-nu_score slice ----
-            ph, phevt = rd("pandoraHit_table", lo, hi, ["hit_id", "slice_id"])
-            pp, ppevt = rd("pandoraPrimary_table", lo, hi, ["slice_id", "nu_score", "flashmatch_score"])
-            best_slice = np.full(n, -2, np.int64)
-            if len(ppevt):
-                srt = np.lexsort((-pp["nu_score"], ppevt))
-                first = np.ones(len(srt), bool)
-                first[1:] = ppevt[srt][1:] != ppevt[srt][:-1]
-                bi = srt[first]
-                ok = pp["nu_score"][bi] > -998
-                pnd_score[ppevt[bi]] = np.where(ok, pp["nu_score"][bi], -999.0)
-                pnd_fm[ppevt[bi]] = pp["flashmatch_score"][bi]
-                best_slice[ppevt[bi][ok]] = pp["slice_id"][bi][ok]
-            prow = hs[phevt] - r0 + ph["hit_id"]
-            pnd = np.zeros(nh, np.uint8)
-            pnd[prow] = (ph["slice_id"] == best_slice[phevt]) & (ph["slice_id"] >= 0)
-            H["pnd_nu"][sl] = pnd
+            if sbnd:
+                # ---- Wire-Cell baseline: hits of any WC nu cluster ----
+                w, wevt = rd("wc_hit_table", lo, hi, ["hit_id", "wc_nu_index"])
+                pnd = np.zeros(nh, np.uint8)
+                pnd[hs[wevt] - r0 + w["hit_id"]] = w["wc_nu_index"] >= 0
+                H["pnd_nu"][sl] = pnd
+            else:
+                # ---- Pandora baseline: hits in the max-nu_score slice ----
+                ph, phevt = rd("pandoraHit_table", lo, hi, ["hit_id", "slice_id"])
+                pp, ppevt = rd("pandoraPrimary_table", lo, hi, ["slice_id", "nu_score", "flashmatch_score"])
+                best_slice = np.full(n, -2, np.int64)
+                if len(ppevt):
+                    srt = np.lexsort((-pp["nu_score"], ppevt))
+                    first = np.ones(len(srt), bool)
+                    first[1:] = ppevt[srt][1:] != ppevt[srt][:-1]
+                    bi = srt[first]
+                    ok = pp["nu_score"][bi] > -998
+                    pnd_score[ppevt[bi]] = np.where(ok, pp["nu_score"][bi], -999.0)
+                    pnd_fm[ppevt[bi]] = pp["flashmatch_score"][bi]
+                    best_slice[ppevt[bi][ok]] = pp["slice_id"][bi][ok]
+                prow = hs[phevt] - r0 + ph["hit_id"]
+                pnd = np.zeros(nh, np.uint8)
+                pnd[prow] = (ph["slice_id"] == best_slice[phevt]) & (ph["slice_id"] >= 0)
+                H["pnd_nu"][sl] = pnd
 
         # ---- optical hits ----
         o, oevt = rd("ophit_table", lo, hi, ["hit_channel", "peaktime", "width", "pe"])
         if len(oevt):
-            # tokenize_light bins PE by evt * 32 + channel (audit #12)
-            assert int(o["hit_channel"].max()) < 32, f"{path}: PMT channel >= 32"
+            # tokenize_light bins PE by evt * N_PMT + channel (audit #12)
+            if sbnd:
+                o["hit_channel"] = pmt_index[o["hit_channel"]]
+                assert (o["hit_channel"] >= 0).all(), f"{path}: ophit on a channel that is not a PMT"
+            assert int(o["hit_channel"].max()) < N_PMT, f"{path}: PMT channel >= {N_PMT}"
             s0 = os_[lo]
             sl = slice(s0, s0 + len(oevt))
             O["ch"][sl] = o["hit_channel"]
@@ -181,6 +236,9 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
 
         # ---- beam flashes (baseline / audit only) ----
         fl, flevt = rd("opflash_table", lo, hi, ["flash_id", "time", "totalpe"])
+        if sbnd:        # SBND flashes span the +-1.5 ms PMT readout: keep those in the light-token window
+            m = (fl["time"] >= G.LIGHT_EDGES[0]) & (fl["time"] < G.LIGHT_EDGES[-1])
+            fl, flevt = {k: v[m] for k, v in fl.items()}, flevt[m]
         if len(flevt):
             np.add.at(fl_n, flevt, 1)
             srt = np.lexsort((-fl["totalpe"], flevt))
@@ -192,8 +250,11 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
             best_flash = np.full(n, -2, np.int64)
             best_flash[flevt[bi]] = fl["flash_id"][bi]
             sp, spevt = rd("opflashsumpe_table", lo, hi, ["flash_id", "pmt_channel", "sumpe"])
-            m = sp["flash_id"] == best_flash[spevt]
-            fl_pmt[spevt[m], sp["pmt_channel"][m].astype(np.int64)] = sp["sumpe"][m]
+            ch = sp["pmt_channel"].astype(np.int64)
+            if sbnd:
+                ch = np.where(ch < len(pmt_index), pmt_index[ch.clip(max=len(pmt_index) - 1)], -1)
+            m = (sp["flash_id"] == best_flash[spevt]) & (ch >= 0)
+            fl_pmt[spevt[m], ch[m]] = sp["sumpe"][m]
 
         print(f"{os.path.basename(path)}: {hi}/{n} events, {time.time()-t0:.0f}s", flush=True)
 
@@ -204,7 +265,7 @@ def convert(path, outdir, chunk=2000, part=0, nparts=1):
     for d in (H, O):
         for v in d.values():
             np.save(_alloc.files.pop(id(v)), v)
-    stats.update(n_events=n, n_hits=n_hits, n_ophits=n_oph, source=os.path.abspath(path),
+    stats.update(n_events=n, n_hits=n_hits, n_ophits=n_oph, source=os.path.abspath(path), is_data=is_data,
                  ev_lo=ev_lo, ev_hi=ev_hi,
                  seconds=time.time() - t0)
     with open(os.path.join(outdir, "meta.json"), "w") as fo:

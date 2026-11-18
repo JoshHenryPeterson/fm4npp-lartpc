@@ -141,8 +141,10 @@ class LightHead(nn.Module):
     event's charge tokens, projected to a common width as in XFusion; each query outputs the PMT's 17 light-token
     features (log1p PE in 16 time bins + log1p total). Identical for every backbone."""
 
-    def __init__(self, d_in, d=256, n_layers=2, heads=8, mlp_ratio=2, n_pmt=32, n_feat=17):
+    def __init__(self, d_in, d=256, n_layers=2, heads=8, mlp_ratio=2, n_pmt=None, n_feat=17):
         super().__init__()
+        from qlfm import geometry as G
+        n_pmt = n_pmt or G.N_PMT
         self.d, self.h, self.n_pmt = d, heads, n_pmt
         self.proj = nn.Sequential(nn.LayerNorm(d_in), nn.Linear(d_in, d))
         self.query = nn.Parameter(torch.randn(n_pmt, d) * 0.02)

@@ -1,0 +1,2740 @@
+{
+ "detector": "SBND",
+ "units": "cm, us, ticks",
+ "tpcs": [
+  {
+   "tpc": 0,
+   "drift_sign": -1,
+   "anode_x": -202.05,
+   "cathode_x": 0.0,
+   "note": "anode_x = collection-plane x"
+  },
+  {
+   "tpc": 1,
+   "drift_sign": 1,
+   "anode_x": 202.05,
+   "cathode_x": 0.0
+  }
+ ],
+ "active_volume": {
+  "x": [
+   -200.0,
+   200.0
+  ],
+  "y": [
+   -203.7325,
+   203.7325
+  ],
+  "z": [
+   0.0,
+   501.0
+  ],
+  "note": "y, z from wire-cell-data semi-analytical-sbnd.json Geometry; x = +-200 cm drift (cathode at 0)"
+ },
+ "planes": [
+  {
+   "plane": 0,
+   "name": "U",
+   "n_wires": 1984,
+   "pitch_cm": 0.3,
+   "angle_deg": 60
+  },
+  {
+   "plane": 1,
+   "name": "V",
+   "n_wires": 1984,
+   "pitch_cm": 0.3,
+   "angle_deg": -60
+  },
+  {
+   "plane": 2,
+   "name": "Y",
+   "n_wires": 1670,
+   "pitch_cm": 0.3,
+   "angle_deg": 0
+  }
+ ],
+ "channels_per_tpc": 5638,
+ "n_channels": 11276,
+ "wire_planes": [
+  {
+   "tpc": 0,
+   "plane": 0,
+   "x": -201.45,
+   "n_wires": 1984,
+   "channel0": 0,
+   "channel_step": 1,
+   "wire0_yz": [
+    199.53199999999998,
+    1.2
+   ],
+   "pitch_dir_yz": [
+    -0.8658650732445463,
+    0.5002775978746367
+   ],
+   "pitch": 0.30003753041961273,
+   "wire_dir": [
+    0.0,
+    0.50028,
+    0.86587
+   ]
+  },
+  {
+   "tpc": 0,
+   "plane": 1,
+   "x": -201.75,
+   "n_wires": 1984,
+   "channel0": 1984,
+   "channel_step": 1,
+   "wire0_yz": [
+    -199.53199999999998,
+    1.2
+   ],
+   "pitch_dir_yz": [
+    0.8658650732445463,
+    0.5002775978746367
+   ],
+   "pitch": 0.30003753041961273,
+   "wire_dir": [
+    0.0,
+    0.50028,
+    -0.86587
+   ]
+  },
+  {
+   "tpc": 0,
+   "plane": 2,
+   "x": -202.05,
+   "n_wires": 1670,
+   "channel0": 3968,
+   "channel_step": 1,
+   "wire0_yz": [
+    0.0,
+    0.15
+   ],
+   "pitch_dir_yz": [
+    -0.0,
+    1.0
+   ],
+   "pitch": 0.30000000000000004,
+   "wire_dir": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "tpc": 1,
+   "plane": 0,
+   "x": 201.45,
+   "n_wires": 1984,
+   "channel0": 7621,
+   "channel_step": -1,
+   "wire0_yz": [
+    199.5325,
+    499.79999999999995
+   ],
+   "pitch_dir_yz": [
+    0.8660039766877451,
+    0.5000371109837862
+   ],
+   "pitch": -0.30000501638498356,
+   "wire_dir": [
+    0.0,
+    0.50004,
+    -0.866
+   ]
+  },
+  {
+   "tpc": 1,
+   "plane": 1,
+   "x": 201.75,
+   "n_wires": 1984,
+   "channel0": 9605,
+   "channel_step": -1,
+   "wire0_yz": [
+    -199.5325,
+    499.79999999999995
+   ],
+   "pitch_dir_yz": [
+    -0.8660039766877451,
+    0.5000371109837862
+   ],
+   "pitch": -0.30000501638498356,
+   "wire_dir": [
+    0.0,
+    0.50004,
+    0.866
+   ]
+  },
+  {
+   "tpc": 1,
+   "plane": 2,
+   "x": 202.05,
+   "n_wires": 1670,
+   "channel0": 11275,
+   "channel_step": -1,
+   "wire0_yz": [
+    0.0,
+    500.85
+   ],
+   "pitch_dir_yz": [
+    -0.0,
+    1.0
+   ],
+   "pitch": -0.30000000000000004,
+   "wire_dir": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  }
+ ],
+ "tick_us": 0.5,
+ "readout_ticks": 3427,
+ "readout_ticks_note": "Wire-Cell detsim/SP frame (WCT sbnd params daq.nticks); detectorproperties ReadOutWindowSize says 3400, the gaushits reach tick 3425",
+ "trigger_tick": 410,
+ "trigger_tick_note": "TriggerOffsetTPC = -205 us: the TPC readout starts 205 us (410 ticks) before the trigger; hit_table.local_time is the gaushit PeakTime in ticks from the readout start",
+ "drift_speed_cm_per_us": 0.1563,
+ "drift_cm_per_tick": 0.07815,
+ "drift_note": "x ~ anode_x - drift_sign * (local_time - trigger_tick) * drift_cm_per_tick for charge produced at the trigger time; the per-plane time offsets fitted for the truth projection are in the HDF5 attribute truth_projection",
+ "max_drift_cm": 200.0,
+ "light": {
+  "ophit_label": "ophitpmt (PMTs only; no X-ARAPUCA ophits in reco1)",
+  "time_unit": "us, relative to the trigger (OpHit::PeakTime); peaktime_abs is OpHit::PeakTimeAbs",
+  "beam_gate_note": "MC beam gate start from sim::BeamGateInfo (event_table.beam_gate_start_ns); BNB spill ~1.6 us long"
+ },
+ "simulation": {
+  "source": "Avinay's Gen2 production (sbn_parsl wct0319 restartable, runinfo/config.toml): sbndcode v10_14_02_03 e26:prof; gen prodgenie_corsika_proton_rockbox0p1_sbnd.fcl, g4 standard_g4_rockbox_sbnd.fcl, detsim standard_detsim_sbnd.fcl, reco1 standard_reco1_sbnd.fcl",
+  "tpc_detsim": {
+   "module": "simtpc2d = sbnd_wcls_simsp_bothrois (wcsimsp_sbnd.fcl), Wire-Cell 2D sim + NF + SP",
+   "DL_cm2_per_s": 4.0,
+   "DT_cm2_per_s": 8.8,
+   "electron_lifetime_ms": 35.0,
+   "drift_speed_mm_per_us": 1.563,
+   "fluctuate": false,
+   "nticks": 3427,
+   "tick0_time_us": -205,
+   "field_response": "garfield-sbnd-v1.json.bz2",
+   "noise": "sbnd-noise-spectra-v1.json.bz2 (scaled from ProtoDUNE-SP)",
+   "enableLowROIThresholds": true,
+   "deposits": "ionandscint (with SCE); priorSCE kept in reco1"
+  },
+  "hit_finder": {
+   "label": "gaushit",
+   "module": "sbnd_gaushitfinder (hitfindermodules_sbnd.fcl), morphological candidate finder per plane",
+   "input": "simtpc2d:gauss (CalDataModuleLabel, reco_sbnd.fcl)"
+  },
+  "light": {
+   "pmt_digitizer": "opdaq (digi_pmt_sbnd.fcl)",
+   "PMTCoatedVUVEff": 0.0392,
+   "PMTUncoatedEff": 0.0357,
+   "PMTDarkNoiseRate_Hz": 1000.0,
+   "PMTBaselineRMS_ADC": 2.6,
+   "PMTChargeToADC": -25.97,
+   "PMTSinglePEmodel": "data",
+   "ScintPreScale": 0.0392,
+   "photon_sim": "pdfastsim (semi-analytical) G4 stage",
+   "ophit_label": "ophitpmt"
+  }
+ },
+ "opdets": [
+  {
+   "channel": 0,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 16.0542
+  },
+  {
+   "channel": 1,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 16.0542
+  },
+  {
+   "channel": 2,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 16.0542
+  },
+  {
+   "channel": 3,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 16.0542
+  },
+  {
+   "channel": 4,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 16.0542
+  },
+  {
+   "channel": 5,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 16.0542
+  },
+  {
+   "channel": 6,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -175.0,
+   "z": 23.6742
+  },
+  {
+   "channel": 7,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -175.0,
+   "z": 23.6742
+  },
+  {
+   "channel": 8,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -95.0,
+   "z": 23.6742
+  },
+  {
+   "channel": 9,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -95.0,
+   "z": 23.6742
+  },
+  {
+   "channel": 10,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -40.0,
+   "z": 23.6742
+  },
+  {
+   "channel": 11,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -40.0,
+   "z": 23.6742
+  },
+  {
+   "channel": 12,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 40.0,
+   "z": 23.6742
+  },
+  {
+   "channel": 13,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 40.0,
+   "z": 23.6742
+  },
+  {
+   "channel": 14,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 95.0,
+   "z": 23.6742
+  },
+  {
+   "channel": 15,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 95.0,
+   "z": 23.6742
+  },
+  {
+   "channel": 16,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 175.0,
+   "z": 23.6742
+  },
+  {
+   "channel": 17,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 175.0,
+   "z": 23.6742
+  },
+  {
+   "channel": 18,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 31.2942
+  },
+  {
+   "channel": 19,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 31.2942
+  },
+  {
+   "channel": 20,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 31.2942
+  },
+  {
+   "channel": 21,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 31.2942
+  },
+  {
+   "channel": 22,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 31.2942
+  },
+  {
+   "channel": 23,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 31.2942
+  },
+  {
+   "channel": 24,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -175.0,
+   "z": 46.0542
+  },
+  {
+   "channel": 25,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -175.0,
+   "z": 46.0542
+  },
+  {
+   "channel": 26,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -95.0,
+   "z": 46.0542
+  },
+  {
+   "channel": 27,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -95.0,
+   "z": 46.0542
+  },
+  {
+   "channel": 28,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -40.0,
+   "z": 46.0542
+  },
+  {
+   "channel": 29,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -40.0,
+   "z": 46.0542
+  },
+  {
+   "channel": 30,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 40.0,
+   "z": 46.0542
+  },
+  {
+   "channel": 31,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 40.0,
+   "z": 46.0542
+  },
+  {
+   "channel": 32,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 95.0,
+   "z": 46.0542
+  },
+  {
+   "channel": 33,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 95.0,
+   "z": 46.0542
+  },
+  {
+   "channel": 34,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 175.0,
+   "z": 46.0542
+  },
+  {
+   "channel": 35,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 175.0,
+   "z": 46.0542
+  },
+  {
+   "channel": 36,
+   "type": "pmt_uncoated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -135.0,
+   "z": 53.6742
+  },
+  {
+   "channel": 37,
+   "type": "pmt_uncoated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -135.0,
+   "z": 53.6742
+  },
+  {
+   "channel": 38,
+   "type": "pmt_uncoated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 0.0,
+   "z": 53.6742
+  },
+  {
+   "channel": 39,
+   "type": "pmt_uncoated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 0.0,
+   "z": 53.6742
+  },
+  {
+   "channel": 40,
+   "type": "pmt_uncoated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 135.0,
+   "z": 53.6742
+  },
+  {
+   "channel": 41,
+   "type": "pmt_uncoated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 135.0,
+   "z": 53.6742
+  },
+  {
+   "channel": 42,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": 213.75,
+   "y": -175.0,
+   "z": 61.2942
+  },
+  {
+   "channel": 43,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -95.0,
+   "z": 61.2942
+  },
+  {
+   "channel": 44,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": 213.75,
+   "y": -40.0,
+   "z": 61.2942
+  },
+  {
+   "channel": 45,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 40.0,
+   "z": 61.2942
+  },
+  {
+   "channel": 46,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": 213.75,
+   "y": 95.0,
+   "z": 61.2942
+  },
+  {
+   "channel": 47,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 175.0,
+   "z": 61.2942
+  },
+  {
+   "channel": 48,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -175.0,
+   "z": 61.2942
+  },
+  {
+   "channel": 49,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": -213.75,
+   "y": -95.0,
+   "z": 61.2942
+  },
+  {
+   "channel": 50,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -40.0,
+   "z": 61.2942
+  },
+  {
+   "channel": 51,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": -213.75,
+   "y": 40.0,
+   "z": 61.2942
+  },
+  {
+   "channel": 52,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 95.0,
+   "z": 61.2942
+  },
+  {
+   "channel": 53,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": -213.75,
+   "y": 175.0,
+   "z": 61.2942
+  },
+  {
+   "channel": 54,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 76.0542
+  },
+  {
+   "channel": 55,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 76.0542
+  },
+  {
+   "channel": 56,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 76.0542
+  },
+  {
+   "channel": 57,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 76.0542
+  },
+  {
+   "channel": 58,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 76.0542
+  },
+  {
+   "channel": 59,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 76.0542
+  },
+  {
+   "channel": 60,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -175.0,
+   "z": 83.6742
+  },
+  {
+   "channel": 61,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -175.0,
+   "z": 83.6742
+  },
+  {
+   "channel": 62,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -95.0,
+   "z": 83.6742
+  },
+  {
+   "channel": 63,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -95.0,
+   "z": 83.6742
+  },
+  {
+   "channel": 64,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -40.0,
+   "z": 83.6742
+  },
+  {
+   "channel": 65,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -40.0,
+   "z": 83.6742
+  },
+  {
+   "channel": 66,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 40.0,
+   "z": 83.6742
+  },
+  {
+   "channel": 67,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 40.0,
+   "z": 83.6742
+  },
+  {
+   "channel": 68,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 95.0,
+   "z": 83.6742
+  },
+  {
+   "channel": 69,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 95.0,
+   "z": 83.6742
+  },
+  {
+   "channel": 70,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 175.0,
+   "z": 83.6742
+  },
+  {
+   "channel": 71,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 175.0,
+   "z": 83.6742
+  },
+  {
+   "channel": 72,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 91.2942
+  },
+  {
+   "channel": 73,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 91.2942
+  },
+  {
+   "channel": 74,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 91.2942
+  },
+  {
+   "channel": 75,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 91.2942
+  },
+  {
+   "channel": 76,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 91.2942
+  },
+  {
+   "channel": 77,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 91.2942
+  },
+  {
+   "channel": 78,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 149.338
+  },
+  {
+   "channel": 79,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 149.338
+  },
+  {
+   "channel": 80,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 149.338
+  },
+  {
+   "channel": 81,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 149.338
+  },
+  {
+   "channel": 82,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 149.338
+  },
+  {
+   "channel": 83,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 149.338
+  },
+  {
+   "channel": 84,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -175.0,
+   "z": 156.958
+  },
+  {
+   "channel": 85,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -175.0,
+   "z": 156.958
+  },
+  {
+   "channel": 86,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -95.0,
+   "z": 156.958
+  },
+  {
+   "channel": 87,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -95.0,
+   "z": 156.958
+  },
+  {
+   "channel": 88,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -40.0,
+   "z": 156.958
+  },
+  {
+   "channel": 89,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -40.0,
+   "z": 156.958
+  },
+  {
+   "channel": 90,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 40.0,
+   "z": 156.958
+  },
+  {
+   "channel": 91,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 40.0,
+   "z": 156.958
+  },
+  {
+   "channel": 92,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 95.0,
+   "z": 156.958
+  },
+  {
+   "channel": 93,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 95.0,
+   "z": 156.958
+  },
+  {
+   "channel": 94,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 175.0,
+   "z": 156.958
+  },
+  {
+   "channel": 95,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 175.0,
+   "z": 156.958
+  },
+  {
+   "channel": 96,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 164.578
+  },
+  {
+   "channel": 97,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 164.578
+  },
+  {
+   "channel": 98,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 164.578
+  },
+  {
+   "channel": 99,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 164.578
+  },
+  {
+   "channel": 100,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 164.578
+  },
+  {
+   "channel": 101,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 164.578
+  },
+  {
+   "channel": 102,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -175.0,
+   "z": 179.338
+  },
+  {
+   "channel": 103,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -175.0,
+   "z": 179.338
+  },
+  {
+   "channel": 104,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -95.0,
+   "z": 179.338
+  },
+  {
+   "channel": 105,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -95.0,
+   "z": 179.338
+  },
+  {
+   "channel": 106,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -40.0,
+   "z": 179.338
+  },
+  {
+   "channel": 107,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -40.0,
+   "z": 179.338
+  },
+  {
+   "channel": 108,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 40.0,
+   "z": 179.338
+  },
+  {
+   "channel": 109,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 40.0,
+   "z": 179.338
+  },
+  {
+   "channel": 110,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 95.0,
+   "z": 179.338
+  },
+  {
+   "channel": 111,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 95.0,
+   "z": 179.338
+  },
+  {
+   "channel": 112,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 175.0,
+   "z": 179.338
+  },
+  {
+   "channel": 113,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 175.0,
+   "z": 179.338
+  },
+  {
+   "channel": 114,
+   "type": "pmt_uncoated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -135.0,
+   "z": 186.958
+  },
+  {
+   "channel": 115,
+   "type": "pmt_uncoated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -135.0,
+   "z": 186.958
+  },
+  {
+   "channel": 116,
+   "type": "pmt_uncoated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 0.0,
+   "z": 186.958
+  },
+  {
+   "channel": 117,
+   "type": "pmt_uncoated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 0.0,
+   "z": 186.958
+  },
+  {
+   "channel": 118,
+   "type": "pmt_uncoated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 135.0,
+   "z": 186.958
+  },
+  {
+   "channel": 119,
+   "type": "pmt_uncoated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 135.0,
+   "z": 186.958
+  },
+  {
+   "channel": 120,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -175.0,
+   "z": 194.578
+  },
+  {
+   "channel": 121,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -175.0,
+   "z": 194.578
+  },
+  {
+   "channel": 122,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -95.0,
+   "z": 194.578
+  },
+  {
+   "channel": 123,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -95.0,
+   "z": 194.578
+  },
+  {
+   "channel": 124,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -40.0,
+   "z": 194.578
+  },
+  {
+   "channel": 125,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -40.0,
+   "z": 194.578
+  },
+  {
+   "channel": 126,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 40.0,
+   "z": 194.578
+  },
+  {
+   "channel": 127,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 40.0,
+   "z": 194.578
+  },
+  {
+   "channel": 128,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 95.0,
+   "z": 194.578
+  },
+  {
+   "channel": 129,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 95.0,
+   "z": 194.578
+  },
+  {
+   "channel": 130,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 175.0,
+   "z": 194.578
+  },
+  {
+   "channel": 131,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 175.0,
+   "z": 194.578
+  },
+  {
+   "channel": 132,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 209.338
+  },
+  {
+   "channel": 133,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 209.338
+  },
+  {
+   "channel": 134,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 209.338
+  },
+  {
+   "channel": 135,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 209.338
+  },
+  {
+   "channel": 136,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 209.338
+  },
+  {
+   "channel": 137,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 209.338
+  },
+  {
+   "channel": 138,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -175.0,
+   "z": 216.958
+  },
+  {
+   "channel": 139,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -175.0,
+   "z": 216.958
+  },
+  {
+   "channel": 140,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -95.0,
+   "z": 216.958
+  },
+  {
+   "channel": 141,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -95.0,
+   "z": 216.958
+  },
+  {
+   "channel": 142,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -40.0,
+   "z": 216.958
+  },
+  {
+   "channel": 143,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -40.0,
+   "z": 216.958
+  },
+  {
+   "channel": 144,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 40.0,
+   "z": 216.958
+  },
+  {
+   "channel": 145,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 40.0,
+   "z": 216.958
+  },
+  {
+   "channel": 146,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 95.0,
+   "z": 216.958
+  },
+  {
+   "channel": 147,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 95.0,
+   "z": 216.958
+  },
+  {
+   "channel": 148,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 175.0,
+   "z": 216.958
+  },
+  {
+   "channel": 149,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 175.0,
+   "z": 216.958
+  },
+  {
+   "channel": 150,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 224.578
+  },
+  {
+   "channel": 151,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 224.578
+  },
+  {
+   "channel": 152,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 224.578
+  },
+  {
+   "channel": 153,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 224.578
+  },
+  {
+   "channel": 154,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 224.578
+  },
+  {
+   "channel": 155,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 224.578
+  },
+  {
+   "channel": 156,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 276.422
+  },
+  {
+   "channel": 157,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 276.422
+  },
+  {
+   "channel": 158,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 276.422
+  },
+  {
+   "channel": 159,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 276.422
+  },
+  {
+   "channel": 160,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 276.422
+  },
+  {
+   "channel": 161,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 276.422
+  },
+  {
+   "channel": 162,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -175.0,
+   "z": 284.042
+  },
+  {
+   "channel": 163,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -175.0,
+   "z": 284.042
+  },
+  {
+   "channel": 164,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -95.0,
+   "z": 284.042
+  },
+  {
+   "channel": 165,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -95.0,
+   "z": 284.042
+  },
+  {
+   "channel": 166,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -40.0,
+   "z": 284.042
+  },
+  {
+   "channel": 167,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -40.0,
+   "z": 284.042
+  },
+  {
+   "channel": 168,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 40.0,
+   "z": 284.042
+  },
+  {
+   "channel": 169,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 40.0,
+   "z": 284.042
+  },
+  {
+   "channel": 170,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 95.0,
+   "z": 284.042
+  },
+  {
+   "channel": 171,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 95.0,
+   "z": 284.042
+  },
+  {
+   "channel": 172,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 175.0,
+   "z": 284.042
+  },
+  {
+   "channel": 173,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 175.0,
+   "z": 284.042
+  },
+  {
+   "channel": 174,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 291.662
+  },
+  {
+   "channel": 175,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 291.662
+  },
+  {
+   "channel": 176,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 291.662
+  },
+  {
+   "channel": 177,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 291.662
+  },
+  {
+   "channel": 178,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 291.662
+  },
+  {
+   "channel": 179,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 291.662
+  },
+  {
+   "channel": 180,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -175.0,
+   "z": 306.422
+  },
+  {
+   "channel": 181,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -175.0,
+   "z": 306.422
+  },
+  {
+   "channel": 182,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -95.0,
+   "z": 306.422
+  },
+  {
+   "channel": 183,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -95.0,
+   "z": 306.422
+  },
+  {
+   "channel": 184,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -40.0,
+   "z": 306.422
+  },
+  {
+   "channel": 185,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -40.0,
+   "z": 306.422
+  },
+  {
+   "channel": 186,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 40.0,
+   "z": 306.422
+  },
+  {
+   "channel": 187,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 40.0,
+   "z": 306.422
+  },
+  {
+   "channel": 188,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 95.0,
+   "z": 306.422
+  },
+  {
+   "channel": 189,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 95.0,
+   "z": 306.422
+  },
+  {
+   "channel": 190,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 175.0,
+   "z": 306.422
+  },
+  {
+   "channel": 191,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 175.0,
+   "z": 306.422
+  },
+  {
+   "channel": 192,
+   "type": "pmt_uncoated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -135.0,
+   "z": 314.042
+  },
+  {
+   "channel": 193,
+   "type": "pmt_uncoated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -135.0,
+   "z": 314.042
+  },
+  {
+   "channel": 194,
+   "type": "pmt_uncoated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 0.0,
+   "z": 314.042
+  },
+  {
+   "channel": 195,
+   "type": "pmt_uncoated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 0.0,
+   "z": 314.042
+  },
+  {
+   "channel": 196,
+   "type": "pmt_uncoated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 135.0,
+   "z": 314.042
+  },
+  {
+   "channel": 197,
+   "type": "pmt_uncoated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 135.0,
+   "z": 314.042
+  },
+  {
+   "channel": 198,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -175.0,
+   "z": 321.662
+  },
+  {
+   "channel": 199,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -175.0,
+   "z": 321.662
+  },
+  {
+   "channel": 200,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -95.0,
+   "z": 321.662
+  },
+  {
+   "channel": 201,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -95.0,
+   "z": 321.662
+  },
+  {
+   "channel": 202,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -40.0,
+   "z": 321.662
+  },
+  {
+   "channel": 203,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -40.0,
+   "z": 321.662
+  },
+  {
+   "channel": 204,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 40.0,
+   "z": 321.662
+  },
+  {
+   "channel": 205,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 40.0,
+   "z": 321.662
+  },
+  {
+   "channel": 206,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 95.0,
+   "z": 321.662
+  },
+  {
+   "channel": 207,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 95.0,
+   "z": 321.662
+  },
+  {
+   "channel": 208,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 175.0,
+   "z": 321.662
+  },
+  {
+   "channel": 209,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 175.0,
+   "z": 321.662
+  },
+  {
+   "channel": 210,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 336.422
+  },
+  {
+   "channel": 211,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 336.422
+  },
+  {
+   "channel": 212,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 336.422
+  },
+  {
+   "channel": 213,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 336.422
+  },
+  {
+   "channel": 214,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 336.422
+  },
+  {
+   "channel": 215,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 336.422
+  },
+  {
+   "channel": 216,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -175.0,
+   "z": 344.042
+  },
+  {
+   "channel": 217,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -175.0,
+   "z": 344.042
+  },
+  {
+   "channel": 218,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -95.0,
+   "z": 344.042
+  },
+  {
+   "channel": 219,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -95.0,
+   "z": 344.042
+  },
+  {
+   "channel": 220,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -40.0,
+   "z": 344.042
+  },
+  {
+   "channel": 221,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -40.0,
+   "z": 344.042
+  },
+  {
+   "channel": 222,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 40.0,
+   "z": 344.042
+  },
+  {
+   "channel": 223,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 40.0,
+   "z": 344.042
+  },
+  {
+   "channel": 224,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 95.0,
+   "z": 344.042
+  },
+  {
+   "channel": 225,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 95.0,
+   "z": 344.042
+  },
+  {
+   "channel": 226,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 175.0,
+   "z": 344.042
+  },
+  {
+   "channel": 227,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 175.0,
+   "z": 344.042
+  },
+  {
+   "channel": 228,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 351.662
+  },
+  {
+   "channel": 229,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 351.662
+  },
+  {
+   "channel": 230,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 351.662
+  },
+  {
+   "channel": 231,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 351.662
+  },
+  {
+   "channel": 232,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 351.662
+  },
+  {
+   "channel": 233,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 351.662
+  },
+  {
+   "channel": 234,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 409.706
+  },
+  {
+   "channel": 235,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 409.706
+  },
+  {
+   "channel": 236,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 409.706
+  },
+  {
+   "channel": 237,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 409.706
+  },
+  {
+   "channel": 238,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 409.706
+  },
+  {
+   "channel": 239,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 409.706
+  },
+  {
+   "channel": 240,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -175.0,
+   "z": 417.326
+  },
+  {
+   "channel": 241,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -175.0,
+   "z": 417.326
+  },
+  {
+   "channel": 242,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -95.0,
+   "z": 417.326
+  },
+  {
+   "channel": 243,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -95.0,
+   "z": 417.326
+  },
+  {
+   "channel": 244,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -40.0,
+   "z": 417.326
+  },
+  {
+   "channel": 245,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -40.0,
+   "z": 417.326
+  },
+  {
+   "channel": 246,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 40.0,
+   "z": 417.326
+  },
+  {
+   "channel": 247,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 40.0,
+   "z": 417.326
+  },
+  {
+   "channel": 248,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 95.0,
+   "z": 417.326
+  },
+  {
+   "channel": 249,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 95.0,
+   "z": 417.326
+  },
+  {
+   "channel": 250,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 175.0,
+   "z": 417.326
+  },
+  {
+   "channel": 251,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 175.0,
+   "z": 417.326
+  },
+  {
+   "channel": 252,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 424.946
+  },
+  {
+   "channel": 253,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 424.946
+  },
+  {
+   "channel": 254,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 424.946
+  },
+  {
+   "channel": 255,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 424.946
+  },
+  {
+   "channel": 256,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 424.946
+  },
+  {
+   "channel": 257,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 424.946
+  },
+  {
+   "channel": 258,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -175.0,
+   "z": 439.706
+  },
+  {
+   "channel": 259,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -175.0,
+   "z": 439.706
+  },
+  {
+   "channel": 260,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -95.0,
+   "z": 439.706
+  },
+  {
+   "channel": 261,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -95.0,
+   "z": 439.706
+  },
+  {
+   "channel": 262,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -40.0,
+   "z": 439.706
+  },
+  {
+   "channel": 263,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -40.0,
+   "z": 439.706
+  },
+  {
+   "channel": 264,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 40.0,
+   "z": 439.706
+  },
+  {
+   "channel": 265,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 40.0,
+   "z": 439.706
+  },
+  {
+   "channel": 266,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 95.0,
+   "z": 439.706
+  },
+  {
+   "channel": 267,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 95.0,
+   "z": 439.706
+  },
+  {
+   "channel": 268,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 175.0,
+   "z": 439.706
+  },
+  {
+   "channel": 269,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 175.0,
+   "z": 439.706
+  },
+  {
+   "channel": 270,
+   "type": "pmt_uncoated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -135.0,
+   "z": 447.326
+  },
+  {
+   "channel": 271,
+   "type": "pmt_uncoated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -135.0,
+   "z": 447.326
+  },
+  {
+   "channel": 272,
+   "type": "pmt_uncoated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 0.0,
+   "z": 447.326
+  },
+  {
+   "channel": 273,
+   "type": "pmt_uncoated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 0.0,
+   "z": 447.326
+  },
+  {
+   "channel": 274,
+   "type": "pmt_uncoated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 135.0,
+   "z": 447.326
+  },
+  {
+   "channel": 275,
+   "type": "pmt_uncoated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 135.0,
+   "z": 447.326
+  },
+  {
+   "channel": 276,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -175.0,
+   "z": 454.946
+  },
+  {
+   "channel": 277,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -175.0,
+   "z": 454.946
+  },
+  {
+   "channel": 278,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -95.0,
+   "z": 454.946
+  },
+  {
+   "channel": 279,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -95.0,
+   "z": 454.946
+  },
+  {
+   "channel": 280,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -40.0,
+   "z": 454.946
+  },
+  {
+   "channel": 281,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -40.0,
+   "z": 454.946
+  },
+  {
+   "channel": 282,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 40.0,
+   "z": 454.946
+  },
+  {
+   "channel": 283,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 40.0,
+   "z": 454.946
+  },
+  {
+   "channel": 284,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 95.0,
+   "z": 454.946
+  },
+  {
+   "channel": 285,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 95.0,
+   "z": 454.946
+  },
+  {
+   "channel": 286,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 175.0,
+   "z": 454.946
+  },
+  {
+   "channel": 287,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 175.0,
+   "z": 454.946
+  },
+  {
+   "channel": 288,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 469.706
+  },
+  {
+   "channel": 289,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 469.706
+  },
+  {
+   "channel": 290,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 469.706
+  },
+  {
+   "channel": 291,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 469.706
+  },
+  {
+   "channel": 292,
+   "type": "xarapuca_vis",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 469.706
+  },
+  {
+   "channel": 293,
+   "type": "xarapuca_vis",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 469.706
+  },
+  {
+   "channel": 294,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -175.0,
+   "z": 477.326
+  },
+  {
+   "channel": 295,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -175.0,
+   "z": 477.326
+  },
+  {
+   "channel": 296,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -95.0,
+   "z": 477.326
+  },
+  {
+   "channel": 297,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -95.0,
+   "z": 477.326
+  },
+  {
+   "channel": 298,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": -40.0,
+   "z": 477.326
+  },
+  {
+   "channel": 299,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": -40.0,
+   "z": 477.326
+  },
+  {
+   "channel": 300,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 40.0,
+   "z": 477.326
+  },
+  {
+   "channel": 301,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 40.0,
+   "z": 477.326
+  },
+  {
+   "channel": 302,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 95.0,
+   "z": 477.326
+  },
+  {
+   "channel": 303,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 95.0,
+   "z": 477.326
+  },
+  {
+   "channel": 304,
+   "type": "pmt_coated",
+   "tpc": 0,
+   "x": -213.4,
+   "y": 175.0,
+   "z": 477.326
+  },
+  {
+   "channel": 305,
+   "type": "pmt_coated",
+   "tpc": 1,
+   "x": 213.4,
+   "y": 175.0,
+   "z": 477.326
+  },
+  {
+   "channel": 306,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": -135.0,
+   "z": 484.946
+  },
+  {
+   "channel": 307,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": -135.0,
+   "z": 484.946
+  },
+  {
+   "channel": 308,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 0.0,
+   "z": 484.946
+  },
+  {
+   "channel": 309,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 0.0,
+   "z": 484.946
+  },
+  {
+   "channel": 310,
+   "type": "xarapuca_vuv",
+   "tpc": 0,
+   "x": -213.75,
+   "y": 135.0,
+   "z": 484.946
+  },
+  {
+   "channel": 311,
+   "type": "xarapuca_vuv",
+   "tpc": 1,
+   "x": 213.75,
+   "y": 135.0,
+   "z": 484.946
+  }
+ ],
+ "n_pmt": 120
+}

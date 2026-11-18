@@ -1,0 +1,67 @@
+--- a/hdf5maker/HDF5Maker/HDF5Maker_module.cc	2026-11-11 22:18:47.743460223 -0600
++++ b/hdf5maker/HDF5Maker/HDF5Maker_module.cc	2026-11-11 22:20:43.363660658 -0600
+@@ -109,6 +109,7 @@
+   string fT0Label;
+ 
+   bool fUseMap;
++  bool fIsData; ///< real data: skip all MC-truth tables (overlay events report isRealData()==true, so this is set in FHiCL)
+   string fEventInfo;
+   string fOutputName;
+ 
+@@ -314,6 +315,7 @@
+     fOpFlashLabel(  p.get<string>("OpFlashLabel")),
+     fT0Label(   p.get<string>("T0Label")),
+     fUseMap(    p.get<bool>("UseMap",false)),
++    fIsData(    p.get<bool>("IsData",false)),
+     fEventInfo( p.get<string>("EventInfo")),
+     fOutputName(p.get<string>("OutputName")),
+     fXOffset(p.get<float>("XOffset")),
+@@ -340,6 +342,9 @@
+ 
+   array<int, 3> evtID { run, subrun, event };
+ 
++  // Real data (IsData: true): no MC truth. Skip the energy-deposit and particle tables and the backtracker.
++  const bool isData = fIsData;
++
+   //std::cout << "evt: " << run << " " << subrun << " " << event << std::endl; 
+ 
+   // Fill event table
+@@ -450,7 +455,7 @@
+ 
+   std::set<int> g4id;
+   std::unique_ptr<art::FindManyP<simb::MCParticle, anab::BackTrackerHitMatchingData>> hittruth;
+-  if (fUseMap) {
++  if (fUseMap && !isData) {
+     hittruth = std::unique_ptr<art::FindManyP<simb::MCParticle, anab::BackTrackerHitMatchingData> >(new art::FindManyP<simb::MCParticle, anab::BackTrackerHitMatchingData>(hitListHandle, e, fHitTruthLabel));
+   }
+ 
+@@ -481,8 +486,10 @@
+                          << ", local time " << hit->PeakTime();
+                          
+ 
+-    // Fill energy deposit table
+-    if (fUseMap) {
++    // Fill energy deposit table (MC only)
++    if (isData) {
++      // no truth in real data
++    } else if (fUseMap) {
+       std::vector<art::Ptr<simb::MCParticle>> particle_vec = hittruth->at(hit.key());
+       std::vector<anab::BackTrackerHitMatchingData const *> match_vec = hittruth->data(hit.key());
+       //loop over particles
+@@ -682,6 +689,7 @@
+   }
+ 
+ 
++  if (!isData) { // MC truth: backtracking particles and particle table
+   const std::vector<sim::MCShower> &inputMCShower = *(e.getValidHandle<std::vector<sim::MCShower> >("mcreco"));
+   const std::vector<sim::MCTrack> &inputMCTrack = *(e.getValidHandle<std::vector<sim::MCTrack> >("mcreco"));
+   std::vector<HDF5Maker::BtPart> btparts_v = initBacktrackingParticleVec(inputMCShower, inputMCTrack, *hitListHandle, hittruth);
+@@ -775,6 +783,8 @@
+                          << ", end process " << p->EndProcess();
+   }
+ 
++  } // !isData
++
+   // Get OpFlashs from the event record
+   art::Handle< vector< OpFlash > > opFlashListHandle;
+   std::unique_ptr<art::FindManyP<recob::OpHit> > assocFlashHit;

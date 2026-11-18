@@ -47,5 +47,12 @@ def build(name, args, ckpt):
                      max_tokens=args.max_tokens or a.get("max_tokens", 4096))
         fm = FM(FMCfg(d=a["d"], depth=a["depth"], heads=a["heads"], use_light=bool(a["light"]), tok=tok,
                       pos_mode=a.get("pos_mode", "fourier"), pos_freq=a.get("pos_freq", 16)))
-        fm.load_state_dict(s["fm"])
+        sd, own = s["fm"], fm.state_dict()
+        # cross-detector transfer (e.g. a MicroBooNE checkpoint on SBND): the per-PMT light embedding and PMT
+        # positions depend on the detector and stay freshly initialised; everything else must load
+        skip = [k for k, v in sd.items() if k in own and own[k].shape != v.shape]
+        assert all(k.startswith("light.pmt") for k in skip), skip
+        if skip:
+            print(f"qlfm backbone: {ckpt}: not loaded (detector-specific shape): {skip}", flush=True)
+        fm.load_state_dict({k: v for k, v in sd.items() if k not in skip}, strict=not skip)
     return QLFMBackbone(fm)

@@ -7,4 +7,5 @@
 #PBS -N qlfm_convert
 #PBS -j oe
 cd /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work
-mpiexec -n 2 --ppn 1 --cpu-bind none bash /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/convert_node.sh
+NN=$(sort -u $PBS_NODEFILE | wc -l)
+mpiexec -n $NN --ppn 1 --cpu-bind none env QLFM_DETECTOR=${QLFM_DETECTOR:-uboone} CONVERT_TASKS=${CONVERT_TASKS:-} bash /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/convert_node.sh

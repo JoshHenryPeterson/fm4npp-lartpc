@@ -36,7 +36,7 @@ class FM(nn.Module):
 
     def tokenize(self, b, generator=None):
         ct = tokenize_charge(b["hit_plane"], b["hit_wire"], b["hit_time"], b["hit_q"], b["hit_rms"],
-                             b["hit_evt"], b["n_events"], self.cfg.tok, generator)
+                             b["hit_evt"], b["n_events"], self.cfg.tok, generator, tpc=b.get("hit_tpc"))
         lt = None
         if self.cfg.use_light:
             lt = tokenize_light(b["oph_ch"], b["oph_t"], b["oph_pe"], b["oph_evt"], b["n_events"], self.cfg.tok)

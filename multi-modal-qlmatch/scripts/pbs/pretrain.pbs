@@ -3,6 +3,7 @@
 #PBS -r y
 #PBS -l filesystems=home:eagle
 #PBS -j oe
+# SBND corpora: add QLFM_DETECTOR=sbnd to -v (qlfm.geometry)
 # qsub -q debug-scaling -l select=8:system=polaris -l walltime=01:00:00 -N pre_cl -v OUT=...,ARGS="..." pretrain.pbs
 source /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/env.sh
 cd $QLFM_ROOT
@@ -10,4 +11,4 @@ NN=$(wc -l < $PBS_NODEFILE)
 WALL=$(qstat -f $PBS_JOBID | awk -F'= ' '/Resource_List.walltime/{split($2,a,":"); print a[1]*60+a[2]}')
 TL=$(( WALL - 7 ))
 echo "nodes=$NN walltime_min=$WALL time_limit=$TL out=$OUT args=$ARGS"
-mpiexec -n $((NN*4)) --ppn 4 --cpu-bind depth -d 8 ${PYBIN:-$PY} -u -m qlfm.train_pretrain --out $OUT --time-limit $TL $ARGS 2>&1 | grep -v -E "Warn|bind: warning"
+mpiexec -n $((NN*4)) --ppn 4 --cpu-bind depth -d 8 env QLFM_DETECTOR=${QLFM_DETECTOR:-uboone} ${PYBIN:-$PY} -u -m qlfm.train_pretrain --out $OUT --time-limit $TL $ARGS 2>&1 | grep -v -E "Warn|bind: warning"

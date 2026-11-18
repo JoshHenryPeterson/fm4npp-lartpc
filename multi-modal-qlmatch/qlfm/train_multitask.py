@@ -40,7 +40,7 @@ def get_args(argv=None):
     ap.add_argument("--splits", default=os.path.expandvars("$QLFM_WORK/cache/splits_all.npz"))
     ap.add_argument("--tasks", default=",".join(TASKS))
     ap.add_argument("--mode", required=True, choices=["frozen", "finetune"])
-    ap.add_argument("--fm", required=True, help="pretrained checkpoint")
+    ap.add_argument("--fm", required=True, help="pretrained checkpoint, or none (qlfm from scratch: --d/--depth/...)")
     ap.add_argument("--backbone", default="qlfm", choices=["qlfm", "fm4npp", "fm4npp_l", "panda", "panda_l", "polarmae"])
     ap.add_argument("--late-light", type=int, default=0, help="as train_downstream (2 = strong late fusion)")
     ap.add_argument("--hit-feat", default="native", choices=["native", "raw", "none"])
@@ -250,7 +250,7 @@ def main(argv=None):
     te = {t: pick(sp["test"][lab_np[t][0][sp["test"]]], args.n_test_light if t == "light" else args.n_test, 12)
           for t in tasks}
 
-    backbone = build_backbone(args.backbone, args, args.fm)
+    backbone = build_backbone(args.backbone, args, None if args.fm == "none" else args.fm)
     model = MultiTaskModel(backbone, tasks, args.mode, args.late_light, args.hit_feat).to(dev)
     model.width = args.width
     if args.mode == "frozen":

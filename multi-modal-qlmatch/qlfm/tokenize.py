@@ -21,8 +21,7 @@ class TokCfg:
     rms_scale: float = 5.0
     max_tokens: int = 4096     # per-event charge-token cap (random subsample above)
     # PMT time bins (us, beam-window clock); fine around the expected neutrino flash
-    light_edges: tuple = (0.0, 1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0, 8.0,
-                          10.0, 12.0, 15.0, 19.0, 24.0)
+    light_edges: tuple = G.LIGHT_EDGES      # detector-dependent (qlfm.geometry)
 
 
 @dataclass
@@ -48,18 +47,21 @@ class LightTokens:
     pmt: torch.Tensor          # [B*32] channel id
 
 
-def tokenize_charge(plane, wire, time, q, rms, evt, n_events, cfg: TokCfg, generator=None):
-    """plane/wire/evt long [Nh]; time/q/rms float [Nh] (time in ticks)."""
+def tokenize_charge(plane, wire, time, q, rms, evt, n_events, cfg: TokCfg, generator=None, tpc=None):
+    """plane/wire/evt long [Nh]; time/q/rms float [Nh] (time in ticks); tpc long [Nh] or None (one TPC).
+    Tokens never mix TPCs: the cell key is (event, tpc, plane, wire cell, time cell)."""
     dev = plane.device
     cw, ct = cfg.cell_wires, cfg.cell_ticks
     wc = torch.div(wire, cw, rounding_mode="floor")
     tc = torch.div(time, ct, rounding_mode="floor").long()
     n_wc = 3456 // cw + 1
     n_tc = 8192 // ct + 1
-    key = ((evt * 3 + plane) * n_wc + wc) * n_tc + tc
+    n_tpc = G.N_TPC
+    et = evt * n_tpc + (tpc if tpc is not None and n_tpc > 1 else 0)
+    key = ((et * 3 + plane) * n_wc + wc) * n_tc + tc
     ukey, inv = torch.unique(key, return_inverse=True)            # sorted -> grouped by event
     nt = ukey.numel()
-    tok_evt = torch.div(ukey, 3 * n_wc * n_tc, rounding_mode="floor")
+    tok_evt = torch.div(ukey, n_tpc * 3 * n_wc * n_tc, rounding_mode="floor")
     tok_plane = torch.div(ukey, n_wc * n_tc, rounding_mode="floor") % 3
 
     # in-cell coordinates and per-hit features

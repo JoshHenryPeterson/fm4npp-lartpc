@@ -17,6 +17,7 @@ class Shard:
         self.meta = json.load(open(os.path.join(d, "meta.json")))
         self.n = self.meta["n_events"]
         self._ev, self._hit, self._oph = {}, {}, {}
+        self.has_tpc = os.path.exists(os.path.join(d, "hit_tpc.npy"))       # SBND (2 TPCs)
 
     def ev(self, k):
         if k not in self._ev:
@@ -84,7 +85,7 @@ class EventDataset(torch.utils.data.Dataset):
         h0, hn = int(sh.ev("hit_off")[j]), int(sh.ev("hit_cnt")[j])
         o0, on = int(sh.ev("oph_off")[j]), int(sh.ev("oph_cnt")[j])
         out = {"gidx": g}
-        cols = HIT_FEAT + (HIT_TRUTH if self.truth else ())
+        cols = HIT_FEAT + (("tpc",) if sh.has_tpc else ()) + (HIT_TRUTH if self.truth else ())
         for k in cols:
             out["hit_" + k] = np.asarray(sh.hit(k)[h0:h0 + hn])
         for k in OPH:
@@ -108,6 +109,8 @@ def collate(items):
     b["hit_time"] = torch.from_numpy(cat("hit_time").astype(np.float32) / 8.0)
     b["hit_q"] = torch.from_numpy(cat("hit_integral").astype(np.float32))
     b["hit_rms"] = torch.from_numpy(cat("hit_rms").astype(np.float32))
+    if "hit_tpc" in items[0]:
+        b["hit_tpc"] = torch.from_numpy(cat("hit_tpc").astype(np.int64))
     b["oph_ch"] = torch.from_numpy(cat("oph_ch").astype(np.int64))
     b["oph_t"] = torch.from_numpy(cat("oph_t").astype(np.float32))
     b["oph_pe"] = torch.from_numpy(cat("oph_pe").astype(np.float32))

@@ -1,0 +1,30 @@
+#!/bin/bash
+#PBS -N sbnd-h5m
+#PBS -A neutrinoGPU::WireCell_aurora
+#PBS -q debug
+#PBS -l select=1
+#PBS -l walltime=01:00:00
+#PBS -l filesystems=flare:home
+#PBS -j oe
+# SBND HDF5 maker, many converter processes on one node (fm4npp-lartpc #11).
+#   qsub -v "LISTS=<dir with parts/part-NNN.txt>,OUTDIR=<dir>,PREFIX=<name>[,NPAR=24][,ARGS='--max-events 11']" pbs/run-many.pbs
+# Each parts/part-NNN.txt lists aurora-r2 unit dirs; output OUTDIR/PREFIX_NNN.h5 (+ .log, .stats.json, .time).
+set -u
+Y=/lus/flare/projects/neutrinoGPU/yuhw
+H=$Y/fm4npp-lartpc/multi-modal-qlmatch/sbnd-h5maker
+LISTS=${LISTS:?}; OUTDIR=${OUTDIR:?}; PREFIX=${PREFIX:?}; NPAR=${NPAR:-24}; ARGS=${ARGS:-}
+mkdir -p "$OUTDIR"
+export SL7_SETUP=$H/env.sh H OUTDIR PREFIX ARGS
+export WRAP=$Y/sbnd-wirecell-production/aurora/env/aurora/in-aurora-sl7.sh
+echo "$(/bin/date -u '+%F %T') START $(hostname) job ${PBS_JOBID:-} LISTS=$LISTS NPAR=$NPAR ARGS=$ARGS code $(git -C $H rev-parse --short HEAD)$(git -C $H diff --quiet -- . || echo +dirty)"
+cd "$H"
+one() {
+  local part=$1 n; n=$(basename "$part" .txt); n=${n#part-}
+  local out=$OUTDIR/${PREFIX}_$n.h5
+  [ -s "$out" ] && { echo "skip $out"; return 0; }
+  /usr/bin/time -v -o "$out.time" "$WRAP" python sbnd_h5maker.py "$out" --units-file "$part" $ARGS > "$out.log" 2>&1
+  echo "$(/bin/date -u '+%F %T') $n rc $? wall $(awk -F': ' '/Elapsed/{print $2}' $out.time) rss_kb $(awk -F': ' '/Maximum resident/{print $2}' $out.time)"
+}
+export -f one
+ls "$LISTS"/part-*.txt | xargs -P "$NPAR" -I{} bash -c 'one {}'
+echo "$(/bin/date -u '+%F %T') DONE"

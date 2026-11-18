@@ -1,0 +1,1778 @@
+{
+ "bnb_overlay": [
+  {
+   "public": "PhysicsRun-2016_7_28_13_32_7-0006989-00011_20160728T204947_ext_unbiased_20160728T232745_merged_gen_20190510T093342_g4_detsim_mix_r1a_r1b_postdlmctruth_d0b61415-eee2-4ff3-b7b1-886102a46138.root",
+   "shared": 98,
+   "events": 98,
+   "reco1": [
+    "PhysicsRun-2016_7_28_13_32_7-0006989-00011_20160728T204947_ext_unbiased_20160728T232745_merged_gen_20190510T093342_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_6b9e616c-09b8-48de-94b1-28543d37d5cc.root",
+     373179535
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01355_20160806T235559_ext_unbiased_20160808T130944_merged_gen_20190511T213851_g4_detsim_mix_r1a_r1b_postdlmctruth_3db43bc5-ac02-4cfd-93d6-facc0d200462.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01355_20160806T235559_ext_unbiased_20160808T130944_merged_gen_20190511T213851_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_6453c4d5-6ba0-4c74-8c8d-6f175fbfb516.root",
+     191324441
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01323_20160806T235640_ext_unbiased_20160808T012404_merged_gen_20190512T064029_g4_detsim_mix_r1a_r1b_postdlmctruth_217ae06e-e578-4c87-8bca-dafc8193a293.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01323_20160806T235640_ext_unbiased_20160808T012404_merged_gen_20190512T064029_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_f0b1ef38-cf0b-4442-a126-76fa11e4044d.root",
+     196160099
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_30_15_59_46-0007008-01143_20160805T043408_ext_unbiased_20160805T121500_merged_gen_20190512T080506_g4_detsim_mix_r1a_r1b_postdlmctrut_da04551a-f18d-45b4-80b7-deeed26ab57e.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_30_15_59_46-0007008-01143_20160805T043408_ext_unbiased_20160805T121500_merged_gen_20190512T080506_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_7a3af943-ecd2-4c70-9ab9-fc85a191155d.root",
+     196422209
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01253_20160807T001155_ext_unbiased_20160807T173656_merged_gen_20190513T152428_g4_detsim_mix_r1a_r1b_postdlmctruth_bf4e8f71-f34a-4f5d-a104-400b59eba35b.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01253_20160807T001155_ext_unbiased_20160807T173656_merged_gen_20190513T152428_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_1047f238-4424-4d3a-98ea-92a505201399.root",
+     180691301
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01337_20160807T000008_ext_unbiased_20160808T033328_merged_gen_20190516T112654_g4_detsim_mix_r1a_r1b_postdlmctruth_cf158df3-69fe-44bd-aa38-85c32496fa0c.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01337_20160807T000008_ext_unbiased_20160808T033328_merged_gen_20190516T112654_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_a579d1f5-aae6-4da4-8bdc-88c34fbc3abd.root",
+     189424736
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01175_20160807T002145_ext_unbiased_20160808T110856_merged_gen_20190516T090207_g4_detsim_mix_r1a_r1b_postdlmctruth_d1b49b11-a381-4dac-9891-db6513524e17.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01175_20160807T002145_ext_unbiased_20160808T110856_merged_gen_20190516T090207_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_00937c53-359b-44d0-889b-ff2081e73419.root",
+     184524982
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_30_5_29_31-0007004-01645_20160804T055741_ext_unbiased_20160804T142449_merged_gen_20190510T203218_g4_detsim_mix_r1a_r1b_postdlmctruth_a9706e60-ca3a-4afe-bde2-77d58bc69f29.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_30_5_29_31-0007004-01645_20160804T055741_ext_unbiased_20160804T142449_merged_gen_20190510T203218_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_d5dfbbd0-2e29-43c8-bbe4-7371b6a6dc9b.root",
+     189477050
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_3_11_15_9_31-0005387-00009_20160326T061916_ext_unbiased_20160327T103331_merged_gen_20190506T011137_g4_detsim_mix_r1a_r1b_postdlmctruth_19a628ac-5756-4e2d-81bf-bd0395ec2f4b.root",
+   "shared": 49,
+   "events": 49,
+   "reco1": [
+    "PhysicsRun-2016_3_11_15_9_31-0005387-00009_20160326T061916_ext_unbiased_20160327T103331_merged_gen_20190506T011137_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_23a07646-ba1b-4f1d-a000-5783f79e4ec2.root",
+     213213769
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01369_20160807T000002_ext_unbiased_20160808T035058_merged_gen_20190506T135609_g4_detsim_mix_r1a_r1b_postdlmctruth_553b5c43-af08-4b83-9c25-508455f2fcb3.root",
+   "shared": 49,
+   "events": 49,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01369_20160807T000002_ext_unbiased_20160808T035058_merged_gen_20190506T135609_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_1aa5dac4-e334-4405-ad54-b65021e2835a.root",
+     175645934
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_30_15_59_46-0007008-01161_20160805T043901_ext_unbiased_20160805T133227_merged_gen_20190504T210211_g4_detsim_mix_r1a_r1b_postdlmctrut_8ef94c9f-4da1-4974-99c1-c8f012dd937f.root",
+   "shared": 49,
+   "events": 49,
+   "reco1": [
+    "PhysicsRun-2016_7_30_15_59_46-0007008-01161_20160805T043901_ext_unbiased_20160805T133227_merged_gen_20190504T210211_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_802de1f3-ad9b-423e-9128-a982e8b8a9e0.root",
+     180191376
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01299_20160807T002801_ext_unbiased_20160808T015907_merged_gen_20190501T070425_g4_detsim_mix_r1a_r1b_postdlmctruth_944ad41e-0ea0-4c7f-9106-3e1a2c5b3aab.root",
+   "shared": 49,
+   "events": 49,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01299_20160807T002801_ext_unbiased_20160808T015907_merged_gen_20190501T070425_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_8d3df258-735b-4d27-97ca-1bdf36955287.root",
+     182422748
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01311_20160806T231811_ext_unbiased_20160808T035112_merged_gen_20190506T142800_g4_detsim_mix_r1a_r1b_postdlmctruth_ab2b8cae-d919-40ad-86b3-2484a40e5cd4.root",
+   "shared": 49,
+   "events": 49,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01311_20160806T231811_ext_unbiased_20160808T035112_merged_gen_20190506T142800_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_75f47914-3a88-49a9-b810-7646ed7cfbd2.root",
+     180718583
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_29_22_26_32-0007003-00911_20160805T194121_ext_unbiased_20160806T210122_merged_gen_20190504T123456_g4_detsim_mix_r1a_r1b_postdlmctrut_93fb9a2e-4415-45bf-810c-19957ea0972a.root",
+   "shared": 49,
+   "events": 49,
+   "reco1": [
+    "PhysicsRun-2016_7_29_22_26_32-0007003-00911_20160805T194121_ext_unbiased_20160806T210122_merged_gen_20190504T123456_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_ad07027c-96ef-463e-8c0a-be4d6896934a.root",
+     189469694
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01149_20160806T234744_ext_unbiased_20160808T012121_merged_gen_20190501T050727_g4_detsim_mix_r1a_r1b_postdlmctruth_d5d57236-b496-4a4a-b036-8eeff655cf29.root",
+   "shared": 49,
+   "events": 49,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01149_20160806T234744_ext_unbiased_20160808T012121_merged_gen_20190501T050727_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_3665dbd1-cd8c-4269-b2bc-d8ffbf037db5.root",
+     179767749
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_6_24_16_41_18-0006663-00155_20160627T192020_ext_unbiased_20160628T135318_merged_gen_20190427T174628_g4_detsim_mix_r1a_r1b_postdlmctrut_66330903-8366-4e43-9843-3e6d7fc9ddbb.root",
+   "shared": 13,
+   "events": 13,
+   "reco1": [
+    "PhysicsRun-2016_6_24_16_41_18-0006663-00155_20160627T192020_ext_unbiased_20160628T135318_merged_gen_20190427T174628_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_45f529d5-0df5-406a-89b6-ff5684958263.root",
+     49181187
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_6_24_12_29_52-0006658-00043_20160627T183259_ext_unbiased_20160628T153017_merged_gen_20190425T154106_g4_detsim_mix_r1a_r1b_postdlmctrut_bd1b681e-7fe0-49db-81f0-80654b51c84b.root",
+   "shared": 11,
+   "events": 11,
+   "reco1": [
+    "PhysicsRun-2016_6_24_12_29_52-0006658-00043_20160627T183259_ext_unbiased_20160628T153017_merged_gen_20190425T154106_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_b0d33488-0726-4f51-80a8-9c0b56a6b9d7.root",
+     36725447
+    ]
+   ]
+  },
+  {
+   "public": "BeamOffRun-2016_9_19_10_35_11-0007769-00074_20160919T191728_ext_unbiased_20160919T205147_merged_gen_20190429T040456_g4_detsim_mix_r1a_r1b_postdlmctrut_987379ac-517a-4a85-9c28-0bdce5ef770d.root",
+   "shared": 9,
+   "events": 9,
+   "reco1": [
+    "BeamOffRun-2016_9_19_10_35_11-0007769-00074_20160919T191728_ext_unbiased_20160919T205147_merged_gen_20190429T040456_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_842cbdac-8231-461e-a45f-ea396192e398.root",
+     36041003
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_2_19_16_45_8-0005070-00065_20160221T080911_ext_unbiased_20160226T115553_merged_gen_20190501T043245_g4_detsim_mix_r1a_r1b_postdlmctruth_8678dba7-f03e-4030-8e8d-507da630ce55.root",
+   "shared": 5,
+   "events": 5,
+   "reco1": [
+    "PhysicsRun-2016_2_19_16_45_8-0005070-00065_20160221T080911_ext_unbiased_20160226T115553_merged_gen_20190501T043245_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_cbf6d34d-c3db-419d-9b47-40a5db69bac2.root",
+     19706524
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_2_19_20_1_7-0005071-00023_20160221T073835_ext_unbiased_20160226T115509_merged_gen_20190501T060630_g4_detsim_mix_r1a_r1b_postdlmctruth__3a798e6a-0116-4e6d-8eab-f0d6f4138aa9.root",
+   "shared": 3,
+   "events": 3,
+   "reco1": [
+    "PhysicsRun-2016_2_19_20_1_7-0005071-00023_20160221T073835_ext_unbiased_20160226T115509_merged_gen_20190501T060630_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_852fb4ce-683a-4bb0-b86e-519f06346d3f.root",
+     12070557
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_6_24_14_26_26-0006659-00065_20160802T081736_ext_unbiased_20160802T115228_merged_gen_20190425T200728_g4_detsim_mix_r1a_r1b_postdlmctrut_3f653170-147a-4231-8dc8-9a533b367efb.root",
+   "shared": 2,
+   "events": 2,
+   "reco1": [
+    "PhysicsRun-2016_6_24_14_26_26-0006659-00065_20160802T081736_ext_unbiased_20160802T115228_merged_gen_20190425T200728_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_2002b1ed-79d4-472b-8023-d44ac61807db.root",
+     7395825
+    ]
+   ]
+  },
+  {
+   "public": "BeamOffRun-2016_8_30_1_14_4-0007435-00024_20160830T075402_ext_unbiased_20160830T082452_merged_gen_20190429T020403_g4_detsim_mix_r1a_r1b_postdlmctruth__8d340701-32c6-41df-89ec-f4d0a7b9671f.root",
+   "shared": 2,
+   "events": 2,
+   "reco1": [
+    "BeamOffRun-2016_8_30_1_14_4-0007435-00024_20160830T075402_ext_unbiased_20160830T082452_merged_gen_20190429T020403_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_d495a1b2-5669-4a22-a2a6-365d401c34c0.root",
+     7242039
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_2_18_7_50_29-0005055-00049_20160219T125124_ext_unbiased_20160226T002246_merged_gen_20190429T022212_g4_detsim_mix_r1a_r1b_postdlmctruth_65b55973-5f2e-4ce7-b302-d5cf42239b27.root",
+   "shared": 2,
+   "events": 2,
+   "reco1": [
+    "PhysicsRun-2016_2_18_7_50_29-0005055-00049_20160219T125124_ext_unbiased_20160226T002246_merged_gen_20190429T022212_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_f905928c-ddfa-4019-87d0-fb2616f30479.root",
+     9048639
+    ]
+   ]
+  },
+  {
+   "public": "BeamOffRun-2016_9_9_2_3_20-0007587-00029_20160909T165817_ext_unbiased_20160910T031300_merged_gen_20190429T100322_g4_detsim_mix_r1a_r1b_postdlmctruth_r_3b848dd3-efa7-4333-9465-363f7778f767.root",
+   "shared": 1,
+   "events": 1,
+   "reco1": [
+    "BeamOffRun-2016_9_9_2_3_20-0007587-00029_20160909T165817_ext_unbiased_20160910T031300_merged_gen_20190429T100322_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_19d5bb6e-5289-4a7f-a5fa-bd210922a8ad.root",
+     5770743
+    ]
+   ]
+  },
+  {
+   "public": "BeamOffRun-2016_9_17_14_55_18-0007742-00116_20160919T011659_ext_unbiased_20160919T021515_merged_gen_20190425T140625_g4_detsim_mix_r1a_r1b_postdlmctrut_d24d9c95-3a1f-4ec0-bae4-08e5cb8ab2ab.root",
+   "shared": 1,
+   "events": 1,
+   "reco1": [
+    "BeamOffRun-2016_9_17_14_55_18-0007742-00116_20160919T011659_ext_unbiased_20160919T021515_merged_gen_20190425T140625_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_556d69fe-5045-44da-900f-3b6b14c4eb15.root",
+     4447214
+    ]
+   ]
+  },
+  {
+   "public": "BeamOffRun-2016_9_18_14_37_43-0007759-00010_20160918T215428_ext_unbiased_20160918T223037_merged_gen_20190426T165902_g4_detsim_mix_r1a_r1b_postdlmctrut_41fe44ac-2d7b-4456-93b2-b2f2deea6680.root",
+   "shared": 1,
+   "events": 1,
+   "reco1": [
+    "BeamOffRun-2016_9_18_14_37_43-0007759-00010_20160918T215428_ext_unbiased_20160918T223037_merged_gen_20190426T165902_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_308b7066-a4b6-46e7-82a3-e644db0e120d.root",
+     4085574
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01218_20160806T231242_ext_unbiased_20160808T082906_merged_gen_20190512T044859_g4_detsim_mix_r1a_r1b_postdlmctruth_f33d9cc6-b141-4eca-be6e-ceebcb6fab41.root",
+   "shared": 49,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01218_20160806T231242_ext_unbiased_20160808T082906_merged_gen_20190512T044859_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_666039dc-a168-408c-8351-5ab4d138cc52.root",
+     186507765
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-00520_20160806T225907_ext_unbiased_20160808T053744_merged_gen_20190515T065943_g4_detsim_mix_r1a_r1b_postdlmctruth_bec988f3-5f52-46c4-a35e-44168c2134b2.root",
+   "shared": 49,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-00520_20160806T225907_ext_unbiased_20160808T053744_merged_gen_20190515T065943_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_5490c37a-6b39-4f4f-aa88-a3e9d3eecdc6.root",
+     182691025
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01234_20160807T001511_ext_unbiased_20160808T035030_merged_gen_20190519T094503_g4_detsim_mix_r1a_r1b_postdlmctruth_f998dd39-2271-4ea6-ba7b-97aff39fb316.root",
+   "shared": 49,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01234_20160807T001511_ext_unbiased_20160808T035030_merged_gen_20190519T094503_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_ee03a4e0-afee-452d-b411-cf69c7ab9664.root",
+     190421509
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_4_5_19_31_27-0005782-00006_20160406T021323_ext_unbiased_20160406T032943_merged_gen_20190429T025231_g4_detsim_mix_r1a_r1b_postdlmctruth_25ea8a59-86ca-4049-a339-c7da3680150d.root",
+   "shared": 21,
+   "events": 22,
+   "reco1": [
+    "PhysicsRun-2016_4_5_19_31_27-0005782-00006_20160406T021323_ext_unbiased_20160406T032943_merged_gen_20190429T025231_g4_detsim_mix_r1a_r1b_postdlmctruth_r1c_postwcct_postdlmc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_a0786b79-9e2e-4ae7-8d89-7a91e1dbd996.root",
+     95695200
+    ]
+   ]
+  }
+ ],
+ "nue_overlay": [
+  {
+   "public": "PhysicsRun-2016_7_30_5_29_31-0007004-01059_20160804T071955_ext_unbiased_20160804T101317_merged_gen_20190427T052717_eventweight_20190427T053852_g4_dets_982d9a9f-415c-4623-abe2-2debaeb7b8b1.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_30_5_29_31-0007004-01059_20160804T071955_ext_unbiased_20160804T101317_merged_gen_20190427T052717_eventweight_20190427T053852_g4_dets_613fb46e-8da4-4f0b-9d97-70d36401a6de.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_dc4131c1-f8cf-48dc-a876-18447261ea3a.root",
+     246310287
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_30_5_29_31-0007004-01155_20160804T064335_ext_unbiased_20160804T103903_merged_gen_20190426T180519_eventweight_20190426T181507_g4_dets_11232df8-35e2-497a-9d8f-93c62329cb2d.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_30_5_29_31-0007004-01155_20160804T064335_ext_unbiased_20160804T103903_merged_gen_20190426T180519_eventweight_20190426T181507_g4_dets_ba340f9e-35c1-476c-bea5-93a71e25c362.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_3e409575-f823-4b21-82f1-7e039f391c44.root",
+     251632373
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_8_1_7_47_22-0007018-00297_20160810T053920_ext_unbiased_20160813T061413_merged_gen_20190428T161048_eventweight_20190428T161936_g4_detsi_268796ca-c059-47dc-9528-1926e85fcdc3.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_8_1_7_47_22-0007018-00297_20160810T053920_ext_unbiased_20160813T061413_merged_gen_20190428T161048_eventweight_20190428T161936_g4_detsi_900d00d3-c6da-442c-9c77-27255f956f86.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_c5af2839-99e7-443d-a3d1-e4bdd6ece3d6.root",
+     259092243
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01319_20160807T001839_ext_unbiased_20160808T033321_merged_gen_20190428T163013_eventweight_20190428T163851_g4_dets_addb15b5-faa3-4873-ada4-a6cbcb67a96d.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01319_20160807T001839_ext_unbiased_20160808T033321_merged_gen_20190428T163013_eventweight_20190428T163851_g4_dets_dfeaeef7-598d-4cfb-b392-7dc8a1f63ba0.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_08a08f9a-3e5e-49c8-a974-127d79725467.root",
+     251623865
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_8_3_15_35_30-0007049-00737_20160815T134702_ext_unbiased_20160815T190501_merged_gen_20190428T173508_eventweight_20190428T174223_g4_dets_d01314f2-3851-4e4c-8f8d-f5f15cb790f7.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_8_3_15_35_30-0007049-00737_20160815T134702_ext_unbiased_20160815T190501_merged_gen_20190428T173508_eventweight_20190428T174223_g4_dets_ed535aac-ce09-4cd1-975f-66d18397f9fc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_b10ff08e-a1c2-4848-b5fe-99ef66dd0ccd.root",
+     265403344
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_8_3_23_22_30-0007054-00967_20160817T163523_ext_unbiased_20160818T083009_merged_gen_20190429T010231_eventweight_20190429T011037_g4_dets_3feab4e7-b6b8-4542-9a41-c2d464493aa1.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_8_3_23_22_30-0007054-00967_20160817T163523_ext_unbiased_20160818T083009_merged_gen_20190429T010231_eventweight_20190429T011037_g4_dets_497f1372-ae38-44f8-a4e6-5fb223f17604.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_82e8bb0d-4fd0-42d2-8c30-8070e039afac.root",
+     253497967
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_29_22_26_32-0007003-00975_20160805T181619_ext_unbiased_20160806T202256_merged_gen_20190426T022419_eventweight_20190426T023734_g4_det_4242a671-3426-42e6-baaa-7fe821a5fb93.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_29_22_26_32-0007003-00975_20160805T181619_ext_unbiased_20160806T202256_merged_gen_20190426T022419_eventweight_20190426T023734_g4_det_87cd2751-06d7-4bb7-83cf-3398fd1cd9dd.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_1ef1308b-e1bf-4dde-b24c-0e19dedd5e1c.root",
+     250939200
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_16_1_10-0007014-01459_20160807T001923_ext_unbiased_20160808T091209_merged_gen_20190427T035500_eventweight_20190427T042753_g4_dets_d673bbb5-57e5-44fb-a664-6dcc5bf08376.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_31_16_1_10-0007014-01459_20160807T001923_ext_unbiased_20160808T091209_merged_gen_20190427T035500_eventweight_20190427T042753_g4_dets_5abce71e-256a-4b6e-b12e-aae61b7ed3f8.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_606fa370-6606-49f9-85c2-80d1a92959a1.root",
+     243452818
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_8_3_23_22_30-0007054-00851_20160817T151445_ext_unbiased_20160818T091232_merged_gen_20190427T001921_eventweight_20190427T002952_g4_dets_85e171b1-c0a6-4a8f-a184-5f2bdb3f6065.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_8_3_23_22_30-0007054-00851_20160817T151445_ext_unbiased_20160818T091232_merged_gen_20190427T001921_eventweight_20190427T002952_g4_dets_001073f2-931b-4b72-8a94-40adf33117e9.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_67d46173-2d03-476e-86a3-bd6b9dc3ff49.root",
+     239090899
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_8_3_15_35_30-0007049-00903_20160815T143345_ext_unbiased_20160816T105339_merged_gen_20190426T090724_eventweight_20190426T092456_g4_dets_fb23ff27-a50f-4ce8-a315-d9aa5ade472e.root",
+   "shared": 50,
+   "events": 50,
+   "reco1": [
+    "PhysicsRun-2016_8_3_15_35_30-0007049-00903_20160815T143345_ext_unbiased_20160816T105339_merged_gen_20190426T090724_eventweight_20190426T092456_g4_dets_c96efd68-537a-4653-809a-15ad78f415da.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_6d7cd772-b884-4622-84fc-b127bc344ee5.root",
+     253792693
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_30_12_38_37-0007006-00049_20160804T193523_ext_unbiased_20160804T222433_merged_gen_20190428T223902_eventweight_20190428T224911_g4_det_1a5792b4-9d82-4dd0-a230-44aefd387972.root",
+   "shared": 49,
+   "events": 49,
+   "reco1": [
+    "PhysicsRun-2016_7_30_12_38_37-0007006-00049_20160804T193523_ext_unbiased_20160804T222433_merged_gen_20190428T223902_eventweight_20190428T224911_g4_det_5aa44578-5caf-46e3-aa0b-559f485eed27.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_bee4f5d3-6000-4d03-bec5-a5cd44deb790.root",
+     242384434
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_8_3_15_35_30-0007049-00283_20160815T125243_ext_unbiased_20160815T180851_merged_gen_20190428T171129_eventweight_20190428T172920_g4_dets_e06eedc9-ba24-4efa-a649-6d0ddd86f750.root",
+   "shared": 49,
+   "events": 49,
+   "reco1": [
+    "PhysicsRun-2016_8_3_15_35_30-0007049-00283_20160815T125243_ext_unbiased_20160815T180851_merged_gen_20190428T171129_eventweight_20190428T172920_g4_dets_aa0630f6-4980-4beb-9ab0-61648aaacf74.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_1e06e2a8-cc7d-424e-86be-a8ed5a89b1a6.root",
+     238212639
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_8_3_23_22_30-0007054-00991_20160817T151915_ext_unbiased_20160818T170853_merged_gen_20190426T090022_eventweight_20190426T090753_g4_dets_bc46206d-5cf6-4716-a293-9f7668c4d548.root",
+   "shared": 49,
+   "events": 49,
+   "reco1": [
+    "PhysicsRun-2016_8_3_23_22_30-0007054-00991_20160817T151915_ext_unbiased_20160818T170853_merged_gen_20190426T090022_eventweight_20190426T090753_g4_dets_58457836-552f-4577-9565-ee429f3b1a38.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_d77527d6-6108-4a08-a6c6-b6ab1b191e96.root",
+     244609534
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_31_6_18_34-0007012-00765_20160806T160702_ext_unbiased_20160807T103434_merged_gen_20190428T170043_eventweight_20190428T171200_g4_dets_d718b701-8679-460f-8331-13251d58f059.root",
+   "shared": 49,
+   "events": 49,
+   "reco1": [
+    "PhysicsRun-2016_7_31_6_18_34-0007012-00765_20160806T160702_ext_unbiased_20160807T103434_merged_gen_20190428T170043_eventweight_20190428T171200_g4_dets_2dd48b98-67ce-4d3b-bec4-0c9e642789e7.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_4504a9da-3fa2-4944-835e-c4e909a934fa.root",
+     249329491
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_7_12_31_45-0006806-00071_20160802T090803_ext_unbiased_20160802T141213_merged_gen_20190426T003631_eventweight_20190426T003749_g4_dets_76ad88a2-3de6-4e8e-9961-987c2554080b.root",
+   "shared": 5,
+   "events": 5,
+   "reco1": [
+    "PhysicsRun-2016_7_7_12_31_45-0006806-00071_20160802T090803_ext_unbiased_20160802T141213_merged_gen_20190426T003631_eventweight_20190426T003749_g4_dets_92f4d768-c584-4b62-ae6f-2d70705e4631.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_ae30d61d-0784-466b-836c-d6d0e3d674c6.root",
+     23226530
+    ]
+   ]
+  },
+  {
+   "public": "BeamOffRun-2016_9_8_2_35_13-0007565-00236_20160908T135234_ext_unbiased_20160909T033453_merged_gen_20190428T161854_eventweight_20190428T162119_g4_detsi_542d7e0e-b711-4cb6-9997-e39db34e31ac.root",
+   "shared": 11,
+   "events": 15,
+   "reco1": [
+    "BeamOffRun-2016_9_8_2_35_13-0007565-00236_20160908T135234_ext_unbiased_20160909T033453_merged_gen_20190428T161854_eventweight_20190428T162119_g4_detsi_50a998b3-7379-45b5-901d-4729ede94ce0.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_e25b9d1f-98d8-488b-8f65-fc5dac1d26eb.root",
+     74574599
+    ]
+   ]
+  },
+  {
+   "public": "BeamOffRun-2016_9_11_1_33_9-0007634-00130_20160911T150637_ext_unbiased_20160912T140811_merged_gen_20190429T014314_eventweight_20190429T014554_g4_detsi_c71f8ee8-c2f9-4e19-8497-4b55ab63bfaa.root",
+   "shared": 10,
+   "events": 14,
+   "reco1": [
+    "BeamOffRun-2016_9_11_1_33_9-0007634-00130_20160911T150637_ext_unbiased_20160912T140811_merged_gen_20190429T014314_eventweight_20190429T014554_g4_detsi_6ac76aa2-fbd0-4d1e-a674-486eba431423.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_e5061aa3-174c-4690-b6c8-172f3c68b832.root",
+     71134083
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_6_21_7_14_24-0006623-00002_20160621T134715_ext_unbiased_20160621T155459_merged_gen_20190428T162703_eventweight_20190428T163859_g4_dets_97d07099-eb1a-43ae-b608-188b030b8e46.root",
+   "shared": 39,
+   "events": 56,
+   "reco1": [
+    "PhysicsRun-2016_6_21_7_14_24-0006623-00002_20160621T134715_ext_unbiased_20160621T155459_merged_gen_20190428T162703_eventweight_20190428T163859_g4_dets_ff4ebf22-e817-4bde-9237-dbb8906d12fc.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_5c4f8768-91e4-42b4-a269-aebb276577a9.root",
+     271225230
+    ]
+   ]
+  },
+  {
+   "public": "BeamOffRun-2016_9_17_11_38_39-0007739-00003_20160919T011349_ext_unbiased_20160919T055007_merged_gen_20190428T175026_eventweight_20190428T175207_g4_det_e2d45395-2d22-450b-bb95-af6192540059.root",
+   "shared": 7,
+   "events": 12,
+   "reco1": [
+    "BeamOffRun-2016_9_17_11_38_39-0007739-00003_20160919T011349_ext_unbiased_20160919T055007_merged_gen_20190428T175026_eventweight_20190428T175207_g4_det_a9fec625-d4a4-404d-acd5-af4efe158fed.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_4ac85c4e-fef1-44ac-8230-57bec047dcc9.root",
+     59474430
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_23_6_38_49-0006953-00076_20160723T153018_ext_unbiased_20160723T165323_merged_gen_20190428T173515_eventweight_20190428T175103_g4_dets_cd9a248c-8596-4cd1-8885-dec358733deb.root",
+   "shared": 24,
+   "events": 44,
+   "reco1": [
+    "PhysicsRun-2016_7_23_6_38_49-0006953-00076_20160723T153018_ext_unbiased_20160723T165323_merged_gen_20190428T173515_eventweight_20190428T175103_g4_dets_3aa16d41-eca5-4308-b12c-50efab95bf0d.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_ff142d83-7a94-4c50-8a1f-65fb94d1c372.root",
+     222996135
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_2_2_46_5-0006768-00085_20160702T132412_ext_unbiased_20160702T154331_merged_gen_20190428T175259_eventweight_20190428T175845_g4_detsim_9cdc6ed7-1f78-4c8d-976d-f9d3da9644f0.root",
+   "shared": 23,
+   "events": 43,
+   "reco1": [
+    "PhysicsRun-2016_7_2_2_46_5-0006768-00085_20160702T132412_ext_unbiased_20160702T154331_merged_gen_20190428T175259_eventweight_20190428T175845_g4_detsim_49e575be-ba3b-43bf-8027-3fb951ad0197.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_4c4d6965-ef28-4115-8658-2718e26682d4.root",
+     211476893
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_2_13_9_35_15-0004992-00076_20160214T002822_ext_unbiased_20160214T085753_merged_gen_20190425T235923_eventweight_20190426T000539_g4_dets_8ae37c12-ab74-4c72-9648-cb334c6f9085.root",
+   "shared": 18,
+   "events": 34,
+   "reco1": [
+    "PhysicsRun-2016_2_13_9_35_15-0004992-00076_20160214T002822_ext_unbiased_20160214T085753_merged_gen_20190425T235923_eventweight_20190426T000539_g4_dets_d33a2a6d-f182-4b8a-a574-af9e90bd25da.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_c6b633a6-f951-4e53-b655-b19d98a51947.root",
+     190848242
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_28_21_11_0-0006991-00002_20160729T030027_ext_unbiased_20160729T032928_merged_gen_20190426T072814_eventweight_20190426T073109_g4_dets_5899ddd0-77dd-4701-abb4-c63b1d5f27ea.root",
+   "shared": 9,
+   "events": 17,
+   "reco1": [
+    "PhysicsRun-2016_7_28_21_11_0-0006991-00002_20160729T030027_ext_unbiased_20160729T032928_merged_gen_20190426T072814_eventweight_20190426T073109_g4_dets_1772bea1-4536-437f-9b2f-dbd588fda635.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_c24068ca-e0d9-4d6f-8f4a-d55b27bdb145.root",
+     70646703
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_24_4_52_12-0006957-00026_20160724T135911_ext_unbiased_20160724T210154_merged_gen_20190426T163338_eventweight_20190426T164524_g4_dets_3bb348b7-c150-48c1-9602-0f5b88051012.root",
+   "shared": 9,
+   "events": 17,
+   "reco1": [
+    "PhysicsRun-2016_7_24_4_52_12-0006957-00026_20160724T135911_ext_unbiased_20160724T210154_merged_gen_20190426T163338_eventweight_20190426T164524_g4_dets_ebfbdb5f-0786-4e50-bfe0-14f762efbf1d.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_a7c7bd13-1013-45b7-a726-941aac93bab1.root",
+     90142615
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_4_21_14_19_1-0006021-00169_20160422T021951_ext_unbiased_20160422T170032_merged_gen_20190426T021453_eventweight_20190426T022403_g4_dets_0616e499-acd1-403f-8ad6-3fc78d8c2621.root",
+   "shared": 28,
+   "events": 53,
+   "reco1": [
+    "PhysicsRun-2016_4_21_14_19_1-0006021-00169_20160422T021951_ext_unbiased_20160422T170032_merged_gen_20190426T021453_eventweight_20190426T022403_g4_dets_84c4e75d-2459-4bf3-92fd-696aabf41274.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_2c495bd9-16fe-43ad-9ac0-0f23cc935d11.root",
+     255611232
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_6_28_22_16_0-0006698-00048_20160629T051720_ext_unbiased_20160629T111031_merged_gen_20190426T010931_eventweight_20190426T012330_g4_dets_da2365e5-4b2b-4dc1-a02b-dd983d1c79e5.root",
+   "shared": 34,
+   "events": 65,
+   "reco1": [
+    "PhysicsRun-2016_6_28_22_16_0-0006698-00048_20160629T051720_ext_unbiased_20160629T111031_merged_gen_20190426T010931_eventweight_20190426T012330_g4_dets_7e58ccbb-63c8-4fbd-b9a3-7b63c84fc2a4.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_1993aa70-3622-49ba-b390-0d72b7a364cf.root",
+     320722184
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_6_9_17_53_6-0006529-00012_20160610T015619_ext_unbiased_20160610T033619_merged_gen_20190428T181143_eventweight_20190428T182141_g4_detsi_a64e362a-dec1-4cb4-8249-2e6393790f94.root",
+   "shared": 41,
+   "events": 82,
+   "reco1": [
+    "PhysicsRun-2016_6_9_17_53_6-0006529-00012_20160610T015619_ext_unbiased_20160610T033619_merged_gen_20190428T181143_eventweight_20190428T182141_g4_detsi_9cfce81d-a38e-4f11-812e-aba0400d37f6.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_f3079090-fe23-44ca-ae91-9ea5f3754943.root",
+     398494423
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_8_24_5_26_4-0007302-00002_20160824T185128_ext_unbiased_20160824T231726_merged_gen_20190426T001703_eventweight_20190426T001931_g4_detsi_6c803860-92a5-4c2e-a68c-3c1af211eea8.root",
+   "shared": 4,
+   "events": 8,
+   "reco1": [
+    "PhysicsRun-2016_8_24_5_26_4-0007302-00002_20160824T185128_ext_unbiased_20160824T231726_merged_gen_20190426T001703_eventweight_20190426T001931_g4_detsi_3c2cce7c-e8f0-41a4-b8b3-b612a26cbbe4.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_462f882b-a091-44c2-9403-8b27d3b0a3c0.root",
+     44680469
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_7_2_7_42_13-0006769-00086_20160702T162950_ext_unbiased_20160702T182043_merged_gen_20190426T215830_eventweight_20190426T221317_g4_detsi_ee244c71-49c6-4a0b-a5d9-4f2615f92625.root",
+   "shared": 39,
+   "events": 79,
+   "reco1": [
+    "PhysicsRun-2016_7_2_7_42_13-0006769-00086_20160702T162950_ext_unbiased_20160702T182043_merged_gen_20190426T215830_eventweight_20190426T221317_g4_detsi_51c6fbda-1327-48c7-9890-726c65627fc3.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_74452938-0ad0-42da-a8c0-22c835a74e75.root",
+     376880575
+    ]
+   ]
+  },
+  {
+   "public": "PhysicsRun-2016_6_27_22_11_54-0006689-00153_20160629T062151_ext_unbiased_20160629T184041_merged_gen_20190428T165530_eventweight_20190428T170059_g4_det_698b22f2-9df4-4b3f-bb4b-8eac179c5f07.root",
+   "shared": 15,
+   "events": 31,
+   "reco1": [
+    "PhysicsRun-2016_6_27_22_11_54-0006689-00153_20160629T062151_ext_unbiased_20160629T184041_merged_gen_20190428T165530_eventweight_20190428T170059_g4_det_8088c50d-0513-484e-9770-7d10d82c7faa.root"
+   ],
+   "nusel": [
+    [
+     "nuselOVERLAY_WCP_7bec3d8b-bbbc-4e0c-a331-2cb476e592b3.root",
+     151813913
+    ]
+   ]
+  }
+ ],
+ "beam_on": [
+  {
+   "reco2": "PhysicsRun-2016_5_24_13_41_48-0006376-00057_20160525T003523_bnb_20160525T012726_merged_20181108T053300_optfilter_20181222T213247_reco1_postwcct_postdl_4e9d9eaf-fbe3-4636-bd04-09da0355fc67.root",
+   "events": 50,
+   "size": 270192518,
+   "nsubruns": 8,
+   "reco1": [
+    "PhysicsRun-2016_5_24_13_41_48-0006376-00042_20160525T000213_bnb_20160525T010523_merged_20181108T053312_optfilter_20181222T210215_reco1_postwcct_postdl_e3a1e7a0-6bcf-4d2e-901b-1d3d7d15483a.root",
+    "PhysicsRun-2016_5_24_13_41_48-0006376-00071_20160524T232825_bnb_20160525T015344_merged_20181108T053446_optfilter_20181222T223431_reco1_postwcct_postdl_616536bb-f5e3-409e-a1e5-822c72368e1d.root",
+    "PhysicsRun-2016_5_24_13_41_48-0006376-00063_20160524T235727_bnb_20160525T015345_merged_20181108T053237_optfilter_20181222T212326_reco1_postwcct_postdl_efdb5af4-6b13-47a8-a7f9-682afa9981c0.root",
+    "PhysicsRun-2016_5_24_13_41_48-0006376-00137_20160525T002340_bnb_20160525T025024_merged_20181108T053506_optfilter_20181222T225958_reco1_postwcct_postdl_ffc359e0-8da9-45d4-bd35-65a359d50f1a.root",
+    "PhysicsRun-2016_5_24_13_41_48-0006376-00057_20160525T003523_bnb_20160525T012726_merged_20181108T053300_optfilter_20181222T213247_reco1_postwcct_postdl_435d1477-e8d4-405a-9266-1f3ec2935d10.root",
+    "PhysicsRun-2016_5_24_13_41_48-0006376-00042_20160525T000213_bnb_20160525T010523_merged_20181108T053312_optfilter_20181222T210215_reco1_postwcct_postdl_20181222T210605.root",
+    "PhysicsRun-2016_5_24_13_41_48-0006376-00063_20160524T235727_bnb_20160525T015345_merged_20181108T053237_optfilter_20181222T212326_reco1_postwcct_postdl_20181222T212651.root",
+    "PhysicsRun-2016_5_24_13_41_48-0006376-00057_20160525T003523_bnb_20160525T012726_merged_20181108T053300_optfilter_20181222T213247_reco1_postwcct_postdl_20181222T214334.root",
+    "PhysicsRun-2016_5_24_13_41_48-0006376-00071_20160524T232825_bnb_20160525T015344_merged_20181108T053446_optfilter_20181222T223431_reco1_postwcct_postdl_20181222T224957.root",
+    "PhysicsRun-2016_5_24_13_41_48-0006376-00137_20160525T002340_bnb_20160525T025024_merged_20181108T053506_optfilter_20181222T225958_reco1_postwcct_postdl_20181222T231216.root"
+   ],
+   "nusel": [
+    [
+     "nuselDATA_WCP_ca940f2a-1e48-4e36-9fe2-e5aedb9c8b05.root",
+     14511249
+    ],
+    [
+     "nuselDATA_WCP_502c0d10-a3c8-44fb-bd1c-5436ae10f1a4.root",
+     9179594
+    ],
+    [
+     "nuselDATA_WCP_5847a050-529e-443a-a7e0-c5374fb6fde2.root",
+     56121753
+    ],
+    [
+     "nuselDATA_WCP_134b6c50-f28c-4f2b-9866-eac576a32837.root",
+     47471624
+    ],
+    [
+     "nuselDATA_WCP_439828bc-4022-4193-8dbf-d333b3b5850e.root",
+     43646798
+    ]
+   ],
+   "nreco1": 5
+  },
+  {
+   "reco2": "PhysicsRun-2016_2_12_11_39_46-0004979-00080_20160213T002508_bnb_20160215T215305_merged_20181106T024356_optfilter_20181221T134201_reco1_postw_845365c7-cff6-4c0e-8fb0-2101b37058fe.root",
+   "events": 200,
+   "size": 1058328579,
+   "nsubruns": 26,
+   "reco1": [
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00028_20160213T135844_bnb_20160215T215311_merged_20181106T024345_optfilter_20181221T134925_reco1_postwcct_postdl_ce288a99-a890-4e4c-b0f5-97d49a82b0f2.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00080_20160213T002508_bnb_20160215T215305_merged_20181106T024356_optfilter_20181221T134201_reco1_postwcct_postdl_c6c9b80d-76cd-43bc-b51e-328f361036bc.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00102_20160213T132420_bnb_20160215T215303_merged_20181106T024510_optfilter_20181221T135608_reco1_postwcct_postdl_cf63d550-9cdc-41ea-a756-03e2255b8554.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00046_20160213T004835_bnb_20160215T215253_merged_20181106T024410_optfilter_20181221T135210_reco1_postwcct_postdl_4b44cf45-2851-4feb-b9df-82df881bcc25.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00001_20160213T013758_bnb_20160213T070939_merged_20181106T001625_optfilter_20181221T141738_reco1_postwcct_postdl_a108853e-6683-4387-926f-d5927895f3e0.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00114_20160215T225539_bnb_20160216T150739_merged_20181106T030748_optfilter_20181221T133143_reco1_postwcct_postdl_629ffbb4-942b-479e-817c-72028054b219.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00108_20160215T224557_bnb_20160216T150703_merged_20181106T014139_optfilter_20181221T132257_reco1_postwcct_postdl_fec4066a-f6b2-45c8-9e8a-f188c3b6793d.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00070_20160213T012423_bnb_20160215T215118_merged_20181106T024355_optfilter_20181221T141416_reco1_postwcct_postdl_0e0a78a3-59f8-4497-8f9e-649b9773080e.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00120_20160213T015033_bnb_20160215T215338_merged_20181106T024250_optfilter_20181221T132257_reco1_postwcct_postdl_3b15e01a-9f77-4db5-80a0-404f4aa9e1da.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00036_20160213T010128_bnb_20160215T215311_merged_20181106T024353_optfilter_20181221T033729_reco1_postwcct_postdl_0d300850-7c11-4fde-802e-377b0e8c1f88.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00034_20160213T003209_bnb_20160215T215321_merged_20181106T024203_optfilter_20181221T133335_reco1_postwcct_postdl_2c7349a8-2d1d-4763-a220-158cb00047ce.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00056_20160212T235430_bnb_20160215T215256_merged_20181106T024218_optfilter_20181221T134929_reco1_postwcct_postdl_7e150a5b-60c7-429c-b730-27958424a607.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00115_20160213T143458_bnb_20160215T215236_merged_20181106T024138_optfilter_20181221T132527_reco1_postwcct_postdl_6ba703cc-b6c2-4424-88d0-5e6f90d6c473.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00108_20160215T224557_bnb_20160216T150703_merged_20181106T014139_optfilter_20181221T132257_reco1_postwcct_postdl_20181221T133224.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00102_20160213T132420_bnb_20160215T215303_merged_20181106T024510_optfilter_20181221T135608_reco1_postwcct_postdl_20181221T141319.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00120_20160213T015033_bnb_20160215T215338_merged_20181106T024250_optfilter_20181221T132257_reco1_postwcct_postdl_20181221T132757.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00034_20160213T003209_bnb_20160215T215321_merged_20181106T024203_optfilter_20181221T133335_reco1_postwcct_postdl_20181221T133915.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00001_20160213T013758_bnb_20160213T070939_merged_20181106T001625_optfilter_20181221T141738_reco1_postwcct_postdl_20181221T144453.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00115_20160213T143458_bnb_20160215T215236_merged_20181106T024138_optfilter_20181221T132527_reco1_postwcct_postdl_20181221T133017.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00070_20160213T012423_bnb_20160215T215118_merged_20181106T024355_optfilter_20181221T141416_reco1_postwcct_postdl_20181221T142903.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00028_20160213T135844_bnb_20160215T215311_merged_20181106T024345_optfilter_20181221T134925_reco1_postwcct_postdl_20181221T140140.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00046_20160213T004835_bnb_20160215T215253_merged_20181106T024410_optfilter_20181221T135210_reco1_postwcct_postdl_20181221T140150.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00080_20160213T002508_bnb_20160215T215305_merged_20181106T024356_optfilter_20181221T134201_reco1_postwcct_postdl_20181221T135203.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00056_20160212T235430_bnb_20160215T215256_merged_20181106T024218_optfilter_20181221T134929_reco1_postwcct_postdl_20181221T135856.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00114_20160215T225539_bnb_20160216T150739_merged_20181106T030748_optfilter_20181221T133143_reco1_postwcct_postdl_20181221T133810.root",
+    "PhysicsRun-2016_2_12_11_39_46-0004979-00036_20160213T010128_bnb_20160215T215311_merged_20181106T024353_optfilter_20181221T033729_reco1_postwcct_postdl_20181221T034952.root"
+   ],
+   "nusel": [
+    [
+     "nuselDATA_WCP_77adea3d-b123-48d4-8a4a-44388a8b113b.root",
+     57101344
+    ],
+    [
+     "nuselDATA_WCP_93968fa8-f5e6-474c-964c-3d72e5471152.root",
+     99084766
+    ],
+    [
+     "nuselDATA_WCP_8bf7c9af-013a-4296-85e8-3904a98c297f.root",
+     43507267
+    ],
+    [
+     "nuselDATA_WCP_b4c9f1e8-0814-4555-a9fb-71747349e6f3.root",
+     40165151
+    ],
+    [
+     "nuselDATA_WCP_e528e3c6-9a38-471c-9ee2-197d52156003.root",
+     81849395
+    ],
+    [
+     "nuselDATA_WCP_6e0af47b-61ad-4b40-aedc-077c5ba1b846.root",
+     39977744
+    ],
+    [
+     "nuselDATA_WCP_5ea6a7bf-e8b6-4bfc-b637-ae970ddb9df7.root",
+     101391425
+    ],
+    [
+     "nuselDATA_WCP_a69e75d8-862d-4399-a834-555c9e4b6097.root",
+     74551496
+    ],
+    [
+     "nuselDATA_WCP_50d72714-b538-4ba3-97b9-f5347adc5f68.root",
+     78722208
+    ],
+    [
+     "nuselDATA_WCP_4841763a-13ef-4609-b8e4-a9bf7286bcf0.root",
+     64988118
+    ],
+    [
+     "nuselDATA_WCP_9418bb3c-dae1-4049-918e-81bb0be01af9.root",
+     56907506
+    ],
+    [
+     "nuselDATA_WCP_c7af1453-2ad9-4e25-af88-11b1c757edb1.root",
+     36763597
+    ],
+    [
+     "nuselDATA_WCP_c21976d0-d927-4ffd-b9bb-f29d655e6de4.root",
+     92241270
+    ]
+   ],
+   "nreco1": 13
+  },
+  {
+   "reco2": "PhysicsRun-2016_4_18_4_37_56-0005966-00027_20160418T122624_bnb_20160502T111232_merged_20181107T105649_optfilter_20181222T153057_reco1_postwcct_postdl__b5b64826-0e6c-44f5-90ce-e5bf5f71c9e1.root",
+   "events": 341,
+   "size": 1826950893,
+   "nsubruns": 48,
+   "reco1": [
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00023_20160418T132633_bnb_20160502T111145_merged_20181107T105605_optfilter_20181222T142441_reco1_postwcct_postdl__53dc731a-c70c-434e-9bb3-e5010bf179a5.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00032_20160418T131253_bnb_20160502T111320_merged_20181107T105615_optfilter_20181222T165151_reco1_postwcct_postdl__5655b116-74ab-44bb-95a7-f8defc261207.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00136_20160418T155756_bnb_20160502T113301_merged_20181107T105730_optfilter_20181222T142106_reco1_postwcct_postdl__ae65fa48-7bdb-4dd8-9283-c2deb225a4a1.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00133_20160418T145514_bnb_20160502T113231_merged_20181107T105713_optfilter_20181222T153449_reco1_postwcct_postdl__6331733a-0a66-4b56-b03d-fdad168fd941.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00161_20160418T165030_bnb_20160502T114448_merged_20181107T105553_optfilter_20181222T141017_reco1_postwcct_postdl__7385b05e-7f0f-43b4-8bdd-76056bcf2e2b.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00039_20160418T125026_bnb_20160502T111235_merged_20181107T105511_optfilter_20181222T134719_reco1_postwcct_postdl__49de9306-c417-46a3-b5fd-4ad25eb6ac32.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00051_20160418T122544_bnb_20160502T111235_merged_20181107T105547_optfilter_20181222T134552_reco1_postwcct_postdl__7fe0920d-99b7-4896-bf47-6731673b9104.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00139_20160418T160817_bnb_20160502T113159_merged_20181107T105544_optfilter_20181222T141257_reco1_postwcct_postdl__31f27138-54e9-4de2-869d-272f89e7a473.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00159_20160418T172244_bnb_20160502T113422_merged_20181107T105515_optfilter_20181222T144816_reco1_postwcct_postdl__cbcf80bc-3462-4ea8-a851-77c5dfd7c167.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00043_20160418T130343_bnb_20160502T111252_merged_20181107T105536_optfilter_20181222T141216_reco1_postwcct_postdl__f681b5a5-a64d-4d20-9fb7-7086c53a1599.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00019_20160418T104355_bnb_20160502T111227_merged_20181107T105616_optfilter_20181222T134803_reco1_postwcct_postdl__7d5a55f7-0b17-4da4-80cf-8450265f0945.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00058_20160418T134127_bnb_20160502T111413_merged_20181107T105547_optfilter_20181222T133128_reco1_postwcct_postdl__8af8d24e-77f6-4248-945a-2e385a356db9.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00183_20160418T173916_bnb_20160502T114420_merged_20181107T105816_optfilter_20181222T151213_reco1_postwcct_postdl__35e79d0c-cd06-4cc9-8d67-ce5fb49ec6b4.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00206_20160418T190304_bnb_20160502T114843_merged_20181107T105624_optfilter_20181222T151640_reco1_postwcct_postdl__98a87516-4494-45f5-8383-071d486e9ff9.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00102_20160418T153959_bnb_20160502T112645_merged_20181107T105756_optfilter_20181222T153609_reco1_postwcct_postdl__2a0c1c0d-3dc6-40a8-9362-81e3cfe986ef.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00029_20160418T120241_bnb_20160502T111416_merged_20181107T105548_optfilter_20181222T145222_reco1_postwcct_postdl__c9452cfd-04c9-414c-8ff1-e2854b9cb4fb.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00026_20160418T121422_bnb_20160502T111154_merged_20181112T210338_optfilter_20181225T000823_reco1_postwcct_postdl__77ffe08a-fa96-4981-bd3f-e4a00a7136af.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00113_20160418T140455_bnb_20160502T113859_merged_20181107T105623_optfilter_20181222T151533_reco1_postwcct_postdl__ae29bd2d-2438-40e1-acb1-c3f7d12765c8.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00027_20160418T122624_bnb_20160502T111232_merged_20181107T105649_optfilter_20181222T153057_reco1_postwcct_postdl__b6f22718-2c7f-43da-8cd4-833acedc792a.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00174_20160418T160446_bnb_20160502T114431_merged_20181107T105615_optfilter_20181222T145234_reco1_postwcct_postdl__748366eb-e284-4985-9f9a-a7098e1c0bd3.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00125_20160418T152604_bnb_20160502T113254_merged_20181107T105554_optfilter_20181222T134456_reco1_postwcct_postdl__7949db09-112a-4783-b950-fd6be222541f.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00054_20160418T144621_bnb_20160502T111412_merged_20181107T105633_optfilter_20181222T135905_reco1_postwcct_postdl__8ad75f7d-ae5a-41c8-9192-0c167050f84a.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00022_20160418T112803_bnb_20160502T111157_merged_20181107T105708_optfilter_20181222T134414_reco1_postwcct_postdl__3ee64a1b-793e-46d1-82df-67ef7d69333b.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00173_20160418T155359_bnb_20160502T114406_merged_20181107T105209_optfilter_20181222T140634_reco1_postwcct_postdl__8997b19e-e7f9-4c4e-acc4-5f23735899a1.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00058_20160418T134127_bnb_20160502T111413_merged_20181107T105547_optfilter_20181222T133128_reco1_postwcct_postdl_20181222T133906.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00125_20160418T152604_bnb_20160502T113254_merged_20181107T105554_optfilter_20181222T134456_reco1_postwcct_postdl_20181222T135241.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00051_20160418T122544_bnb_20160502T111235_merged_20181107T105547_optfilter_20181222T134552_reco1_postwcct_postdl_20181222T135623.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00022_20160418T112803_bnb_20160502T111157_merged_20181107T105708_optfilter_20181222T134414_reco1_postwcct_postdl_20181222T135437.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00039_20160418T125026_bnb_20160502T111235_merged_20181107T105511_optfilter_20181222T134719_reco1_postwcct_postdl_20181222T135407.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00019_20160418T104355_bnb_20160502T111227_merged_20181107T105616_optfilter_20181222T134803_reco1_postwcct_postdl_20181222T135815.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00054_20160418T144621_bnb_20160502T111412_merged_20181107T105633_optfilter_20181222T135905_reco1_postwcct_postdl_20181222T141143.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00161_20160418T165030_bnb_20160502T114448_merged_20181107T105553_optfilter_20181222T141017_reco1_postwcct_postdl_20181222T141832.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00139_20160418T160817_bnb_20160502T113159_merged_20181107T105544_optfilter_20181222T141257_reco1_postwcct_postdl_20181222T142052.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00043_20160418T130343_bnb_20160502T111252_merged_20181107T105536_optfilter_20181222T141216_reco1_postwcct_postdl_20181222T142014.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00173_20160418T155359_bnb_20160502T114406_merged_20181107T105209_optfilter_20181222T140634_reco1_postwcct_postdl_20181222T142006.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00023_20160418T132633_bnb_20160502T111145_merged_20181107T105605_optfilter_20181222T142441_reco1_postwcct_postdl_20181222T143735.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00136_20160418T155756_bnb_20160502T113301_merged_20181107T105730_optfilter_20181222T142106_reco1_postwcct_postdl_20181222T144116.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00159_20160418T172244_bnb_20160502T113422_merged_20181107T105515_optfilter_20181222T144816_reco1_postwcct_postdl_20181222T145344.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00029_20160418T120241_bnb_20160502T111416_merged_20181107T105548_optfilter_20181222T145222_reco1_postwcct_postdl_20181222T150303.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00174_20160418T160446_bnb_20160502T114431_merged_20181107T105615_optfilter_20181222T145234_reco1_postwcct_postdl_20181222T150413.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00183_20160418T173916_bnb_20160502T114420_merged_20181107T105816_optfilter_20181222T151213_reco1_postwcct_postdl_20181222T152130.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00206_20160418T190304_bnb_20160502T114843_merged_20181107T105624_optfilter_20181222T151640_reco1_postwcct_postdl_20181222T152527.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00113_20160418T140455_bnb_20160502T113859_merged_20181107T105623_optfilter_20181222T151533_reco1_postwcct_postdl_20181222T152525.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00027_20160418T122624_bnb_20160502T111232_merged_20181107T105649_optfilter_20181222T153057_reco1_postwcct_postdl_20181222T154429.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00133_20160418T145514_bnb_20160502T113231_merged_20181107T105713_optfilter_20181222T153449_reco1_postwcct_postdl_20181222T155338.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00102_20160418T153959_bnb_20160502T112645_merged_20181107T105756_optfilter_20181222T153609_reco1_postwcct_postdl_20181222T160918.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00032_20160418T131253_bnb_20160502T111320_merged_20181107T105615_optfilter_20181222T165151_reco1_postwcct_postdl_20181222T170429.root",
+    "PhysicsRun-2016_4_18_4_37_56-0005966-00026_20160418T121422_bnb_20160502T111154_merged_20181112T210338_optfilter_20181225T000823_reco1_postwcct_postdl_20181225T003023.root"
+   ],
+   "nusel": [
+    [
+     "nuselDATA_WCP_4eed1b99-e2d3-4aee-a6f9-e873a67fdbd6.root",
+     45151555
+    ],
+    [
+     "nuselDATA_WCP_0d35fd7f-1991-4b9b-84c2-b409fd123a50.root",
+     38873064
+    ],
+    [
+     "nuselDATA_WCP_47fb9d2a-f27f-4b5f-95b6-d2d3afc2675f.root",
+     30325374
+    ],
+    [
+     "nuselDATA_WCP_312aa499-a9a1-4860-9c4f-87786237bd12.root",
+     56250099
+    ],
+    [
+     "nuselDATA_WCP_46589d16-c4b4-4d00-8ee9-14ffbac0dbeb.root",
+     30862443
+    ],
+    [
+     "nuselDATA_WCP_f831d246-fd36-436c-83f8-1e1cda4131ef.root",
+     54462207
+    ],
+    [
+     "nuselDATA_WCP_1217eab3-1621-4694-9974-315afd4a9c78.root",
+     41465966
+    ],
+    [
+     "nuselDATA_WCP_d208554b-99b1-4fa2-8967-0e64613c280d.root",
+     36802680
+    ],
+    [
+     "nuselDATA_WCP_d432bbac-b6ec-4296-8bd9-f53c4142b3f4.root",
+     47331527
+    ],
+    [
+     "nuselDATA_WCP_16c9277f-bff5-4b5a-9b9d-0e63be23f687.root",
+     40800045
+    ],
+    [
+     "nuselDATA_WCP_0b21345f-5033-4379-8d18-4354c6d8266e.root",
+     39886256
+    ],
+    [
+     "nuselDATA_WCP_438e8bb6-8cc6-4cc0-9c6e-df58d76ec8c1.root",
+     79992113
+    ],
+    [
+     "nuselDATA_WCP_f76815e0-3ae6-40d8-96f7-cca36836bc90.root",
+     26572571
+    ],
+    [
+     "nuselDATA_WCP_75b5731f-0788-45a1-afe3-5c18261aecc9.root",
+     41203523
+    ],
+    [
+     "nuselDATA_WCP_93984d71-ea8c-4f7a-848f-be239e9bbec1.root",
+     62811901
+    ],
+    [
+     "nuselDATA_WCP_6778e877-3389-4182-988d-756597e2be55.root",
+     52379868
+    ],
+    [
+     "nuselDATA_WCP_25aeccc3-56ab-4557-bd82-9ed2c391a721.root",
+     48744253
+    ],
+    [
+     "nuselDATA_WCP_60a7c026-2772-4722-b37a-4131d59ebc12.root",
+     69688281
+    ],
+    [
+     "nuselDATA_WCP_b2459cdb-8240-4c51-b21f-444753b89bfe.root",
+     46471423
+    ],
+    [
+     "nuselDATA_WCP_e6bf9bd2-34e3-4e18-a477-189d2160ab8e.root",
+     72855864
+    ],
+    [
+     "nuselDATA_WCP_8fb2f0ba-7e56-40b8-bc50-e182a46ae60c.root",
+     66135360
+    ],
+    [
+     "nuselDATA_WCP_0de409d4-8932-4d25-9c7d-faddf169bc0c.root",
+     38345857
+    ]
+   ],
+   "nreco1": 24
+  },
+  {
+   "reco2": "PhysicsRun-2016_5_3_12_2_19-0006158-00006_20160503T193109_bnb_20160503T213957_merged_20181107T141213_optfilter_20181222T150308_reco1_postwcct_postdl_2_2a8ab181-8643-47a1-84e3-39c63c441b1b.root",
+   "events": 41,
+   "size": 227824561,
+   "nsubruns": 5,
+   "reco1": [
+    "PhysicsRun-2016_5_3_12_2_19-0006158-00027_20160503T215856_bnb_20160503T222900_merged_20181107T141316_optfilter_20181222T143030_reco1_postwcct_postdl_2_143b2181-e7a3-4566-b9e9-06ced811213a.root",
+    "PhysicsRun-2016_5_3_12_2_19-0006158-00006_20160503T193109_bnb_20160503T213957_merged_20181107T141213_optfilter_20181222T150308_reco1_postwcct_postdl_2_c0e6c3c3-9ea7-4030-b5c2-1d30b1e14c6f.root",
+    "PhysicsRun-2016_5_3_12_2_19-0006158-00025_20160503T215823_bnb_20160503T222809_merged_20181107T140900_optfilter_20181222T161122_reco1_postwcct_postdl_2_aad66cff-7647-4adc-bbb2-7062e95e794b.root",
+    "PhysicsRun-2016_5_3_12_2_19-0006158-00027_20160503T215856_bnb_20160503T222900_merged_20181107T141316_optfilter_20181222T143030_reco1_postwcct_postdl_20181222T143912.root",
+    "PhysicsRun-2016_5_3_12_2_19-0006158-00006_20160503T193109_bnb_20160503T213957_merged_20181107T141213_optfilter_20181222T150308_reco1_postwcct_postdl_20181222T151221.root",
+    "PhysicsRun-2016_5_3_12_2_19-0006158-00025_20160503T215823_bnb_20160503T222809_merged_20181107T140900_optfilter_20181222T161122_reco1_postwcct_postdl_20181222T161900.root"
+   ],
+   "nusel": [
+    [
+     "nuselDATA_WCP_79162906-1166-42f4-9314-54c5204657b9.root",
+     42953138
+    ],
+    [
+     "nuselDATA_WCP_b8bacac6-237f-4360-8b60-c12f935b5fa8.root",
+     63882619
+    ],
+    [
+     "nuselDATA_WCP_2d364373-d955-40be-ac93-39d1e806a181.root",
+     31322732
+    ]
+   ],
+   "nreco1": 3
+  },
+  {
+   "reco2": "PhysicsRun-2016_3_9_4_13_34-0005364-00165_20160310T165953_bnb_20160310T210029_merged_20181106T082659_optfilter_20181221T231522_reco1_postwcct_postdl_2_c3f6fda1-6b8f-41d4-a31c-733db16bc53f.root",
+   "events": 141,
+   "size": 746383573,
+   "nsubruns": 18,
+   "reco1": [
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00047_20160310T154644_bnb_20160310T165014_merged_20181106T082511_optfilter_20181221T224803_reco1_postwcct_postdl_2_e45d9e30-be0e-4160-b88c-fb957a285268.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00165_20160310T165953_bnb_20160310T210029_merged_20181106T082659_optfilter_20181221T231522_reco1_postwcct_postdl_2_74b32c7e-0647-4a3c-9bda-8b1ce91adc92.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00089_20160310T164926_bnb_20160310T184337_merged_20181106T082659_optfilter_20181221T231111_reco1_postwcct_postdl_2_7a2db799-2825-49a2-9231-e4e850e38a95.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00187_20160310T154019_bnb_20160310T185414_merged_20181106T082650_optfilter_20181222T011906_reco1_postwcct_postdl_2_c9f0ff98-b3e5-4b01-8e59-461b1a2cf387.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00108_20160310T171343_bnb_20160310T181137_merged_20181106T082808_optfilter_20181221T224241_reco1_postwcct_postdl_2_6a18fb4d-aa02-4174-ae61-a8799f9360d7.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00022_20160310T164038_bnb_20160310T181139_merged_20181106T082555_optfilter_20181221T233239_reco1_postwcct_postdl_2_5eb2ca33-44ae-46c4-a633-3cd7a0e42025.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00151_20160310T154019_bnb_20160310T181129_merged_20181106T082640_optfilter_20181222T012724_reco1_postwcct_postdl_2_f2376669-a46b-482a-a7e6-8ee67f442651.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00034_20160310T162001_bnb_20160310T181144_merged_20181106T082713_optfilter_20181222T005642_reco1_postwcct_postdl_2_33051f50-2986-41d5-8db3-f253dd79f8a6.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00016_20160310T163940_bnb_20160310T183914_merged_20181106T082600_optfilter_20181222T000910_reco1_postwcct_postdl_2_da35e7c5-ecc3-4cdc-9bc6-78f245e29d72.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00108_20160310T171343_bnb_20160310T181137_merged_20181106T082808_optfilter_20181221T224241_reco1_postwcct_postdl_20181221T225452.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00047_20160310T154644_bnb_20160310T165014_merged_20181106T082511_optfilter_20181221T224803_reco1_postwcct_postdl_20181221T230612.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00165_20160310T165953_bnb_20160310T210029_merged_20181106T082659_optfilter_20181221T231522_reco1_postwcct_postdl_20181221T233252.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00089_20160310T164926_bnb_20160310T184337_merged_20181106T082659_optfilter_20181221T231111_reco1_postwcct_postdl_20181221T232901.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00022_20160310T164038_bnb_20160310T181139_merged_20181106T082555_optfilter_20181221T233239_reco1_postwcct_postdl_20181221T235034.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00016_20160310T163940_bnb_20160310T183914_merged_20181106T082600_optfilter_20181222T000910_reco1_postwcct_postdl_20181222T001905.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00034_20160310T162001_bnb_20160310T181144_merged_20181106T082713_optfilter_20181222T005642_reco1_postwcct_postdl_20181222T011345.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00187_20160310T154019_bnb_20160310T185414_merged_20181106T082650_optfilter_20181222T011906_reco1_postwcct_postdl_20181222T013218.root",
+    "PhysicsRun-2016_3_9_4_13_34-0005364-00151_20160310T154019_bnb_20160310T181129_merged_20181106T082640_optfilter_20181222T012724_reco1_postwcct_postdl_20181222T013942.root"
+   ],
+   "nusel": [
+    [
+     "nuselDATA_WCP_363aaab6-8b58-49bf-a23f-e187f381022e.root",
+     71569631
+    ],
+    [
+     "nuselDATA_WCP_d6944c3d-316b-4d30-ac21-6a811487f464.root",
+     58830362
+    ],
+    [
+     "nuselDATA_WCP_6a96c9c6-bb4d-47cb-96cb-cc2ed5b672f8.root",
+     77532903
+    ],
+    [
+     "nuselDATA_WCP_6e58f47c-fb49-458a-a4ca-816716376fe2.root",
+     43053229
+    ],
+    [
+     "nuselDATA_WCP_5700f582-4224-44ba-8849-f7193182ad22.root",
+     75144688
+    ],
+    [
+     "nuselDATA_WCP_2a3461ed-2402-4c42-84e3-2296c042d9ac.root",
+     49249836
+    ],
+    [
+     "nuselDATA_WCP_d7167450-6b2b-4b1e-a832-c4185e3b87f6.root",
+     72466317
+    ],
+    [
+     "nuselDATA_WCP_1636b909-cbc0-46be-b4a1-f41cb8563e47.root",
+     80575386
+    ],
+    [
+     "nuselDATA_WCP_d4ba5488-09df-41b5-9ed4-05943a25be91.root",
+     61554268
+    ]
+   ],
+   "nreco1": 9
+  },
+  {
+   "reco2": "PhysicsRun-2016_3_14_2_53_11-0005422-00002_20160322T072709_bnb_20160323T213210_merged_20181106T122631_optfilter_20181221T164751_reco1_postwc_88d3b787-b62f-4f43-93ad-256be39f7446.root",
+   "events": 18,
+   "size": 102709019,
+   "nsubruns": 2,
+   "reco1": [
+    "PhysicsRun-2016_3_14_2_53_11-0005422-00002_20160322T072709_bnb_20160323T213210_merged_20181106T122631_optfilter_20181221T164751_reco1_postwcct_postdl__3e031e92-10ea-44a9-bf2b-e0530f013918.root",
+    "PhysicsRun-2016_3_14_2_53_11-0005422-00002_20160322T072709_bnb_20160323T213210_merged_20181106T122631_optfilter_20181221T164751_reco1_postwcct_postdl_20181221T170510.root"
+   ],
+   "nusel": [
+    [
+     "nuselDATA_WCP_3d875433-6968-42d6-99f5-85dc773ffbef.root",
+     81640232
+    ]
+   ],
+   "nreco1": 1
+  },
+  {
+   "reco2": "PhysicsRun-2016_7_25_10_41_50-0006964-00064_20160726T113650_bnb_20160726T125327_merged_20181110T081543_optfilter_20181224T035552_reco1_postw_cad4acdb-2a10-4300-bd95-c454b7714e4c.root",
+   "events": 169,
+   "size": 903784909,
+   "nsubruns": 50,
+   "reco1": [
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00061_20160726T115428_bnb_20160726T125318_merged_20181110T080521_optfilter_20181224T021746_reco1_postwcct_postdl_8197b9b2-0946-4989-8712-7536f5e71820.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00052_20160726T113027_bnb_20160726T144249_merged_20181110T080619_optfilter_20181224T021152_reco1_postwcct_postdl_a6edcafd-8b48-4af5-b841-1bbd3e28869b.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00039_20160726T113123_bnb_20160726T141445_merged_20181110T080800_optfilter_20181224T022113_reco1_postwcct_postdl_41853c2b-d968-4e93-b11d-e9f336a77278.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00056_20160726T114223_bnb_20160726T164051_merged_20181110T080943_optfilter_20181224T034354_reco1_postwcct_postdl_efb5056b-64e9-4101-bb4a-16a7ec0fa54c.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00005_20160726T122533_bnb_20160726T164230_merged_20181110T080820_optfilter_20181227T054339_reco1_postwcct_postdl_718fa11e-528f-4587-ac5b-9fa6cc1ae238.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00004_20160726T114407_bnb_20160726T163810_merged_20181110T081050_optfilter_20181224T030634_reco1_postwcct_postdl_fe0273db-80b2-4fe3-aaa3-70edf4bdf5ca.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00027_20160726T115239_bnb_20160726T134503_merged_20181110T080635_optfilter_20181224T010943_reco1_postwcct_postdl_123aa89a-9421-4ddf-9bf9-048995768b48.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00077_20160726T120403_bnb_20160726T140019_merged_20181110T080509_optfilter_20181224T034931_reco1_postwcct_postdl_dd69c6b1-a63f-416e-8744-e6e071b5c4d9.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00024_20160726T131739_bnb_20160726T142736_merged_20181110T080754_optfilter_20181224T022451_reco1_postwcct_postdl_6044f15f-da19-49de-853d-e328ecde35b2.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00010_20160726T115314_bnb_20160726T125237_merged_20181110T080812_optfilter_20181224T022253_reco1_postwcct_postdl_99af96f5-6701-442a-be8f-d16872a52060.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00090_20160726T113400_bnb_20160726T125101_merged_20181110T081232_optfilter_20181227T052929_reco1_postwcct_postdl_00a62746-f2e7-4e49-9496-dbd171fedc31.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00023_20160726T113359_bnb_20160726T142746_merged_20181110T080933_optfilter_20181224T033239_reco1_postwcct_postdl_028a378b-90a1-4e7a-a00b-8a8ca851d653.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00012_20160726T113157_bnb_20160726T125210_merged_20181110T081551_optfilter_20181224T040533_reco1_postwcct_postdl_e756b241-20b7-4691-8adb-65e6e846699e.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00016_20160726T125027_bnb_20160726T141459_merged_20181110T080911_optfilter_20181224T021716_reco1_postwcct_postdl_2443bd11-59ae-4e40-a632-b222c5826c6b.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00076_20160726T114218_bnb_20160726T125146_merged_20181110T081152_optfilter_20181224T035812_reco1_postwcct_postdl_941dce3b-96fc-4bf4-b704-9405ec87ef3f.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00032_20160726T123028_bnb_20160726T134500_merged_20181110T080509_optfilter_20181224T035139_reco1_postwcct_postdl_a7330f68-17ef-4b24-8992-ca6fee07c12f.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00042_20160726T123137_bnb_20160726T141443_merged_20181110T080504_optfilter_20181224T022555_reco1_postwcct_postdl_95d6fe7f-f2fc-4da1-a767-39b6b3133c32.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00075_20160726T115242_bnb_20160726T140001_merged_20181110T080509_optfilter_20181227T053233_reco1_postwcct_postdl_29965067-1d94-499a-9540-a9c0d138f13a.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00064_20160726T113650_bnb_20160726T125327_merged_20181110T081543_optfilter_20181224T035552_reco1_postwcct_postdl_e4e9c302-deee-488f-96f1-1a7832814e6a.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00063_20160726T113328_bnb_20160726T125106_merged_20181110T081333_optfilter_20181227T053646_reco1_postwcct_postdl_7344a46d-0327-4d8c-ab71-5bc60716df0d.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00091_20160726T110728_bnb_20160726T125122_merged_20181110T080527_optfilter_20181224T011637_reco1_postwcct_postdl_f2db05fa-c179-4595-a1a6-b90143c29189.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00083_20160726T115256_bnb_20160726T125258_merged_20181110T081534_optfilter_20181224T020613_reco1_postwcct_postdl_614d0ed4-a1b5-4b33-8481-c88b0d413609.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00038_20160726T112016_bnb_20160726T141449_merged_20181110T080802_optfilter_20181224T024052_reco1_postwcct_postdl_9b91a9dc-9db4-4cac-a6ee-622fdd85a04c.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00053_20160726T124918_bnb_20160726T164053_merged_20181110T080717_optfilter_20181224T024941_reco1_postwcct_postdl_c5aabecf-b017-4a81-b64d-d281a87e5c9f.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00007_20160726T132854_bnb_20160726T164055_merged_20181110T080826_optfilter_20181224T024646_reco1_postwcct_postdl_f80b32c3-d6ff-4048-8e61-d6e962245605.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00079_20160726T124134_bnb_20160726T140036_merged_20181110T080801_optfilter_20181224T035107_reco1_postwcct_postdl_2a65dc15-aed0-421d-9668-18f36f772e1c.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00083_20160726T115256_bnb_20160726T125258_merged_20181110T081534_optfilter_20181224T020613_reco1_postwcct_postdl_20181224T021807.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00063_20160726T113328_bnb_20160726T125106_merged_20181110T081333_optfilter_20181227T053646_reco1_postwcct_postdl_20181227T055059.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00038_20160726T112016_bnb_20160726T141449_merged_20181110T080802_optfilter_20181224T024052_reco1_postwcct_postdl_20181224T024358.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00077_20160726T120403_bnb_20160726T140019_merged_20181110T080509_optfilter_20181224T034931_reco1_postwcct_postdl_20181224T035633.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00012_20160726T113157_bnb_20160726T125210_merged_20181110T081551_optfilter_20181224T040533_reco1_postwcct_postdl_20181224T041255.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00027_20160726T115239_bnb_20160726T134503_merged_20181110T080635_optfilter_20181224T010943_reco1_postwcct_postdl_20181224T011520.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00091_20160726T110728_bnb_20160726T125122_merged_20181110T080527_optfilter_20181224T011637_reco1_postwcct_postdl_20181224T012039.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00052_20160726T113027_bnb_20160726T144249_merged_20181110T080619_optfilter_20181224T021152_reco1_postwcct_postdl_20181224T022052.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00061_20160726T115428_bnb_20160726T125318_merged_20181110T080521_optfilter_20181224T021746_reco1_postwcct_postdl_20181224T022240.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00079_20160726T124134_bnb_20160726T140036_merged_20181110T080801_optfilter_20181224T035107_reco1_postwcct_postdl_20181224T035609.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00007_20160726T132854_bnb_20160726T164055_merged_20181110T080826_optfilter_20181224T024646_reco1_postwcct_postdl_20181224T025749.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00024_20160726T131739_bnb_20160726T142736_merged_20181110T080754_optfilter_20181224T022451_reco1_postwcct_postdl_20181224T022708.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00064_20160726T113650_bnb_20160726T125327_merged_20181110T081543_optfilter_20181224T035552_reco1_postwcct_postdl_20181224T040515.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00076_20160726T114218_bnb_20160726T125146_merged_20181110T081152_optfilter_20181224T035812_reco1_postwcct_postdl_20181224T040434.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00090_20160726T113400_bnb_20160726T125101_merged_20181110T081232_optfilter_20181227T052929_reco1_postwcct_postdl_20181227T053442.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00010_20160726T115314_bnb_20160726T125237_merged_20181110T080812_optfilter_20181224T022253_reco1_postwcct_postdl_20181224T022932.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00016_20160726T125027_bnb_20160726T141459_merged_20181110T080911_optfilter_20181224T021716_reco1_postwcct_postdl_20181224T022347.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00005_20160726T122533_bnb_20160726T164230_merged_20181110T080820_optfilter_20181227T054339_reco1_postwcct_postdl_20181227T055425.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00004_20160726T114407_bnb_20160726T163810_merged_20181110T081050_optfilter_20181224T030634_reco1_postwcct_postdl_20181224T031039.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00075_20160726T115242_bnb_20160726T140001_merged_20181110T080509_optfilter_20181227T053233_reco1_postwcct_postdl_20181227T055126.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00023_20160726T113359_bnb_20160726T142746_merged_20181110T080933_optfilter_20181224T033239_reco1_postwcct_postdl_20181224T034025.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00042_20160726T123137_bnb_20160726T141443_merged_20181110T080504_optfilter_20181224T022555_reco1_postwcct_postdl_20181224T023047.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00056_20160726T114223_bnb_20160726T164051_merged_20181110T080943_optfilter_20181224T034354_reco1_postwcct_postdl_20181224T035258.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00053_20160726T124918_bnb_20160726T164053_merged_20181110T080717_optfilter_20181224T024941_reco1_postwcct_postdl_20181224T025519.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00032_20160726T123028_bnb_20160726T134500_merged_20181110T080509_optfilter_20181224T035139_reco1_postwcct_postdl_20181224T035611.root",
+    "PhysicsRun-2016_7_25_10_41_50-0006964-00039_20160726T113123_bnb_20160726T141445_merged_20181110T080800_optfilter_20181224T022113_reco1_postwcct_postdl_20181224T022344.root"
+   ],
+   "nusel": [
+    [
+     "nuselDATA_WCP_d0f924de-731f-4518-87d2-c354d64ae9fa.root",
+     17193316
+    ],
+    [
+     "nuselDATA_WCP_7002f285-ede4-4b84-bd65-fe581521f06a.root",
+     31343895
+    ],
+    [
+     "nuselDATA_WCP_f0aeeca7-702d-44ff-af94-0eebe289b458.root",
+     9347955
+    ],
+    [
+     "nuselDATA_WCP_27f13340-d908-4263-914d-f12657c9ddf1.root",
+     36045703
+    ],
+    [
+     "nuselDATA_WCP_412de58e-274a-410b-a1e7-d9e4b74a3398.root",
+     36823883
+    ],
+    [
+     "nuselDATA_WCP_0f572209-0094-4f15-8e45-864c3e66c196.root",
+     24573988
+    ],
+    [
+     "nuselDATA_WCP_213c31a3-282e-4e97-a110-67c0e2fd4bdf.root",
+     13230830
+    ],
+    [
+     "nuselDATA_WCP_0ad62186-5b75-4d52-b83e-b4b0bc1d8b8c.root",
+     10476484
+    ],
+    [
+     "nuselDATA_WCP_3be7af81-d281-4f22-adbd-7418828e41d0.root",
+     23816519
+    ],
+    [
+     "nuselDATA_WCP_cef8d40f-644b-4345-9b48-15cf1081f47b.root",
+     15983679
+    ],
+    [
+     "nuselDATA_WCP_07e52d3e-1a56-40c2-b57f-d856e1c8081f.root",
+     35913352
+    ],
+    [
+     "nuselDATA_WCP_e0a918f8-ba63-4250-bb1a-404ad1fda15e.root",
+     4019691
+    ],
+    [
+     "nuselDATA_WCP_166e4ad4-1842-4a47-a158-e33c72465e27.root",
+     28192445
+    ],
+    [
+     "nuselDATA_WCP_bb19cbcb-1b9d-4287-8a49-c76b700d1f04.root",
+     25383564
+    ],
+    [
+     "nuselDATA_WCP_a3c2e0bf-e44f-4401-b46b-9f43f1aedb57.root",
+     28375941
+    ],
+    [
+     "nuselDATA_WCP_55aca196-394b-4391-b7c8-5f55d7d40d64.root",
+     24789734
+    ],
+    [
+     "nuselDATA_WCP_2be0b369-7f38-4005-bcaf-68d67b7b5f10.root",
+     21271292
+    ],
+    [
+     "nuselDATA_WCP_0806c065-a1f7-428c-aa1c-769760d6e6f5.root",
+     20914981
+    ],
+    [
+     "nuselDATA_WCP_902bb49f-44e1-41f8-a4b4-14b718cd6fc8.root",
+     24821881
+    ],
+    [
+     "nuselDATA_WCP_9047170f-6ec0-4cb8-8dfd-8b9ba51f0a96.root",
+     23691437
+    ],
+    [
+     "nuselDATA_WCP_f9140557-9f4c-48cc-9882-d57178f96a3e.root",
+     16837759
+    ],
+    [
+     "nuselDATA_WCP_11c37ff0-fc8d-4170-b0a9-86e831930ebc.root",
+     23976094
+    ],
+    [
+     "nuselDATA_WCP_8583bd64-ec80-41f7-9358-87d0fe33bfe3.root",
+     25073037
+    ],
+    [
+     "nuselDATA_WCP_ae78c082-abd5-4cbd-8a55-7a722a464885.root",
+     15600514
+    ],
+    [
+     "nuselDATA_WCP_32a955ac-58df-4e4e-8843-b9285fff3017.root",
+     9166340
+    ]
+   ],
+   "nreco1": 26
+  },
+  {
+   "reco2": "PhysicsRun-2016_5_7_5_37_10-0006199-00087_20160507T173201_bnb_20160507T223204_merged_20181107T161703_optfilter_20181222T171403_reco1_postwcct_postdl_2_eb1624f6-d765-485f-91b0-4ce210cb5c55.root",
+   "events": 99,
+   "size": 552484548,
+   "nsubruns": 10,
+   "reco1": [
+    "PhysicsRun-2016_5_7_5_37_10-0006199-00091_20160507T171111_bnb_20160507T223218_merged_20181107T161736_optfilter_20181222T171507_reco1_postwcct_postdl_2_e1e259f3-1921-4070-bc79-869844a2b18e.root",
+    "PhysicsRun-2016_5_7_5_37_10-0006199-00087_20160507T173201_bnb_20160507T223204_merged_20181107T161703_optfilter_20181222T171403_reco1_postwcct_postdl_2_f488202a-261d-4300-9ace-14badd3d44f3.root",
+    "PhysicsRun-2016_5_7_5_37_10-0006199-00001_20160507T122212_bnb_20160507T131206_merged_20181107T161520_optfilter_20181222T160651_reco1_postwcct_postdl_2_e16840f1-47e3-46f3-b6bb-51f7a92d7932.root",
+    "PhysicsRun-2016_5_7_5_37_10-0006199-00183_20160507T175016_bnb_20160507T223656_merged_20181107T161842_optfilter_20181222T171051_reco1_postwcct_postdl_2_2f6d603c-f269-4f62-8cd8-8cd3f5b7f3c1.root",
+    "PhysicsRun-2016_5_7_5_37_10-0006199-00202_20160507T191537_bnb_20160507T223905_merged_20181107T161417_optfilter_20181222T173522_reco1_postwcct_postdl_2_208f0e69-dee9-40ae-9365-f76af24d5e45.root",
+    "PhysicsRun-2016_5_7_5_37_10-0006199-00001_20160507T122212_bnb_20160507T131206_merged_20181107T161520_optfilter_20181222T160651_reco1_postwcct_postdl_20181222T161444.root",
+    "PhysicsRun-2016_5_7_5_37_10-0006199-00183_20160507T175016_bnb_20160507T223656_merged_20181107T161842_optfilter_20181222T171051_reco1_postwcct_postdl_20181222T173153.root",
+    "PhysicsRun-2016_5_7_5_37_10-0006199-00087_20160507T173201_bnb_20160507T223204_merged_20181107T161703_optfilter_20181222T171403_reco1_postwcct_postdl_20181222T173829.root",
+    "PhysicsRun-2016_5_7_5_37_10-0006199-00091_20160507T171111_bnb_20160507T223218_merged_20181107T161736_optfilter_20181222T171507_reco1_postwcct_postdl_20181222T181225.root",
+    "PhysicsRun-2016_5_7_5_37_10-0006199-00202_20160507T191537_bnb_20160507T223905_merged_20181107T161417_optfilter_20181222T173522_reco1_postwcct_postdl_20181222T201116.root"
+   ],
+   "nusel": [
+    [
+     "nuselDATA_WCP_3e9f7e5e-3f27-42e8-ab92-2d9126b60544.root",
+     55624184
+    ],
+    [
+     "nuselDATA_WCP_e94abc68-ee54-438b-adaa-d487245ac109.root",
+     78789158
+    ],
+    [
+     "nuselDATA_WCP_f7b4cec6-11ac-4f71-96bc-1d72ba96ebac.root",
+     69345526
+    ],
+    [
+     "nuselDATA_WCP_51e691b7-5784-4335-af11-6a1a1acaf9c4.root",
+     58247167
+    ],
+    [
+     "nuselDATA_WCP_e0df350d-43b8-4af0-a3f0-663a8d49e25d.root",
+     75642078
+    ]
+   ],
+   "nreco1": 5
+  }
+ ],
+ "ext": [
+  {
+   "reco2": "BeamOffRun-2016_9_18_17_22_25-0007762-00014_20160919T004920_ext_bnb_20160919T054057_merged_20181118T224906_optfilter_20181225T191256_reco1_postwcct_po_68c7136e-e192-4bbf-a8c3-1a2d48914ecf.root",
+   "epoch": "o2_C2_all_reco2",
+   "events": 314,
+   "wc_events": 314,
+   "size": 1672731803,
+   "runs": [
+    7762
+   ],
+   "reco1": [
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00021_20160919T012508_ext_bnb_20160919T054128_merged_20181118T224711_optfilter_20181225T194443_reco1_postwcct_po_97b4bb9f-adc1-4630-9d8e-f51fcddc5407.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00029_20160919T013514_ext_bnb_20160919T054101_merged_20181118T224721_optfilter_20181225T185323_reco1_postwcct_po_11f83d4f-f8c4-469b-8a66-72b5b82cae3a.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00008_20160919T004832_ext_bnb_20160919T054046_merged_20181118T224842_optfilter_20181225T182027_reco1_postwcct_po_41f83ed6-0137-41b9-b6f2-37534026f15e.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00039_20160919T020058_ext_bnb_20160919T054208_merged_20181118T224142_optfilter_20181225T191257_reco1_postwcct_po_3c2cf3d7-b563-43d0-b32f-b7d58909be54.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00036_20160919T005843_ext_bnb_20160919T054139_merged_20181118T224532_optfilter_20181225T185012_reco1_postwcct_po_56dcea1f-2c74-41f8-970e-7f9399314ab9.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00014_20160919T004920_ext_bnb_20160919T054057_merged_20181118T224906_optfilter_20181225T191256_reco1_postwcct_po_696a5cb5-bc46-47c4-9bc7-8b5b3480b31e.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00012_20160919T013311_ext_bnb_20160919T054125_merged_20181119T035240_optfilter_20181225T182512_reco1_postwcct_po_d0c79030-c789-421c-bb0e-f7d9e8b8dc42.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00019_20160919T005336_ext_bnb_20160919T015733_merged_20181118T222703_optfilter_20181225T134515_reco1_postwcct_po_3cb2be80-909c-4520-beb5-e530e22f935d.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00009_20160919T004704_ext_bnb_20160919T015746_merged_20181118T221146_optfilter_20181225T124053_reco1_postwcct_po_7cb92e16-4e77-44a9-bbba-bcc39257d19f.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00003_20160919T003942_ext_bnb_20160919T054127_merged_20181118T224421_optfilter_20181225T193656_reco1_postwcct_po_9a30ac44-e4be-4123-8a26-031625a79f29.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00031_20160919T004058_ext_bnb_20160919T054225_merged_20181118T224713_optfilter_20181225T185209_reco1_postwcct_po_15bbdf4b-9ab8-411f-9f81-8d88d93021d2.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00009_20160919T004704_ext_bnb_20160919T015746_merged_20181118T221146_optfilter_20181225T124053_reco1_postwcct_postdl_20181225T130149.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00019_20160919T005336_ext_bnb_20160919T015733_merged_20181118T222703_optfilter_20181225T134515_reco1_postwcct_postdl_20181225T153356.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00008_20160919T004832_ext_bnb_20160919T054046_merged_20181118T224842_optfilter_20181225T182027_reco1_postwcct_postdl_20181225T183421.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00012_20160919T013311_ext_bnb_20160919T054125_merged_20181119T035240_optfilter_20181225T182512_reco1_postwcct_postdl_20181225T184628.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00036_20160919T005843_ext_bnb_20160919T054139_merged_20181118T224532_optfilter_20181225T185012_reco1_postwcct_postdl_20181225T192447.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00031_20160919T004058_ext_bnb_20160919T054225_merged_20181118T224713_optfilter_20181225T185209_reco1_postwcct_postdl_20181225T192610.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00039_20160919T020058_ext_bnb_20160919T054208_merged_20181118T224142_optfilter_20181225T191257_reco1_postwcct_postdl_20181225T193225.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00014_20160919T004920_ext_bnb_20160919T054057_merged_20181118T224906_optfilter_20181225T191256_reco1_postwcct_postdl_20181225T194105.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00029_20160919T013514_ext_bnb_20160919T054101_merged_20181118T224721_optfilter_20181225T185323_reco1_postwcct_postdl_20181225T195524.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00003_20160919T003942_ext_bnb_20160919T054127_merged_20181118T224421_optfilter_20181225T193656_reco1_postwcct_postdl_20181225T200446.root",
+    "BeamOffRun-2016_9_18_17_22_25-0007762-00021_20160919T012508_ext_bnb_20160919T054128_merged_20181118T224711_optfilter_20181225T194443_reco1_postwcct_postdl_20181225T202640.root"
+   ],
+   "nreco1": 11,
+   "nusel": [
+    [
+     "nuselDATA_WCP_71ca6d0f-ed34-42f5-a52d-f21b6801b5ba.root",
+     104640051
+    ],
+    [
+     "nuselDATA_WCP_54841fff-0910-467d-9cf6-84582ff581f7.root",
+     108795077
+    ],
+    [
+     "nuselDATA_WCP_2c9c7524-df50-49e0-8ca2-e889301cfb56.root",
+     67313848
+    ],
+    [
+     "nuselDATA_WCP_f7a1d781-37bd-49b4-b0da-16ad5ecf3890.root",
+     111798093
+    ],
+    [
+     "nuselDATA_WCP_73f3577f-5bc4-4111-be13-c3d73fc068a6.root",
+     131973296
+    ],
+    [
+     "nuselDATA_WCP_fab3e83d-289e-4bab-9d51-919f080a874d.root",
+     113925279
+    ],
+    [
+     "nuselDATA_WCP_f1a72873-4093-4743-a3f0-cc4ee4b7d6a6.root",
+     101606042
+    ],
+    [
+     "nuselDATA_WCP_e9721b04-b378-4415-b13d-8d1f5773d39b.root",
+     116014689
+    ],
+    [
+     "nuselDATA_WCP_c42c6ad5-463a-42f2-99b5-ad52f88f6c9b.root",
+     114689681
+    ],
+    [
+     "nuselDATA_WCP_a8bc533d-1e45-49be-90be-a6e41154cb33.root",
+     121860827
+    ],
+    [
+     "nuselDATA_WCP_57f78e38-08e9-4ea3-9ff8-70fffa86ca78.root",
+     94020038
+    ]
+   ]
+  },
+  {
+   "reco2": "BeamOffRun-2016_9_15_13_19_5-0007712-00014_20160915T220725_ext_bnb_20160916T012534_merged_20181118T223742_optfilter_20181228T192314_reco1_postwcct_201_1c5cd162-7d15-4b73-b529-be44dadd9137.root",
+   "epoch": "o2_C2_all_reco2",
+   "events": 312,
+   "wc_events": 312,
+   "size": 1614017773,
+   "runs": [
+    7712
+   ],
+   "reco1": [
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00029_20160915T221734_ext_bnb_20160916T012704_merged_20181118T224000_optfilter_20181225T131337_reco1_postwcct_pos_aea6cb3f-4e36-4c7c-b545-0c475bed0c40.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00036_20160915T224110_ext_bnb_20160916T013023_merged_20181118T223631_optfilter_20181225T125435_reco1_postwcct_pos_924605f9-44fe-4594-933e-4d64196d19da.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00014_20160915T220725_ext_bnb_20160916T012534_merged_20181118T223742_optfilter_20181228T192314_reco1_postwcct_201_511bd1fa-56cc-4820-bedd-abe99698c0d3.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00035_20160915T220850_ext_bnb_20160916T012656_merged_20181118T223644_optfilter_20181225T184138_reco1_postwcct_pos_373c680c-7569-4b14-964c-a2ff3c9d55f2.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00004_20160915T220906_ext_bnb_20160915T232401_merged_20181118T223823_optfilter_20181225T121601_reco1_postwcct_pos_2209c292-6e13-4dc2-8540-cda7cf3d3627.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00026_20160915T223753_ext_bnb_20160916T012923_merged_20181118T223327_optfilter_20181225T122433_reco1_postwcct_pos_e24d214f-6410-491f-9b8f-8fbd1d407b71.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00005_20160915T222214_ext_bnb_20160915T232424_merged_20181118T223947_optfilter_20181228T192320_reco1_postwcct_201_294ffa80-ddb6-490a-872c-e21549edb0c0.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00039_20160915T231209_ext_bnb_20160916T013038_merged_20181118T223420_optfilter_20181225T123832_reco1_postwcct_pos_c7e2bd33-1ee5-4147-918d-56beed6b319c.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00013_20160915T214703_ext_bnb_20160916T003936_merged_20181118T223924_optfilter_20181225T193528_reco1_postwcct_pos_cf83163c-c3d9-4288-8dd9-3a7073c5081a.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00024_20160915T230702_ext_bnb_20160916T012727_merged_20181118T224041_optfilter_20181225T124747_reco1_postwcct_pos_ce656038-4e83-4c6c-9b95-7bf881d51a09.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00003_20160915T222928_ext_bnb_20160915T232309_merged_20181118T223510_optfilter_20181225T135547_reco1_postwcct_pos_7eeedb00-7a85-4787-933a-101438f26c60.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00004_20160915T220906_ext_bnb_20160915T232401_merged_20181118T223823_optfilter_20181225T121601_reco1_postwcct_postdl_20181225T123018.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00026_20160915T223753_ext_bnb_20160916T012923_merged_20181118T223327_optfilter_20181225T122433_reco1_postwcct_postdl_20181225T124817.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00039_20160915T231209_ext_bnb_20160916T013038_merged_20181118T223420_optfilter_20181225T123832_reco1_postwcct_postdl_20181225T125622.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00036_20160915T224110_ext_bnb_20160916T013023_merged_20181118T223631_optfilter_20181225T125435_reco1_postwcct_postdl_20181225T131156.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00024_20160915T230702_ext_bnb_20160916T012727_merged_20181118T224041_optfilter_20181225T124747_reco1_postwcct_postdl_20181225T131331.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00029_20160915T221734_ext_bnb_20160916T012704_merged_20181118T224000_optfilter_20181225T131337_reco1_postwcct_postdl_20181225T134348.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00003_20160915T222928_ext_bnb_20160915T232309_merged_20181118T223510_optfilter_20181225T135547_reco1_postwcct_postdl_20181225T143802.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00035_20160915T220850_ext_bnb_20160916T012656_merged_20181118T223644_optfilter_20181225T184138_reco1_postwcct_postdl_20181225T185650.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00013_20160915T214703_ext_bnb_20160916T003936_merged_20181118T223924_optfilter_20181225T193528_reco1_postwcct_postdl_20181225T210954.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00014_20160915T220725_ext_bnb_20160916T012534_merged_20181118T223742_optfilter_20181228T192314_reco1_postwcct_20181228T194710.root",
+    "BeamOffRun-2016_9_15_13_19_5-0007712-00005_20160915T222214_ext_bnb_20160915T232424_merged_20181118T223947_optfilter_20181228T192320_reco1_postwcct_20181228T195846.root"
+   ],
+   "nreco1": 11,
+   "nusel": [
+    [
+     "nuselDATA_WCP_d44b6114-991c-4263-bd9f-f0427a7a8c7e.root",
+     67366803
+    ],
+    [
+     "nuselDATA_WCP_a5a8aae3-860f-4096-9ee0-a41a6b167706.root",
+     96948453
+    ],
+    [
+     "nuselDATA_WCP_f4fba388-e536-46a3-bb42-1c3837a2321a.root",
+     98717041
+    ],
+    [
+     "nuselDATA_WCP_2c87d9b3-35f0-4b5a-8a48-afbd29c0e5ed.root",
+     99291913
+    ],
+    [
+     "nuselDATA_WCP_ab8f8c77-0948-41cc-b597-cb631719af26.root",
+     132992467
+    ],
+    [
+     "nuselDATA_WCP_2f3328a0-0f40-4ca2-92ff-bce488433fc4.root",
+     134528099
+    ],
+    [
+     "nuselDATA_WCP_52a20395-71f4-48fd-93c7-8562960bcc49.root",
+     106451881
+    ],
+    [
+     "nuselDATA_WCP_94aa8f68-ed77-43df-87df-72fddb7c340e.root",
+     98088342
+    ],
+    [
+     "nuselDATA_WCP_740b87c7-3c1b-4d7c-b7cc-d8d4f290b8a5.root",
+     87202117
+    ],
+    [
+     "nuselDATA_WCP_e0580d82-fc5d-4076-af4d-74568e8a652f.root",
+     130504653
+    ],
+    [
+     "nuselDATA_WCP_a2303eec-f2b0-46e5-83ed-6a980cfc9b1d.root",
+     130274954
+    ]
+   ]
+  },
+  {
+   "reco2": "BeamOffRun-2016_9_11_10_28_4-0007640-00041_20160911T193638_ext_bnb_20160912T043635_merged_20181118T211907_optfilter_20181225T090712_reco1_postwcct_pos_c0b7afc4-4b57-4c46-b0af-5266571d1d16.root",
+   "epoch": "o2_C2_all_reco2",
+   "events": 311,
+   "wc_events": 311,
+   "size": 1575452904,
+   "runs": [
+    7640
+   ],
+   "reco1": [
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00000_20160911T193730_ext_bnb_20160912T043540_merged_20181118T172348_optfilter_20181225T062031_reco1_postwcct_pos_92230bb8-0327-45ef-a564-d4db3aaebb98.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00017_20160911T191922_ext_bnb_20160912T043650_merged_20181118T172132_optfilter_20181225T053623_reco1_postwcct_pos_26c880bf-5e6e-493f-ac9c-60423d240e6f.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00030_20160911T194119_ext_bnb_20160912T043609_merged_20181118T212846_optfilter_20181225T121705_reco1_postwcct_pos_9ce6374c-7272-4072-8ecd-349e15b8d7b6.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00048_20160911T203019_ext_bnb_20160912T043900_merged_20181118T172225_optfilter_20181225T061300_reco1_postwcct_pos_48ee7273-04a0-4c59-a333-97378123136c.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00007_20160911T195603_ext_bnb_20160912T043608_merged_20181118T172254_optfilter_20181225T055605_reco1_postwcct_pos_ce6af6bc-a21f-4d12-a5dc-fa2da0cc2780.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00004_20160911T194659_ext_bnb_20160912T043711_merged_20181118T212349_optfilter_20181225T120348_reco1_postwcct_pos_4c891d1d-655a-4dc2-a2fa-b4c1fcf78cb8.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00034_20160911T204421_ext_bnb_20160912T043817_merged_20181118T172503_optfilter_20181225T060751_reco1_postwcct_pos_0b0800a9-8856-4f0a-9710-a3c52da287c0.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00015_20160911T195617_ext_bnb_20160912T043712_merged_20181118T172035_optfilter_20181225T064357_reco1_postwcct_pos_9e8c9cf9-ea03-4cf8-8b06-73f857795a9b.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00044_20160911T195430_ext_bnb_20160912T043807_merged_20181118T212221_optfilter_20181225T105543_reco1_postwcct_pos_217b120e-77c6-48d9-83fa-23ec176ca5e8.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00041_20160911T193638_ext_bnb_20160912T043635_merged_20181118T211907_optfilter_20181225T090712_reco1_postwcct_pos_96ec22fc-a29b-4625-bb31-39f0f07c9851.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00045_20160911T194536_ext_bnb_20160912T043646_merged_20181118T172541_optfilter_20181225T053343_reco1_postwcct_pos_30ced7e8-1f1c-4aa7-aace-8d7ec61a93f1.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00066_20160911T195200_ext_bnb_20160912T043745_merged_20181118T171807_optfilter_20181225T040223_reco1_postwcct_pos_7b7d3373-0f44-4d48-b07c-b9e4cc896aea.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00066_20160911T195200_ext_bnb_20160912T043745_merged_20181118T171807_optfilter_20181225T040223_reco1_postwcct_postdl_20181225T040352.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00017_20160911T191922_ext_bnb_20160912T043650_merged_20181118T172132_optfilter_20181225T053623_reco1_postwcct_postdl_20181225T055303.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00045_20160911T194536_ext_bnb_20160912T043646_merged_20181118T172541_optfilter_20181225T053343_reco1_postwcct_postdl_20181225T055646.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00007_20160911T195603_ext_bnb_20160912T043608_merged_20181118T172254_optfilter_20181225T055605_reco1_postwcct_postdl_20181225T060803.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00034_20160911T204421_ext_bnb_20160912T043817_merged_20181118T172503_optfilter_20181225T060751_reco1_postwcct_postdl_20181225T063609.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00000_20160911T193730_ext_bnb_20160912T043540_merged_20181118T172348_optfilter_20181225T062031_reco1_postwcct_postdl_20181225T065759.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00015_20160911T195617_ext_bnb_20160912T043712_merged_20181118T172035_optfilter_20181225T064357_reco1_postwcct_postdl_20181225T071935.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00048_20160911T203019_ext_bnb_20160912T043900_merged_20181118T172225_optfilter_20181225T061300_reco1_postwcct_postdl_20181225T080909.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00041_20160911T193638_ext_bnb_20160912T043635_merged_20181118T211907_optfilter_20181225T090712_reco1_postwcct_postdl_20181225T094718.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00044_20160911T195430_ext_bnb_20160912T043807_merged_20181118T212221_optfilter_20181225T105543_reco1_postwcct_postdl_20181225T112352.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00004_20160911T194659_ext_bnb_20160912T043711_merged_20181118T212349_optfilter_20181225T120348_reco1_postwcct_postdl_20181225T121749.root",
+    "BeamOffRun-2016_9_11_10_28_4-0007640-00030_20160911T194119_ext_bnb_20160912T043609_merged_20181118T212846_optfilter_20181225T121705_reco1_postwcct_postdl_20181225T125505.root"
+   ],
+   "nreco1": 12,
+   "nusel": [
+    [
+     "nuselDATA_WCP_5cae1933-820d-4354-aec2-b94f56315c83.root",
+     435
+    ],
+    [
+     "nuselDATA_WCP_42445329-3c77-4a96-9fb1-3fbe967fabf8.root",
+     89511855
+    ],
+    [
+     "nuselDATA_WCP_846648b3-0ba3-4915-8d9d-c5d40d56adcc.root",
+     110500521
+    ],
+    [
+     "nuselDATA_WCP_52562967-2de0-4d34-b10e-5de22e8cb7f4.root",
+     81117186
+    ],
+    [
+     "nuselDATA_WCP_4505200f-3386-4484-9b9c-c10838a685a5.root",
+     89348867
+    ],
+    [
+     "nuselDATA_WCP_fa74e224-0d5e-456a-8ff8-5d0642e03af3.root",
+     109303812
+    ],
+    [
+     "nuselDATA_WCP_eb87e3a0-4fc9-468f-b998-7a1c7929c233.root",
+     143188096
+    ],
+    [
+     "nuselDATA_WCP_c78f2a17-50a9-4ae1-bdb4-935a6cb4b688.root",
+     100163717
+    ],
+    [
+     "nuselDATA_WCP_b103a0fa-e8e3-458d-bc20-20c32cdac404.root",
+     101117083
+    ],
+    [
+     "nuselDATA_WCP_1a76a211-f133-4407-938b-7c2669cd3bb0.root",
+     88413637
+    ],
+    [
+     "nuselDATA_WCP_808610fa-36b7-4835-9beb-7b8076520b72.root",
+     64417996
+    ],
+    [
+     "nuselDATA_WCP_6b793294-7e17-49de-9adc-10c978130ea8.root",
+     105479066
+    ]
+   ]
+  },
+  {
+   "reco2": "BeamOffRun-2016_9_6_7_25_46-0007535-00009_20160906T144436_ext_bnb_20160906T151053_merged_20181118T142504_optfilter_20181225T041403_reco1_postwcct_post_af9e1154-d86b-4ecb-aacb-6334b0891f75.root",
+   "epoch": "o2_C2_all_reco2",
+   "events": 311,
+   "wc_events": 311,
+   "size": 1593455413,
+   "runs": [
+    7535
+   ],
+   "reco1": [
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00013_20160906T140400_ext_bnb_20160906T144609_merged_20181118T143522_optfilter_20181225T050745_reco1_postwcct_post_e6399f21-37cf-430d-9f74-17cb8f9f8465.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00019_20160906T152950_ext_bnb_20160906T164811_merged_20181118T142313_optfilter_20181225T015002_reco1_postwcct_post_5181cc74-37ef-4e39-a911-f61e744ad838.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00007_20160906T151732_ext_bnb_20160906T155237_merged_20181118T143507_optfilter_20181225T045409_reco1_postwcct_post_1375cfc2-d4ef-4e84-b3a1-90e9fb1e43f9.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00012_20160906T135323_ext_bnb_20160906T144535_merged_20181118T142645_optfilter_20181225T022603_reco1_postwcct_post_a3edcba4-5a69-48f3-b5bf-5b6dd9e98673.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00042_20160906T150031_ext_bnb_20160906T153857_merged_20181118T142800_optfilter_20181225T010809_reco1_postwcct_post_ce3001cf-4cbb-4c63-bbca-8e3fcb661837.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00036_20160906T144254_ext_bnb_20160906T152705_merged_20181118T142440_optfilter_20181225T014549_reco1_postwcct_post_20ce8322-101c-477d-9239-5e826eec28c5.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00001_20160906T151848_ext_bnb_20160906T155134_merged_20181118T143220_optfilter_20181225T041846_reco1_postwcct_post_fafa26ca-220d-4d13-84dc-18597166ecf0.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00021_20160906T153857_ext_bnb_20160906T164846_merged_20181118T142029_optfilter_20181225T005909_reco1_postwcct_post_0382774b-8cc5-4030-b6b6-a513c1ba0756.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00018_20160906T150220_ext_bnb_20160906T164910_merged_20181118T143113_optfilter_20181225T025232_reco1_postwcct_post_030415c2-d0b5-4a93-b03c-9fd7a7ab0de4.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00031_20160906T145918_ext_bnb_20160906T165407_merged_20181118T142113_optfilter_20181225T010645_reco1_postwcct_post_47d464f3-bf93-402a-aa4f-a5e0584191b3.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00002_20160906T151619_ext_bnb_20160906T155221_merged_20181118T142743_optfilter_20181225T013915_reco1_postwcct_post_1252b22e-cf2b-4402-a9c9-d09cd3ae9e25.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00009_20160906T144436_ext_bnb_20160906T151053_merged_20181118T142504_optfilter_20181225T041403_reco1_postwcct_post_9c44f8b6-5ccc-42b7-975a-1dc486875bd8.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00021_20160906T153857_ext_bnb_20160906T164846_merged_20181118T142029_optfilter_20181225T005909_reco1_postwcct_postdl_20181225T011020.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00042_20160906T150031_ext_bnb_20160906T153857_merged_20181118T142800_optfilter_20181225T010809_reco1_postwcct_postdl_20181225T012125.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00031_20160906T145918_ext_bnb_20160906T165407_merged_20181118T142113_optfilter_20181225T010645_reco1_postwcct_postdl_20181225T020004.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00002_20160906T151619_ext_bnb_20160906T155221_merged_20181118T142743_optfilter_20181225T013915_reco1_postwcct_postdl_20181225T020140.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00036_20160906T144254_ext_bnb_20160906T152705_merged_20181118T142440_optfilter_20181225T014549_reco1_postwcct_postdl_20181225T022129.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00019_20160906T152950_ext_bnb_20160906T164811_merged_20181118T142313_optfilter_20181225T015002_reco1_postwcct_postdl_20181225T022027.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00018_20160906T150220_ext_bnb_20160906T164910_merged_20181118T143113_optfilter_20181225T025232_reco1_postwcct_postdl_20181225T034359.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00012_20160906T135323_ext_bnb_20160906T144535_merged_20181118T142645_optfilter_20181225T022603_reco1_postwcct_postdl_20181225T042021.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00001_20160906T151848_ext_bnb_20160906T155134_merged_20181118T143220_optfilter_20181225T041846_reco1_postwcct_postdl_20181225T043119.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00009_20160906T144436_ext_bnb_20160906T151053_merged_20181118T142504_optfilter_20181225T041403_reco1_postwcct_postdl_20181225T042959.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00007_20160906T151732_ext_bnb_20160906T155237_merged_20181118T143507_optfilter_20181225T045409_reco1_postwcct_postdl_20181225T051909.root",
+    "BeamOffRun-2016_9_6_7_25_46-0007535-00013_20160906T140400_ext_bnb_20160906T144609_merged_20181118T143522_optfilter_20181225T050745_reco1_postwcct_postdl_20181225T053727.root"
+   ],
+   "nreco1": 12,
+   "nusel": [
+    [
+     "nuselDATA_WCP_f803f945-a26a-4083-85cc-111b3157c716.root",
+     56040758
+    ],
+    [
+     "nuselDATA_WCP_cc89b22e-ce3c-4035-8cf0-7d0b5e6d620a.root",
+     61298663
+    ],
+    [
+     "nuselDATA_WCP_af2bfaad-1b12-4ca6-8c13-db941fb66f4a.root",
+     56386786
+    ],
+    [
+     "nuselDATA_WCP_ba379d3e-1dc0-4468-b2c3-068d692753c5.root",
+     96331473
+    ],
+    [
+     "nuselDATA_WCP_d39e2fb1-1782-4e88-a7ca-f4fecb160a8a.root",
+     119037126
+    ],
+    [
+     "nuselDATA_WCP_1ee3ffdb-1858-4b73-b462-a78c35552b21.root",
+     80560597
+    ],
+    [
+     "nuselDATA_WCP_c676359f-840e-47e4-b559-9d16382620cb.root",
+     144587824
+    ],
+    [
+     "nuselDATA_WCP_68f1a058-7c20-4aa7-9b39-c6d408a96aa2.root",
+     132287497
+    ],
+    [
+     "nuselDATA_WCP_1ff10496-e98f-4b48-b624-c43c82e0495c.root",
+     64514938
+    ],
+    [
+     "nuselDATA_WCP_2feec223-11a2-499e-869a-97120ce95739.root",
+     52117766
+    ],
+    [
+     "nuselDATA_WCP_5de60fd6-17e8-4401-be80-aa7122eb7f28.root",
+     105249595
+    ],
+    [
+     "nuselDATA_WCP_d03b2ac6-f3ff-4fc6-ba32-882afffab3a8.root",
+     120442826
+    ]
+   ]
+  }
+ ]
+}

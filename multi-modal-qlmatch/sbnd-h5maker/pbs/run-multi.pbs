@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -N sbnd-h5full
+#PBS -A neutrinoGPU::WireCell_aurora
+#PBS -q capacity
+#PBS -l select=4
+#PBS -l walltime=04:00:00
+#PBS -l filesystems=flare:home
+#PBS -j oe
+# SBND HDF5 maker on several nodes (fm4npp-lartpc #11). TASKS lists "<part list>\t<out.h5>" per line; node k takes
+# lines k, k+NN, ... (round-robin) and runs NPAR converter processes (pbs/node-many.sh), launched by mpiexec -ppn 1.
+# Resume: resubmit with the same TASKS (finished outputs are skipped; the converter writes <out>.tmp then renames).
+#   qsub -l select=<N> -v "TASKS=<tasks.tsv>,WORK=<dir for node logs>[,NPAR=96][,ARGS=...]" pbs/run-multi.pbs
+set -u
+Y=/lus/flare/projects/neutrinoGPU/yuhw
+H=$Y/fm4npp-lartpc/multi-modal-qlmatch/sbnd-h5maker
+TASKS=${TASKS:?}; WORK=${WORK:?}; export NPAR=${NPAR:-96} ARGS=${ARGS:-}
+mkdir -p "$WORK"
+NN=$(sort -u "$PBS_NODEFILE" | wc -l)
+echo "$(/bin/date -u '+%F %T') START job ${PBS_JOBID:-} nodes $NN tasks $(wc -l < "$TASKS") NPAR=$NPAR code $(git -C $H rev-parse --short HEAD)$(git -C $H diff --quiet -- . || echo +dirty)"
+for k in $(seq 0 $((NN - 1))); do awk -v k=$k -v n=$NN '(NR - 1) % n == k' "$TASKS" > "$WORK/node$k.tasks"; done
+mpiexec -n "$NN" -ppn 1 --cpu-bind none bash "$H/pbs/node-many.sh" "$WORK"
+echo "$(/bin/date -u '+%F %T') DONE; outputs: $(awk -F'\t' '{print $2}' "$TASKS" | xargs ls 2>/dev/null | wc -l) of $(wc -l < "$TASKS")"
+grep -h " rc " "$WORK"/node*.log | awk '{print $4, $5}' | sort | uniq -c

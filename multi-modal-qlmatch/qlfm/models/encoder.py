@@ -77,9 +77,9 @@ class LightEmbed(nn.Module):
     def __init__(self, d, n_feat):
         super().__init__()
         self.proj = mlp([n_feat, d, d])
-        self.pos = Fourier(2, d, scale=(130.0, 1100.0))     # PMT (y + 65, z)
+        self.pos = Fourier(2, d, scale=(130.0, 1100.0))     # PMT (y + G.PMT_Y_SHIFT, z)
         self.pmt = nn.Embedding(G.N_PMT, d)
-        self.register_buffer("pmt_yz", torch.from_numpy(G.PMT_YZ.copy()) + torch.tensor([65.0, 0.0]))
+        self.register_buffer("pmt_yz", torch.from_numpy(G.PMT_YZ.copy()) + torch.tensor([G.PMT_Y_SHIFT, 0.0]))
 
     def forward(self, lt: LightTokens):
         return self.proj(lt.feat) + self.pos_embed(lt)

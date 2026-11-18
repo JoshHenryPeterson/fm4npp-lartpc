@@ -2,7 +2,7 @@
 """Create the (run, subrun)-hashed splits and nested pretraining / label subsets for a corpus.
 
 Keys written:
-  train, val, test                 partitions (90/5/5 %)
+  train, val, test                 partitions (90/5/5 % by default)
   pre_f{F}                         pretraining subsets, F = fraction of ALL events (0.01, 0.10, 0.50, 0.90)
   lab_f{F}                         labeled-pool subsets, F = fraction of the train partition (0.001 ... 1.0)
 """
@@ -18,10 +18,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("corpus")
     ap.add_argument("out")
+    ap.add_argument("--frac-val", type=float, default=0.05)
+    ap.add_argument("--frac-test", type=float, default=0.05)
     a = ap.parse_args()
     c = Corpus(a.corpus)
     run, sub = c.ev_array("run"), c.ev_array("subrun")
-    s = make_splits(run, sub)
+    s = make_splits(run, sub, a.frac_val, a.frac_test)
     n = c.n
     out = dict(s)
     for f in (0.01, 0.10, 0.50, 0.90):

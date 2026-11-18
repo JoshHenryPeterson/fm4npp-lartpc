@@ -1,0 +1,428 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usetheme{default}
+\usecolortheme{seahorse}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{itemize items}[circle]
+\setbeamerfont{frametitle}{size=\normalsize,series=\bfseries}
+\setbeamercolor{frametitle}{fg=blue!50!black}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{graphicx}
+\newcommand{\fitw}[1]{\resizebox{\linewidth}{!}{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\good}[1]{{\color{green!45!black}\textbf{#1}}}
+\newcommand{\bad}[1]{{\color{red!70!black}\textbf{#1}}}
+\newcommand{\iss}[1]{{\color{blue!60!black}\##1}}
+\setlength{\tabcolsep}{4pt}
+% PTv3+XF fine-tune, 1% labels: paper metrics, mean over seeds (slide 1b)
+\newcommand{\PTvT}{0.831}
+\newcommand{\PTvTT}{0.976}
+\newcommand{\PTvTTT}{0.789}
+\newcommand{\PTvTTTT}{0.227}
+\newcommand{\PTvTTTTT}{0.592}
+\newcommand{\PTvSeeds}{1 seed}
+
+\title{Charge + light foundation model (qlfm): status}
+\subtitle{Data/sim width check, new MicroBooNE and SBND samples, first real-data test}
+\author{Haiwang Yu}
+\institute{fm4npp-lartpc \;\textbullet\; issues \iss{8}--\iss{11}}
+\date{13 November 2026}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+  \vfill
+  {\tiny Prepared with the assistance of Claude (Anthropic). Code and numbers: \url{https://github.com/HaiwangYu/fm4npp-lartpc}.}
+\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}{Summary}
+  \small
+  \begin{enumerate}\setlength{\itemsep}{7pt}
+    \item \textbf{Sunny's data/sim width check (\iss{9}).} qlfm-M CL relies on the simulated hit width:
+      the measured data/sim rescale costs $-0.21$ in hit F1 (T1). Retraining at data-like widths keeps most of the
+      score \emph{in simulation}; removing width costs about 0.09.
+    \item \textbf{MicroBooNE real-data samples (\iss{10}).} Round 1 is delivered: BNB and $\nu_e$ overlay, beam-on, EXT,
+      each about 1k events with Wire-Cell labels. The processing matches the open data exactly. Clean pools for round 2 are identified.
+    \item \textbf{SBND samples (\iss{11}).} The reco1 + Wire-Cell $\rightarrow$ HDF5 chain works; the 10k BNB sample converts and trains.
+      MicroBooNE pretraining transfers (T1 0.85 vs 0.60--0.70 from scratch). The fixed Wire-Cell labels still lead on T1 (0.91).
+    \item \textbf{First real-data check (\iss{10}).} In simulation (overlay), qlfm beats Wire-Cell and Pandora.
+      \bad{On real beam-on data Wire-Cell wins}: qlfm-M CL finds only about 20\% of Wire-Cell's $\nu$ charge (90\% in simulation).
+      The size of the drop follows each model's reliance on hit width.
+  \end{enumerate}
+\end{frame}
+
+%=====================================================================
+\begin{frame}{1a. Sunny's finding, and our test: perturb simulated $\nu$ hits, no retraining (\iss{9})}
+  \footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.36\textwidth}
+      \textbf{Sunny (6 Nov).} In the overlay, every $\nu$ is simulated and every negative is a real cosmic.
+      \begin{itemize}
+        \item Simulated hits broaden faster with drift: data/sim width $\approx$ 0.92--0.94 at the cathode (Y).
+          The simulation is over-diffused: $D_L$ 6.40 vs 3.74\,cm$^2$/s.
+        \item Per hit, width barely separates data from sim (AUC 0.51--0.58), but a model that pools many hits might still use it.
+      \end{itemize}
+      \vspace{2pt}
+      \textbf{Our test} (\code{eval\_perturb.py}): rescale the simulated $\nu$ hits' width (2D factors, per plane and drift) or charge ($\pm$2, 5\%), then re-evaluate T1 and T2.
+    \end{column}
+    \begin{column}{0.62\textwidth}
+      \centering
+      \scriptsize
+      $\Delta$ vs nominal. Multi-task fine-tune on 1\% of labels, mean of 3 seeds.\\[2pt]
+      \fitw{\begin{tabular}{llcccc}
+        \toprule
+        model & task & nominal & sim width $\times$ meas. & all widths $\times$ meas. & charge $\pm5\%$ \\
+        \midrule
+        qlfm-M CL   & T1 F1  & 0.919 & \bad{$-0.212$} & $-0.191$ & $\le$0.001 \\
+                    & T2 AUC & 0.993 & \bad{$-0.034$} & $-0.025$ & $\le$0.001 \\
+        qlfm-M C+XF & T1 F1  & 0.859 & $-0.029$ & $-0.008$ & $\le$0.001 \\
+                    & T2 AUC & 0.990 & $-0.003$ & $0.000$  & $\le$0.001 \\
+        PTv3+XF     & T1 F1  & 0.840 & 0 (sees no width) & 0 & 0.001 \\
+        \bottomrule
+      \end{tabular}}\\[1pt]
+      {\tiny Test-set 95\% half-width: 0.001--0.003.}
+      \begin{itemize}
+        \item \textbf{Charge shift:} negligible for every model.
+        \item \textbf{Width:} 50--100$\times$ the test uncertainty for qlfm-M CL.
+          Rescaling \emph{all} hits (sim/real ratio unchanged) hurts almost as much, and so does broadening:
+          the model has learned a sharp width-vs-drift relation.
+        \item \textbf{Reading:} with light, the model knows $t_0$, so diffusion width tells drift distance. That is real physics, learned on an over-diffused simulation.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{1b. Fix (b): fine-tune with data-like or no width (\iss{9})}
+  \footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.58\textwidth}
+      \centering
+      \scriptsize
+      Test, 1\% labels, fine-tuned, 3 seeds. Width change applied in training \emph{and} test.\\[2pt]
+      \begin{tabular}{llccccc}
+        \toprule
+        model & widths & T1\,$\uparrow$ & T2\,$\uparrow$ & T3\,$\uparrow$ & T4\,$\downarrow$ & T5\,$\downarrow$ \\
+        \midrule
+        qlfm-M CL   & nominal   & \good{0.922} & 0.988 & 0.748 & 0.225 & 0.529 \\
+                    & data-like & \good{0.914} & 0.993 & 0.746 & 0.227 & 0.528 \\
+                    & removed   & 0.829 & 0.968 & 0.685 & 0.246 & 0.601 \\
+        \midrule
+        qlfm-M C+XF & nominal   & 0.862 & 0.969 & 0.685 & 0.283 & 0.585 \\
+                    & data-like & 0.831 & 0.963 & 0.673 & 0.286 & 0.597 \\
+                    & removed   & 0.809 & 0.953 & 0.660 & 0.288 & 0.610 \\
+        \midrule
+        PTv3+XF (\PTvSeeds) & n/a & \PTvT & \PTvTT & \PTvTTT & \PTvTTTT & \PTvTTTTT \\
+        \bottomrule
+      \end{tabular}\\[2pt]
+      {\tiny T1 per-event median F1; T2 AUC on bright-flash events; T3 flavour macro-F1; T4 $E_\nu$ resolution; T5 PMT-light MSE.}
+    \end{column}
+    \begin{column}{0.40\textwidth}
+      \begin{itemize}\setlength{\itemsep}{5pt}
+        \item \textbf{In simulation,} retraining at data-like widths keeps qlfm-M CL's T1 lead (0.914).
+        \item \textbf{Without width,} the lead disappears (0.829, PTv3's level). The T1 advantage \emph{is} width.
+        \item \textbf{Frozen M CL} is the most width-dependent: T1 0.894 / 0.847 / 0.533 (nominal / data-like / removed).
+        \item \textbf{New:} Sunny's \emph{3D} per-plane factors (U 0.88, V 0.94, Y 0.90 at full drift) arrived. Not applied yet.
+        \item \textbf{Open:} these are still simulation scores. The real-data test is section 4.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%=====================================================================
+\begin{frame}{2a. MicroBooNE round-1 samples with Wire-Cell labels (\iss{10})}
+  \footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      Made at FNAL with our own HDF5Maker build (open-data layout plus a real-data mode).
+      Wire-Cell hit labels come from the WC nusel files.\\[4pt]
+      \centering
+      \scriptsize
+      \fitw{\begin{tabular}{lrrrr}
+        \toprule
+        sample & events & WC-labelled & WC generic $\nu$ & hits \\
+        \midrule
+        BNB overlay (MCC9.1 run1)   & 1013 & 959  & 305 (32\%) & 15.6M \\
+        $\nu_e$ overlay (intrinsic) & 1271 & 1271 & 865 (68\%) & 21.7M \\
+        beam-on (run1 C1)           & 1041 & 849  & 71 (8.2\%) & 17.2M \\
+        EXT (run1 C2)               & 1248 & 1248 & 27 (2.2\%) & 19.8M \\
+        \bottomrule
+      \end{tabular}}\\[4pt]
+      \raggedright\footnotesize
+      WC $\nu$ hit label $=$ \code{wc\_main} (in-time main cluster) \& \code{wc\_generic\_nu}.
+      Against truth in the overlay: efficiency 0.53 / 0.52, purity 0.95 / 0.97 (BNB / $\nu_e$).
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \textbf{Checks on Polaris}
+      \begin{itemize}\setlength{\itemsep}{4pt}
+        \item The same converter handles all four files; a real-data mode covers the absent truth.
+        \item \good{Identical} to the published open data on the 849 shared BNB events: hits, light, truth.
+          Light is \code{*Stage1Optical} in both data and MC.
+        \item \bad{Overlap:} 783 / 1058 of the BNB / $\nu_e$ overlay events are in our \emph{train} split.
+          Clean overlay events: 230 BNB, 213 $\nu_e$. Beam-on and EXT are fully clean.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{2b. Round 2: clean candidate pools (not started; needs approval)}
+  \footnotesize
+  An event is \emph{clean} for a qlfm-vs-Wire-Cell test if it is not in our train split (train = pretraining set and source of fine-tune labels).
+  \vspace{6pt}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{BNB overlay}
+      \begin{itemize}
+        \item 155,337 events are in the WC run1 checkout but \emph{not} in the published HDF5: 4,595 public artroot files, including 2,196 files (98k events) where every event qualifies.
+        \item About 3k events $\approx$ 70 artroot files plus about 13\,GB of nusel staging.
+        \item Fallback: our test (38.8k) or val (38.0k) split.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{$\nu_e$ overlay}
+      \begin{itemize}
+        \item Every public $\nu_e$ event is in the published HDF5, but our corpus never used two of its files, \code{nue\_NoWire\_01} and \code{\_04} ($\approx$12k events).
+        \item Fallback: our test (3.0k) or val (3.9k) split.
+      \end{itemize}
+      \textbf{Real data}
+      \begin{itemize}
+        \item More beam-on and EXT is the most valuable addition (slide 4b).
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vfill
+  {\scriptsize Event lists for FNAL: \code{fm4npp-lartpc-data/uboone-round1/requests/}.}
+\end{frame}
+
+%=====================================================================
+\begin{frame}{3a. SBND sample production on Aurora (\iss{11})}
+  \footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.54\textwidth}
+      \textbf{Chain} (\code{sbnd-h5maker}): Gen2 reco1 MC (sbndcode v10\_14, CORSIKA cosmics) plus Wire-Cell aurora-r2 output $\rightarrow$ MicroBooNE open-data HDF5 layout.
+      \begin{itemize}\setlength{\itemsep}{2pt}
+        \item \textbf{Per-hit truth:} reco1 has no hit back-tracking, so 3D G4 deposits are projected onto hits (SCE, drift, channel, tick). 2.4\% of hits get no deposit.
+        \item \textbf{Per-$\nu$ truth:} two $\nu$ in a spill happen often.
+        \item \textbf{Reco baseline:} the Wire-Cell $\nu$-cluster footprint per hit (no Pandora here).
+        \item \textbf{Bug found in review:} WC numbers channels plane-major, LArSoft TPC-major, so only 2 of 6 planes matched.
+          Fixed in v0.4: label efficiency 0.29 $\rightarrow$ 0.85.
+        \item \textbf{qlfm:} \code{QLFM\_DETECTOR=sbnd}. Two TPCs (TPC 1 mirrored onto one drift axis), 120 PMTs, beam window 0--3\,$\mu$s.
+          MicroBooNE checkpoints load; only the PMT embeddings start fresh.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \centering
+      \scriptsize
+      \begin{tabular}{lr}
+        \toprule
+        \multicolumn{2}{l}{\textbf{10k BNB CV}} \\
+        events / files & 10,754 / 21 \\
+        $\nu$ / vertex in AV & 19,402 / 4,807 \\
+        hits (per event) & 132M (12.3k) \\
+        $\nu$ / cosmic hits & 6.4M / 123M \\
+        WC $\nu$ hits: eff.\ / purity & 0.66 / 0.90 \\
+        cost & 0.35 node-h, 3.9\,GB \\
+        \midrule
+        \multicolumn{2}{l}{\textbf{full aurora-r2} (not run)} \\
+        BNB CV & 627k \\
+        $\nu_e$ CC & 269k \\
+        NC $\Delta$ radiative & 27k \\
+        estimate & 12--30 node-h, 0.33\,TB \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{3b. SBND 10k fine-tune test: MicroBooNE pretraining transfers (\iss{11})}
+  \footnotesize
+  \centering
+  \scriptsize
+  Test split ($\approx$1k events; 425 for T1). All training labels, 5 tasks jointly, 3,000 steps (17 min on one A100).\\[3pt]
+  \begin{tabular}{lccccc}
+    \toprule
+    model & T1 F1\,$\uparrow$ & T2 AUC\,$\uparrow$ & T3$^\ast$\,$\uparrow$ & T4\,$\downarrow$ & T5\,$\downarrow$ \\
+    \midrule
+    qlfm-M CL, MicroBooNE-pretrained, fine-tune (2 seeds) & \good{0.852 / 0.851} & 0.994 & 0.80 / 0.85 & \good{0.24} & \good{0.66} \\
+    qlfm-M C+XF, MicroBooNE-pretrained & 0.791 & 0.989 & 0.76 & 0.27 & 0.74 \\
+    qlfm-M CL, frozen & 0.486 & 0.977 & 0.71 & 0.28 & 0.84 \\
+    same model, from scratch (2 seeds) & 0.600 / 0.699 & 0.984 / 0.989 & 0.74 / 0.76 & 0.26 / 0.27 & 0.97 \\
+    \midrule
+    \textbf{Wire-Cell $\nu$ clusters (fixed labels)} & \textbf{0.912} & & & & \\
+    \bottomrule
+  \end{tabular}\\[1pt]
+  {\tiny T1 charge-weighted F1. $^\ast$T3: $\nu_\mu$CC vs NC macro-F1 (only 4 $\nu_e$CC in test).}
+  \vspace{6pt}
+  \raggedright\footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}
+        \item \textbf{Transfer works:} pretrained beats scratch on every task and is stable over seeds.
+          T5 improves too, though the 120 PMT embeddings are new.
+        \item \textbf{Frozen} is poor on T1: the features need adapting to SBND.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}
+        \item \textbf{Wire-Cell leads T1 by 0.06}, but the runs were short: 3.6k hit-labelled events, still improving.
+        \item \textbf{Needed:} a $\nu_e$CC sample (BNB CV has 30 per 10k). Full production awaits approval.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%=====================================================================
+\begin{frame}{4a. Overlay (simulated $\nu$ + real cosmics): qlfm beats Wire-Cell and Pandora (\iss{10})}
+  \footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.54\textwidth}
+      \centering
+      \scriptsize
+      T1 charge-weighted F1, events with a visible in-AV $\nu$ (all / clean)\\[2pt]
+      \fitw{\begin{tabular}{lcc}
+        \toprule
+        & BNB & $\nu_e$ \\
+        & 379 / 71 events & 1254 / 211 events \\
+        \midrule
+        qlfm-M CL, nominal widths (3 seeds) & \good{0.92 / 0.93} & \good{0.94 / 0.93} \\
+        qlfm-M CL, data-like widths (3 seeds) & 0.91 / 0.93 & 0.93 / 0.93 \\
+        qlfm-M CL, width removed & 0.83 / 0.84 & 0.90 / 0.90 \\
+        PTv3+XF (3 seeds) & 0.82 / 0.81 & 0.91 / 0.91 \\
+        \midrule
+        WC main cluster & 0.88 / 0.92 & 0.85 / 0.83 \\
+        WC main \& generic $\nu$ (the label) & 0.82 / 0.88 & 0.73 / 0.63 \\
+        Pandora (max $\nu$-score slice) & 0.64 / 0.68 & 0.76 / 0.76 \\
+        \bottomrule
+      \end{tabular}}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \centering
+      \scriptsize
+      T2, $\nu$ vs no-$\nu$ (BNB + $\nu_e$ overlay)\\[2pt]
+      \fitw{\begin{tabular}{lcc}
+        \toprule
+        & all & clean \\
+        & 1633 / 189 & 282 / 37 \\
+        \midrule
+        qlfm-M CL AUC & 0.993--0.997 & 0.994--0.999 \\
+        PTv3+XF AUC & 0.995 & 0.990 \\
+        Pandora AUC & 0.85 & 0.89 \\
+        \midrule
+        WC generic $\nu$: efficiency & 0.70 & 0.61 \\
+        \quad at false-positive rate & 1.1\% & 0\% \\
+        qlfm-M CL efficiency at WC's FPR & \good{0.95--0.97} & \good{0.96--0.99} \\
+        \bottomrule
+      \end{tabular}}\\[6pt]
+      \raggedright\footnotesize
+      Existing 1\%-label multi-task models, no retraining. ``Clean'' $=$ not in our train split.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{4b. Real beam-on data: Wire-Cell wins, and the drop follows hit width (\iss{10})}
+  \footnotesize
+  \centering
+  \scriptsize
+  \begin{tabular}{lccc}
+    \toprule
+    & \multicolumn{2}{c}{share of WC's $\nu$ charge that the model also tags} & beam-on pass rate \\
+    model & overlay (simulated $\nu$) & \textbf{beam-on (real $\nu$)} & with EXT fixed at 2.2\% \\
+    \midrule
+    \textbf{Wire-Cell generic $\nu$} & -- & -- & \good{8.2\%} \\
+    PTv3+XF (sees no width, 3 seeds) & 0.76--0.78 & 0.56--0.58 & 7.2--7.8\% \\
+    qlfm-M C+XF & 0.82 & 0.60 & 5.7\% \\
+    qlfm-M CL, width removed & 0.80 & 0.63 & 4.9\% \\
+    qlfm-M CL, data-like widths (3 seeds) & 0.89 & 0.35--0.39 & 4.9--6.0\% \\
+    qlfm-M CL, nominal widths (3 seeds) & 0.89--0.90 & \bad{0.18--0.24} & 3.9--5.4\% \\
+    \bottomrule
+  \end{tabular}\\[1pt]
+  {\tiny 849 beam-on and 1248 EXT events with WC labels. Hit agreement on the 70 (beam-on) / 305 (overlay) WC-selected events. Pass rate: model cut set so EXT passes at WC's rate; binomial error $\approx\pm0.9\%$.}
+  \vspace{6pt}
+  \raggedright\footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}
+        \item \textbf{qlfm-M CL nominal} calls the same charge share $\nu$ in beam-on as in EXT (0.6\% vs 0.5\%): it finds essentially no real neutrinos.
+        \item \textbf{Drop $\propto$ reliance on width.} Data-like 2D widths help only partly; removing width leaves a smaller, uniform gap (0.80 $\rightarrow$ 0.63).
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}
+        \item \textbf{Wire-Cell} gives the largest beam-on excess at fixed EXT rate. Its tuning carries over to data better than our heads do.
+        \item \textbf{Caveats:} on data, WC is a reference, not truth (purity $\approx$0.96 in the overlay). Small samples; no POT scaling.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%=====================================================================
+\begin{frame}{Choice: which setting?}
+  \small
+  \begin{columns}[T]
+    \begin{column}{0.31\textwidth}
+      \begin{block}{A. MicroBooNE open data only}
+        \begin{itemize}
+          \item Domain shift is \emph{simulated} (data-like widths, \dots).
+          \item \textbf{Caveat:} known up front that not every data/sim difference is covered.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \begin{block}{B. Open data + some real data + Wire-Cell labeller}
+        \begin{itemize}
+          \item Real beam-on/EXT, labelled by Wire-Cell.
+          \item \textbf{Caveat gauged} on real data.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \begin{block}{C. SBND simulation alone}
+        \begin{itemize}
+          \item All-simulation sample: no domain-shift issue.
+          \item \textbf{Needs negotiation} with SBND.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%=====================================================================
+\begin{frame}{For discussion: next steps (tracked in \iss{12})}
+  \footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Closing the data/sim gap}
+      \begin{itemize}
+        \item Sunny's 3D per-plane width factors in training: fine-tune rerun ($\approx$3 node-h) or full re-pretraining.
+        \item Width randomisation or dropout, or no width input at all.
+        \item Wire-Cell as labeller: fine-tune on real data (beam-on/EXT) with Wire-Cell $\nu$ labels.
+        \item Pretrain on data-like sim, freeze the backbone, fine-tune on nominal (sim-like) sim.
+        \item Pretrain on real data, freeze the backbone, fine-tune on data-like sim.
+      \end{itemize}
+      \textbf{Samples}
+      \begin{itemize}
+        \item MicroBooNE round 2: more beam-on/EXT plus clean overlay.
+        \item SBND: $\nu_e$CC 10k (0.35 node-h) and the full 923k (12--30 node-h).
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{SBND modelling}
+      \begin{itemize}
+        \item Longer fine-tune: can qlfm close the 0.06 T1 gap to Wire-Cell?
+        \item SBND pretraining once the full sample exists.
+        \item The data/sim question applies to SBND too (all-simulation sample, no overlay).
+      \end{itemize}
+      \textbf{Paper (ME1, \iss{8})}
+      \begin{itemize}
+        \item The T1/T2 ``light helps'' claim must hold at data-like widths \emph{and} on real data.
+        \item Should the headline evaluation be on real data?
+        \item Fair comparison: give hit width to the other models (PTv3, \dots), or remove width from all of them.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\end{document}

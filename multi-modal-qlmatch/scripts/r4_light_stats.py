@@ -8,6 +8,7 @@ plus the PE-weighted ophit time spectrum per T2 class, and the largest reconstru
 OUT/light_cut.json (chosen cut, light-only T2 AUCs) and the figure FIG.
 
 Usage: r4_light_stats.py OUT_DIR FIG_PNG
+Other corpora (e.g. SBND, QLFM_DETECTOR=sbnd): set QLFM_CORPUS and QLFM_SPLITS; the windows come from qlfm.geometry.
 """
 import json
 import os
@@ -20,15 +21,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import roc_auc_score, roc_curve
 
+from qlfm import geometry as G
 from qlfm.data.dataset import Corpus
 from qlfm.data.labels import EV_KEYS, event_labels
 
 W = os.environ.get("QLFM_WORK", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work")
-WIN_LO, WIN_HI = 3.0, 6.0        # us: truth nu time 3.1-4.7 us + 0.48 us flash lag, with margin
-CUTS = (10, 20, 50, 100, 200, 500)
+WIN_LO, WIN_HI = G.BEAM_WINDOW_US   # MicroBooNE 3-6 us: truth nu time 3.1-4.7 us + 0.48 us flash lag, with margin
+T_LO, T_HI = G.LIGHT_EDGES[0], G.LIGHT_EDGES[-1]   # light-token window (MicroBooNE 0-24 us)
+CUTS = G.T2_PE_CUTS
 
 
-TB = np.arange(0, 24.25, 0.25)
+TB = np.arange(T_LO, T_HI + 0.25, 0.25)
 
 
 def per_event(c, cls):
@@ -40,7 +43,7 @@ def per_event(c, cls):
         ev = np.repeat(np.arange(sh.n), cnt)
         o = off[0]
         t, pe = t[o:o + cnt.sum()], pe[o:o + cnt.sum()]
-        inw = (t >= 0) & (t < 24.0)
+        inw = (t >= T_LO) & (t < T_HI)
         bw = (t >= WIN_LO) & (t < WIN_HI)
         a = np.bincount(ev, pe * inw, minlength=sh.n)
         pe_all.append(a)
@@ -55,8 +58,8 @@ def per_event(c, cls):
 def main():
     out, fig = sys.argv[1], sys.argv[2]
     os.makedirs(out, exist_ok=True)
-    c = Corpus(f"{W}/cache/bnb,{W}/cache/nue")
-    sp = np.load(f"{W}/cache/splits_all.npz")
+    c = Corpus(os.environ.get("QLFM_CORPUS", f"{W}/cache/bnb,{W}/cache/nue"))
+    sp = np.load(os.environ.get("QLFM_SPLITS", f"{W}/cache/splits_all.npz"))
     lab = event_labels({k: c.ev_array(k) for k in EV_KEYS})
     elig, y = lab["evt_nu"]
     pe_all, pe_win, spec = per_event(c, np.where(elig, y, -1))
@@ -80,7 +83,7 @@ def main():
                          n_fail_class=np.bincount(yt[~p], minlength=3).tolist()))
     res["cuts"] = rows
     # chosen cut: best balanced accuracy (in-AV nu vs no-nu) over a fine scan, rounded to the CUTS grid
-    grid = np.unique(np.round(np.logspace(0, 3.5, 200)))
+    grid = np.unique(np.round(np.logspace(0, 3.5 + np.log10(CUTS[-1] / 500), 200)))   # MicroBooNE: 10**3.5
     ba = [0.5 * ((pe_win[te][yt == 1] >= g).mean() + (pe_win[te][yt == 0] < g).mean()) for g in grid]
     g_best = float(grid[int(np.argmax(ba))])
     res["best_balanced_cut"] = g_best
