@@ -1,0 +1,64 @@
+#!/bin/bash
+#PBS -A LArTPC_FM
+#PBS -N a1r3_s0
+#PBS -q debug
+#PBS -l select=2:system=polaris
+#PBS -l walltime=01:00:00
+#PBS -l filesystems=home:eagle
+#PBS -j oe
+#PBS -r n
+# A1 round 3, stage 0 (plan sec. 3/6): node A = gates 1-4,6 (tests, splits, pretrain/downstream/eval smoke, qsub test);
+# node B = Part 1 (6 novnorm evals via run_queue.sh) concurrently. Then gate 5 + Part-1 summary.
+# GATE_OK -> chain-forward: qsub stage 1 (not in CHAIN_MODE). GATE_FAIL -> stop (exit 1).
+# Submit via scripts/a1r3_submit.sh (it overrides queue/nodes/walltime/account on the qsub command line).
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/a1r3_common.sh
+cd $QLFM_ROOT
+export JOB_T0=$(/bin/date +%s)
+WALL=$(wall_secs)
+mkdir -p $A1R3/smoke $A1R3/logs $A1R3/tasks $A1R3/novnorm
+status 0 "job started ($PBS_JOBID) queue=$(stage_queue 0) wall=$WALL s"
+if [ -f $A1R3/GATE_OK ]; then
+  status 0 "GATE_OK already present; skipping gates"
+else
+  rm -f $A1R3/GATE_FAIL
+  NA=$(head -1 $PBS_NODEFILE)
+  NB=$(grep -v -x "$NA" $PBS_NODEFILE | sort -u | head -1)
+  echo "$NA" > $A1R3/tasks/hosts_A; echo "$NB" > $A1R3/tasks/hosts_B
+  status 0 "node A (gates) = $NA, node B (part 1) = $NB"
+  # ---- node B: Part 1 (idempotent: finished tasks are skipped) -------------------------------------------------------
+  make_novnorm_tasks_file
+  ( DEADLINE=$(( JOB_T0 + WALL - 10 * 60 ))
+    mpiexec -n 1 --ppn 1 --hostfile $A1R3/tasks/hosts_B --cpu-bind none env RUN_ID="${PBS_JOBID%%.*}@$JOB_T0" \
+      QLFM_DETECTOR=${QLFM_DETECTOR:-uboone} bash $QLFM_ROOT/scripts/run_queue.sh $A1R3/tasks/novnorm.txt $DEADLINE ) \
+      > $A1R3/logs/s0_partB.log 2>&1 &
+  PB=$!
+  watch_tasks 0 $A1R3/tasks/novnorm.txt & W=$!
+  # ---- node A: gates 1-4, 6 (runs on the head node of this job) --------------------------------------------------------
+  s0_node_a > $A1R3/logs/s0_nodeA.log 2>&1
+  wait $PB
+  kill $W 2>/dev/null
+  # ---- gate 5 + Part-1 summary -----------------------------------------------------------------------------------------
+  REASONS=()
+  [ -f $A1R3/smoke/A_FAIL ] && REASONS+=("$(cat $A1R3/smoke/A_FAIL)")
+  NNV=$(n_novnorm_done)
+  if [ $NNV -ne 6 ]; then REASONS+=("gate5: only $NNV/6 novnorm evals finished (see logs/s0_partB.log)"); fi
+  if [ $NNV -eq 6 ]; then
+    $PY scripts/a1r3_summary.py --part 1 --check-gate5 --a1r3 $A1R3 > $A1R3/logs/s0_summary1.log 2>&1 \
+      || REASONS+=("gate5: a1r3_summary.py --part 1 --check-gate5 failed (see logs/s0_summary1.log)")
+  fi
+  if [ ${#REASONS[@]} -gt 0 ]; then
+    printf '%s\n' "${REASONS[@]}" > $A1R3/GATE_FAIL
+    status 0 "GATE_FAIL: ${REASONS[*]}"
+    exit 1
+  fi
+  { echo "$(/bin/date +%F_%T) job $PBS_JOBID"; cat $A1R3/smoke/ratio.txt
+    [ -f $A1R3/smoke/qsub_no ] && echo "qsub_compute=no"; } > $A1R3/GATE_OK
+  status 0 "GATE_OK ($(cat $A1R3/smoke/ratio.txt))"
+fi
+if grep -q "qsub_compute=no" $A1R3/GATE_OK 2>/dev/null && [ $CHAIN_MODE != 1 ]; then
+  status 0 "stage0 OK but compute-node qsub unavailable: run \`bash $QLFM_ROOT/scripts/a1r3_submit.sh --resume --chain\` from a login node"
+  exit 0
+fi
+if [ $CHAIN_MODE = 1 ]; then status 0 "chain mode: stage 1 already queued by a1r3_submit.sh"; exit 0; fi
+submit_stage 1 0 > /dev/null || { status 0 "FAILED: cannot submit stage 1"; exit 4; }

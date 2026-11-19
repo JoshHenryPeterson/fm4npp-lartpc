@@ -50,7 +50,10 @@ F_MEAS = F_MEAS_2D                                               # round-1 name
 F_MEAS_3D = {2: [1.000, 0.967, 0.941, 0.926, 0.915, 0.903],      # Y   (Sunny, p.13, 3D; round 2)
              1: [1.000, 0.980, 0.954, 0.938, 0.942, 0.941],      # V
              0: [1.000, 0.960, 0.922, 0.907, 0.892, 0.880]}      # U
-TABLES = {"meas": F_MEAS_2D, "meas3d": F_MEAS_3D}
+F_MEAS_3D_NOVNORM = {2: [1.000, 0.967, 0.941, 0.926, 0.915, 0.903],   # Y (= F_MEAS_3D)
+                     1: [0.900, 0.882, 0.859, 0.844, 0.848, 0.847],   # V, not renormalised at the anode (round 3)
+                     0: [1.000, 0.960, 0.922, 0.907, 0.892, 0.880]}   # U (= F_MEAS_3D)
+TABLES = {"meas": F_MEAS_2D, "meas3d": F_MEAS_3D, "meas3d_noVnorm": F_MEAS_3D_NOVNORM}
 US_PER_TICK, V_DRIFT_CM_US, MAX_DRIFT_CM = 0.5, 0.1098, 256.35
 V_DRIFT_DATA_CM_US = 0.1076                                      # drift velocity measured in data (round 2, diff_vd)
 D_DATA, D_SIM, S0_US2 = 3.74e-6, 6.40e-6, 1.9                    # cm2/us, cm2/us, us2
@@ -68,9 +71,16 @@ VARIANTS = {"nominal": (None, 0.0, ()), "w_meas": ("meas", 0.0, ()), "w_diff": (
             "l_scale80": (None, 0.0, ("scale80",)), "l_scale82": (None, 0.0, ("scale82",)),
             "l_slow": (None, 0.0, ("slow",)), "l_tail": (None, 0.0, ("tail",)),
             "l_comb80": (None, 0.0, ("scale80", "slow", "tail")), "l_comb82": (None, 0.0, ("scale82", "slow", "tail")),
-            "l_prompt": (None, 0.0, ("prompt",))}
-LIGHT_VARIANTS = [v for v, x in VARIANTS.items() if x[2]]
-WIDTH_VARIANTS = [v for v, x in VARIANTS.items() if not x[2]]       # what --variants all means (round-1/2 behaviour)
+            "l_prompt": (None, 0.0, ("prompt",)),
+            # A1 check round 3: noVnorm table, V-only pair, composite data-like domains (width + light)
+            "w_meas3d_noVnorm": ("meas3d_noVnorm", 0.0, ()), "w_meas3d_V": ("meas3d@1", 0.0, ()),
+            "w_meas3d_noVnorm_V": ("meas3d_noVnorm@1", 0.0, ()),
+            "d_real": ("meas3d", 0.0, ("scale80", "slow", "tail")),
+            "d_real_noVnorm": ("meas3d_noVnorm", 0.0, ("scale80", "slow", "tail"))}
+DOMAINS = {"sim": "nominal", "real": "d_real", "real_noVnorm": "d_real_noVnorm"}   # train/pretrain/eval --domain
+ROUND3_VARIANTS = ["w_meas3d_noVnorm", "w_meas3d_V", "w_meas3d_noVnorm_V", "d_real", "d_real_noVnorm"]
+LIGHT_VARIANTS = [v for v, x in VARIANTS.items() if x[2] and x[0] is None and not x[1]]   # pure-light (round 1); d_* are composite
+WIDTH_VARIANTS = [v for v, x in VARIANTS.items() if not x[2] and v not in ROUND3_VARIANTS]   # --variants all (round-1/2)
 # T5 target variants: the same components applied to the light target of has_flash events (no l_prompt counterpart)
 T5_TARGETS = {"t_scale80": ("scale80",), "t_scale82": ("scale82",), "t_slow": ("slow",), "t_tail": ("tail",),
               "t_comb80": ("scale80", "slow", "tail"), "t_comb82": ("scale82", "slow", "tail")}
@@ -515,7 +525,7 @@ def t5_analysis(pred, tgts, info, lab_evt, n_boot, nonu_dark_pb=None, bs_seed=0)
 
 
 # ---------------- model / test-set reconstruction ----------------
-def load_run(run, dev):
+def load_run(run, dev, absolute_domain=False):
     a = json.load(open(os.path.join(run, "metrics.json")))
     multitask = "tasks" in a
     a.setdefault("pimm_prep", "legacy")          # runs before audit #6 used the round 2-4 PTv3 preprocessing
@@ -532,6 +542,9 @@ def load_run(run, dev):
     if multitask:
         model = MultiTaskModel(backbone, list(a["tasks"]), ns.mode, ns.late_light, ns.hit_feat)
         model.width = a.get("width", "native")       # widths the model was trained with (applied in its forward)
+        model.domain = a.get("domain", "sim")        # input domain the model was trained in (applied in its forward)
+        if absolute_domain:                          # variants are then absolute input domains (nominal = sim)
+            model.width, model.domain = "native", "sim"
     else:
         model = DownstreamModel(backbone, ns.task, ns.mode, ns.late_light, ns.hit_feat)
     model = model.to(dev)
@@ -570,6 +583,8 @@ def main(argv=None):
     ap.add_argument("--nonu-dark-pb", type=float, default=None,
                     help="nonu_dark = class 0 with P_b < this (PE); default: class 0 without a flash, falling back "
                          "to P_b < 20 PE if that has fewer than %d events in the T5 test subset" % T5_MIN_DARK)
+    ap.add_argument("--absolute-domain", action="store_true",
+                    help="ignore the model's training width/domain: variants are absolute input domains (nominal = sim)")
     ap.add_argument("--time-limit", type=float, default=None, help="accepted for run_queue.sh; unused")
     args = ap.parse_args(argv)
     t0 = time.time()
@@ -581,7 +596,7 @@ def main(argv=None):
                                                                              if v != "nominal"]
     save_set = [v for v in args.save_preds.split(",") if v]
     assert all(v in variants for v in save_set), f"--save-preds variants must be run variants: {save_set}"
-    a, ns, model, multitask = load_run(args.run, dev)
+    a, ns, model, multitask = load_run(args.run, dev, args.absolute_domain)
     run_tasks = list(a["tasks"]) if multitask else [a["task"]]
     tasks = [t for t in args.tasks.split(",") if t in run_tasks]
     t5_targets = [v for v in args.t5_targets.split(",") if v]
@@ -684,6 +699,7 @@ def main(argv=None):
     out = dict(run=args.run, backbone=ns.backbone, mode=ns.mode, late_light=ns.late_light, multitask=multitask,
                tasks=tasks, variants=variants, sim_edep=args.sim_edep, n_boot=args.n_boot,
                stored={t: stored[t]["score"] for t in tasks}, results=summary, sim_share=sim_share,
+               model_domain=getattr(model, "domain", None), model_width=getattr(model, "width", None),
                light_diag=light_diag, t5=t5, minutes=(time.time() - t0) / 60)
     json.dump(out, open(out_path + ".tmp", "w"), indent=1)
     os.replace(out_path + ".tmp", out_path)

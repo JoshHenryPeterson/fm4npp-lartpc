@@ -1,0 +1,38 @@
+#!/bin/bash
+#PBS -A LArTPC_FM
+#PBS -N a1r3_s1
+#PBS -q preemptable
+#PBS -l select=4:system=polaris
+#PBS -l walltime=03:30:00
+#PBS -l filesystems=home:eagle
+#PBS -j oe
+#PBS -r y
+# A1 round 3, stage 1: 4 pretrains (pre/{sim,real}_{cl,c}), one node (4 ranks) each, pretrain_multi.pbs pattern.
+# --time-limit = walltime - 10 min; train_pretrain resumes from ckpt.pt (written every val_every=4000 steps and at exit),
+# so reruns (preemption requeue via -r y, or the RETRY chain below) continue where they stopped.
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/a1r3_common.sh
+cd $QLFM_ROOT
+JID=${PBS_JOBID%%.*}
+WALL=$(( $(wall_secs) / 60 )); TL=$(( WALL - 10 ))
+status 1 "job started ($PBS_JOBID) retry=$RETRY wall=${WALL}min time_limit=${TL}min"
+fix_done
+make_pretrain_runs
+mapfile -t NODES < <(sort -u $PBS_NODEFILE)
+i=0
+while read -r OUT ARGS; do
+  [ -z "$OUT" ] && continue
+  if [ $i -ge ${#NODES[@]} ]; then echo "not enough nodes for $OUT"; break; fi
+  hf=$A1R3/tasks/hosts_${JID}_$i; echo "${NODES[$i]}" > $hf
+  mkdir -p $OUT
+  ( export MASTER_ADDR=${NODES[$i]} MASTER_PORT=$((29600+i))
+    mpiexec -n 4 --ppn 4 --hostfile $hf --cpu-bind depth -d 8 env QLFM_DETECTOR=${QLFM_DETECTOR:-uboone} \
+      $PY -u -m qlfm.train_pretrain --out $OUT --time-limit $TL $ARGS 2>&1 | grep -v -E "Warn|bind: warning" >> $OUT/stdout_$JID.log ) &
+  echo "run $i on ${NODES[$i]} -> $OUT"
+  status 1 "pretrain $(basename $OUT) on ${NODES[$i]}"
+  i=$((i+1))
+done < $A1R3/tasks/pretrain_runs.txt
+wait
+fix_done
+status 1 "pretrain done files: $(n_pre_done)/4"
+chain_forward 1

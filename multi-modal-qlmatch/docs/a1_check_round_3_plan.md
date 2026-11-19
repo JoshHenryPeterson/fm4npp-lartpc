@@ -186,17 +186,16 @@ Required matrix (from the preplan), with run-dir names:
 |---|---|---|---|---|---|---|
 | 1 | CL | sim | real | frozen | 0, 1 | `cl_sim2real_frozen_s{0,1}` |
 | 2 | CL | sim | real | finetune | 0, 1 | `cl_sim2real_finetune_s{0,1}` |
-| 3 | C + XF | sim | real | frozen | 0 | `cxf_sim2real_frozen_s0` |
-| 4 | C + XF | sim | real | finetune | 0 | `cxf_sim2real_finetune_s0` |
+| 3 | C + XF | sim | real | frozen | 0, 1 | `cxf_sim2real_frozen_s{0,1}` |
+| 4 | C + XF | sim | real | finetune | 0, 1 | `cxf_sim2real_finetune_s{0,1}` |
 | 5 | CL | real | sim | frozen | 0, 1 | `cl_real2sim_frozen_s{0,1}` |
 | 6 | CL | real | sim | finetune | 0, 1 | `cl_real2sim_finetune_s{0,1}` |
-| 7 | C + XF | real | sim | frozen | 0 | `cxf_real2sim_frozen_s0` |
-| 8 | C + XF | real | sim | finetune | 0 | `cxf_real2sim_finetune_s0` |
+| 7 | C + XF | real | sim | frozen | 0, 1 | `cxf_real2sim_frozen_s{0,1}` |
+| 8 | C + XF | real | sim | finetune | 0, 1 | `cxf_real2sim_finetune_s{0,1}` |
 
-That is 12 runs: 8 at seed 0, plus seed 1 for the 4 CL runs.
+That is 16 runs: every arm at seeds 0 and 1.
 
-- The preplan asks for a second downstream seed for CL "if it isn't resource intensive". It costs about 4 GPU-h, roughly 1 nh, so it is included. The seed-1 runs use the same backbone.
-- Setting `EXTRA_SEEDS_CXF=1` in `a1r3_common.sh` adds the 4 C + XF seed-1 runs for about 0.8 nh more.
+- The preplan asks for a second downstream seed for CL "if it isn't resource intensive". Per the user's decision (2026-11-19), C + XF also gets seed 1. Together the seed-1 runs cost about 7 GPU-h (~2 nh). They use the same backbones as seed 0.
 
 **Recommended controls (seed 0, on by default; drop with `CONTROLS=0`).** These are needed to read the results: without them, a sim→real number has no matched in-domain reference.
 
@@ -223,7 +222,7 @@ That is 8 runs.
 - The default stays off, so rounds 1–2 behaviour is unchanged.
 - All round-3 evaluation uses `--absolute-domain`.
 
-For every new downstream run (20) and every baseline (8):
+For every new downstream run (24) and every baseline (8):
 
 ```
 python -m qlfm.eval_perturb --run <run> --absolute-domain --tasks hit,evt_nu \
@@ -305,7 +304,7 @@ $A1R3/
   summary.md, summary.json    # final Part 2 tables
 ```
 
-Disk use: preds are ~0.5 GB per saved variant, so 34 × 0.5 ≈ 17 GB. Backbones and heads add about 4 GB.
+Disk use: preds are ~0.5 GB per saved variant, so 32 × 0.5 ≈ 16 GB. Backbones and heads add about 4 GB.
 
 Final Part 2 table, one row per (model, pretrain→downstream, mode):
 - T1 cw, T1 evt-median and T2 AUC on the **real** domain, as mean ± SD where there are 2+ seeds;
@@ -323,11 +322,11 @@ Existing-model rows are included for both modes.
 |---|---|---|---|---|
 | 0: tests, splits, smoke, Part 1 | debug | 2 × 1:00 | ~1.5 nh | 2 nh |
 | 1: 4 pretrains | preemptable (`-r y`) | 4 × 3:30 | ~9 nh (2.0–2.5 h each) | 14 nh |
-| 2: 20 downstream runs | preemptable | 5 × 2:00 | ~6 nh | 10 nh |
-| 3: 28 evaluations + summary | preemptable | 4 × 1:30 | ~4 nh | 6 nh |
-| **total** | | | **~20 nh** | **~32 nh** |
+| 2: 24 downstream runs | preemptable | 6 × 2:00 | ~7 nh | 12 nh |
+| 3: 32 evaluations + summary | preemptable | 4 × 1:30 | ~4.5 nh | 6 nh |
+| **total** | | | **~22 nh** | **~34 nh** |
 
-Without controls the total drops by about 2 nh. With `EXTRA_SEEDS_CXF` it rises by about 1 nh.
+Without controls the total drops by about 2 nh.
 
 - Check the allocation with `sbank` before submitting. Paper-campaign mentions `neutrinoGPU::WireCellDev`; the scripts default to `LArTPC_FM` through `QLFM_PBS_ACCOUNT` in `env.sh`.
 - Add the job IDs and node-hours to the ledger in `paper-campaign.md` afterwards. Round 2 skipped this step.
@@ -350,7 +349,7 @@ Preemptable queue waits can be hours. To use debug-scaling instead (≤1 h jobs)
   - Otherwise, if `RETRY < 4`: `qsub -v RETRY=$((RETRY+1)) a1r3_stage1.pbs` (resume).
   - Otherwise: write FAILED to `STATUS`.
   - A preemption requeues the job (`-r y`), and it resumes.
-- **`a1r3_stage2.pbs`** (5 nodes). Runs `run_queue.sh` on the downstream task file. The task file is generated at stage start from the `done` backbones. Lock dirs and skip-if-`metrics.json` make reruns safe.
+- **`a1r3_stage2.pbs`** (6 nodes). Runs `run_queue.sh` on the downstream task file. The task file is generated at stage start from the `done` backbones. Lock dirs and skip-if-`metrics.json` make reruns safe.
   - The end-of-job logic is the same: if all present, submit stage 3; else retry ≤3; else fail.
 - **`a1r3_stage3.pbs`** (4 nodes). Runs the eval task file the same way, then `a1r3_summary.py --part 2`, then writes `STATUS: COMPLETE`.
 
@@ -398,7 +397,7 @@ Cost-saving note for the implementation session: delegate items 2–4 to an impl
 |---|---|---|
 | Sim-domain backbones | re-pretrain on `pre_r3` (disjoint, +4 nh) | reuse `Y/pre/m_*_f0.90` (overlaps `lab_f0.01`, so it violates the separate-lists request) |
 | In-domain controls (sim2sim, real2real) | included (+2 nh) | `CONTROLS=0` |
-| Second seed | CL only (as requested) | `EXTRA_SEEDS_CXF=1` (+1 nh) |
+| Second seed | CL and C + XF (user decision) | — |
 | Event lists | one disjoint set of lists shared by all variants | a different random split per variant (makes comparison noisier; not recommended) |
 | Queue for stages 1–3 | preemptable | debug-scaling segments |
 | Downstream tasks | all five (matches existing models) | `hit,evt_nu` only (slightly faster; heads not comparable to the existing models) |
@@ -408,4 +407,4 @@ Cost-saving note for the implementation session: delegate items 2–4 to an impl
 - "Real" is a modelled data-like domain: the round-2 width factors and the light-round `l_comb80`. It is not actual detector data. Widths are corrected on simulated neutrino hits only; light is corrected on all ophits of flash events.
 - C + XF pretraining sees only the width part of the domain shift.
 - One pretraining seed per backbone, so seed variance is downstream only.
-- There is one sample per arm for C + XF (unless `EXTRA_SEEDS_CXF`). Quote the bootstrap CIs and do not over-read differences smaller than the round-2 seed SD.
+- There are only two downstream seeds per arm. Quote the bootstrap CIs and do not over-read differences smaller than the round-2 seed SD.

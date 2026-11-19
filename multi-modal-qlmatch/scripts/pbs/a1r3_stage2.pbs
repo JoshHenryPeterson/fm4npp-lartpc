@@ -1,0 +1,24 @@
+#!/bin/bash
+#PBS -A LArTPC_FM
+#PBS -N a1r3_s2
+#PBS -q preemptable
+#PBS -l select=6:system=polaris
+#PBS -l walltime=02:00:00
+#PBS -l filesystems=home:eagle
+#PBS -j oe
+#PBS -r y
+# A1 round 3, stage 2: downstream runs (train_multitask) over 6 nodes x 4 GPUs via run_queue.sh. The task file is
+# regenerated at start from the finished backbones; run_queue skips tasks with metrics.json and reclaims stale locks,
+# train_multitask resumes (--resume 1). run_queue's >=45 min rule keeps finetune runs out of short remainders.
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/a1r3_common.sh
+cd $QLFM_ROOT
+export JOB_T0=$(/bin/date +%s)
+status 2 "job started ($PBS_JOBID) retry=$RETRY"
+make_down_tasks
+status 2 "$(wc -l < $A1R3/tasks/down.txt) tasks queued ($(n_down_done)/$(n_down_expected) already done)"
+watch_tasks 2 $A1R3/tasks/down.txt & W=$!
+run_tasks $A1R3/tasks/down.txt 3
+kill $W 2>/dev/null
+status 2 "downstream metrics.json: $(n_down_done)/$(n_down_expected)"
+chain_forward 2

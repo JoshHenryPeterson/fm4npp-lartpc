@@ -25,6 +25,9 @@ def get_args(argv=None):
     ap.add_argument("--splits", default=os.path.expandvars("$QLFM_WORK/cache/splits_all.npz"))
     ap.add_argument("--subset", default="train", help="key in the splits file (e.g. train, pre_f0.10)")
     ap.add_argument("--out", required=True)
+    ap.add_argument("--domain", default="sim", choices=["sim", "real", "real_noVnorm"],
+                    help="input domain of the pretraining (and validation) batches (A1 round 3; "
+                         "qlfm.eval_perturb.DOMAINS): real = w_meas3d widths on sim nu hits + l_comb80 light")
     ap.add_argument("--light", type=int, default=1)
     ap.add_argument("--steps", type=int, default=20000)
     ap.add_argument("--bs", type=int, default=32, help="events per GPU")
@@ -119,8 +122,16 @@ def lr_at(step, args, base):
     return base * 0.5 * (1 + math.cos(math.pi * min(1.0, p)))
 
 
+def to_domain(b, domain):
+    """Apply the input domain to an on-device batch (needs hit_nu_edep: the loaders use truth=True for domain != sim)."""
+    if domain == "sim":
+        return b
+    from qlfm.eval_perturb import DOMAINS, perturb
+    return perturb(b, DOMAINS[domain], 0.0)
+
+
 @torch.no_grad()
-def validate(mae, loader, dev, n_batches):
+def validate(mae, loader, dev, n_batches, domain="sim"):
     mae.eval()
     state = torch.cuda.get_rng_state()
     torch.cuda.manual_seed(1234)                      # identical masks every validation
@@ -129,7 +140,7 @@ def validate(mae, loader, dev, n_batches):
         if i >= n_batches:
             break
         with torch.autocast("cuda", dtype=torch.bfloat16):
-            out = mae(to_device(b, dev))
+            out = mae(to_domain(to_device(b, dev), domain))
         for key, v in out.items():
             if key.startswith("loss"):
                 acc[key] = acc.get(key, 0.0) + float(v)
@@ -172,6 +183,8 @@ def main(argv=None):
         step = s["step"]
         if s.get("steps_final"):
             args.steps = s["steps_final"]
+        if s["args"].get("domain", "sim") != args.domain:
+            raise SystemExit(f"checkpoint {ck} was trained with --domain {s['args'].get('domain', 'sim')}")
         if s["args"].get("warmup_steps"):
             args.warmup_steps = s["args"]["warmup_steps"]
     if not args.warmup_steps:                         # fixed once; later --budget-h changes of steps keep it
@@ -182,17 +195,19 @@ def main(argv=None):
         return
     model = DDP(mae, device_ids=[dev.index], find_unused_parameters=True) if world > 1 else mae
 
-    ds = EventDataset(corpus, train_idx)
+    truth = args.domain != "sim"                      # perturb() reads hit_nu_edep
+    ds = EventDataset(corpus, train_idx, truth=truth)
     loader = torch.utils.data.DataLoader(
         ds, batch_size=args.bs, sampler=InfiniteSampler(len(ds), args.seed * 1000 + rank * 7 + step),
         collate_fn=collate, num_workers=args.workers, pin_memory=True, persistent_workers=True, prefetch_factor=4)
-    vds = EventDataset(corpus, val_idx[rank::world])
+    vds = EventDataset(corpus, val_idx[rank::world], truth=truth)
     vloader = torch.utils.data.DataLoader(vds, batch_size=args.bs, collate_fn=collate, num_workers=2)
     n_val_batches = len(vds) // args.bs
 
     if dist.is_main():
         print(f"params(FM)={n_params/1e6:.2f}M world={world} train={len(train_idx)} lr={base_lr:.2e} "
               f"start_step={step}", flush=True)
+        np.savez(os.path.join(args.out, "event_lists.npz"), pretrain=train_idx, val=val_idx)
         json.dump(vars(args) | {"n_params": n_params, "world": world, "n_train": len(train_idx), "detector": G.DETECTOR},
                   open(os.path.join(args.out, "args.json"), "w"), indent=1)
     logf = open(os.path.join(args.out, "log.jsonl"), "a") if dist.is_main() else None
@@ -222,7 +237,7 @@ def main(argv=None):
     model.train()
     it = iter(loader)
     while step < args.steps:
-        b = to_device(next(it), dev)
+        b = to_domain(to_device(next(it), dev), args.domain)
         for g in opt.param_groups:
             g["lr"] = lr_at(step, args, base_lr)
         if args.budget_h and steps_final is None:
@@ -264,7 +279,7 @@ def main(argv=None):
                 logf.flush()
             t_log, ev_log, acc, acc_n = time.time(), 0, {}, {}
         if step % args.val_every == 0 or step == args.steps:
-            v = validate(mae, vloader, dev, n_val_batches)
+            v = validate(mae, vloader, dev, n_val_batches, args.domain)
             if dist.is_main():
                 rec = {"step": step, **{"val_" + k: x for k, x in v.items()}}
                 print(json.dumps(rec), flush=True)

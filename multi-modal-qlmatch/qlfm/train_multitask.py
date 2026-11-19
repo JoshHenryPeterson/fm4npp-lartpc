@@ -34,6 +34,12 @@ from qlfm.train_downstream import layer_groups, light_target
 TASKS = ("hit", "evt_nu", "flavor", "energy", "light")
 
 
+def check_args(args):
+    if args.width != "native" and args.domain != "sim":
+        raise SystemExit("--width and --domain are exclusive (would perturb twice)")
+    return args
+
+
 def get_args(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--corpus", default=os.path.expandvars("$QLFM_WORK/cache/bnb,$QLFM_WORK/cache/nue"))
@@ -48,6 +54,9 @@ def get_args(argv=None):
     ap.add_argument("--width", default="native", choices=["native", "meas", "const"],
                     help="hit widths in training and evaluation (#9): meas = simulated nu hits rescaled to data "
                          "(qlfm.eval_perturb w_meas), const = every hit the same width (no width information)")
+    ap.add_argument("--domain", default="sim", choices=["sim", "real", "real_noVnorm"],
+                    help="input domain in training and evaluation (A1 round 3; qlfm.eval_perturb.DOMAINS): real = "
+                         "w_meas3d widths + l_comb80 light. Exclusive with --width. T5 targets stay native.")
     ap.add_argument("--max-hits", type=int, default=None)
     ap.add_argument("--max-tokens", type=int, default=None)
     ap.add_argument("--label-frac", type=float, default=0.01)
@@ -77,7 +86,7 @@ def get_args(argv=None):
     ap.add_argument("--pos-freq", type=int, default=10)
     ap.add_argument("--cell-wires", type=int, default=16)
     ap.add_argument("--cell-ticks", type=int, default=64)
-    return ap.parse_args(argv)
+    return check_args(ap.parse_args(argv))
 
 
 class MultiTaskModel(nn.Module):
@@ -119,6 +128,9 @@ class MultiTaskModel(nn.Module):
         if getattr(self, "width", "native") != "native":
             from qlfm.eval_perturb import perturb
             b = perturb(b, "w_" + self.width, 0.0)
+        if getattr(self, "domain", "sim") != "sim":
+            from qlfm.eval_perturb import DOMAINS, perturb
+            b = perturb(b, DOMAINS[self.domain], 0.0)
         out = {}
         need_main = any(t != "light" for t in self.tasks)
         if need_main or not self.light_off_pass:
@@ -253,9 +265,11 @@ def main(argv=None):
     te = {t: pick(sp["test"][lab_np[t][0][sp["test"]]], args.n_test_light if t == "light" else args.n_test, 12)
           for t in tasks}
 
+    np.savez(os.path.join(args.out, "event_lists.npz"), train=tr, **{f"val_{t}": v for t, v in va.items()},
+             **{f"test_{t}": v for t, v in te.items()})
     backbone = build_backbone(args.backbone, args, None if args.fm == "none" else args.fm)
     model = MultiTaskModel(backbone, tasks, args.mode, args.late_light, args.hit_feat).to(dev)
-    model.width = args.width
+    model.width, model.domain = args.width, args.domain
     if args.mode == "frozen":
         for n_, p in backbone.named_parameters():
             p.requires_grad_("adapter_" in n_)

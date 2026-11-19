@@ -1,0 +1,41 @@
+#!/bin/bash
+#PBS -A LArTPC_FM
+#PBS -N a1r3_s3
+#PBS -q preemptable
+#PBS -l select=4:system=polaris
+#PBS -l walltime=01:30:00
+#PBS -l filesystems=home:eagle
+#PBS -j oe
+#PBS -r y
+# A1 round 3, stage 3: absolute-domain evaluation of the 24 new runs + 8 baselines (+ the Part-1 novnorm tasks, skipped
+# if done in stage 0), then a1r3_summary.py --part 2, then STATUS COMPLETE.
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/a1r3_common.sh
+cd $QLFM_ROOT
+export JOB_T0=$(/bin/date +%s)
+status 3 "job started ($PBS_JOBID) retry=$RETRY"
+make_eval_tasks
+status 3 "$(wc -l < $A1R3/tasks/eval.txt) tasks queued ($(n_eval_done)/$(n_eval_expected) evals + $(n_novnorm_done)/6 novnorm already done)"
+watch_tasks 3 $A1R3/tasks/eval.txt & W=$!
+run_tasks $A1R3/tasks/eval.txt 25         # leave 25 min of walltime for the summary (npz postprocessing of ~32 runs)
+kill $W 2>/dev/null
+NE=$(n_eval_done); NV=$(n_novnorm_done)
+status 3 "evals: $NE/$(n_eval_expected), novnorm: $NV/6"
+if [ $NV -eq 6 ] && [ ! -f $A1R3/novnorm/summary.md ]; then
+  $PY scripts/a1r3_summary.py --part 1 --a1r3 $A1R3 > $A1R3/logs/s3_summary1.log 2>&1 || status 3 "part-1 summary FAILED (see logs/s3_summary1.log)"
+fi
+if [ $NE -eq $(n_eval_expected) ]; then
+  status 3 "stage3 summary_start"
+  LEFT=$(( JOB_T0 + $(wall_secs) - $(/bin/date +%s) - 120 )); [ $LEFT -lt 300 ] && LEFT=300
+  timeout $LEFT $PY scripts/a1r3_summary.py --part 2 --a1r3 $A1R3 > $A1R3/logs/s3_summary2.log 2>&1
+  rc=$?
+  if [ $rc -ne 0 ]; then
+    status 3 "summary FAILED rc=$rc$([ $rc -eq 124 ] && echo ' (timeout)') (see logs/s3_summary2.log); not COMPLETE. Rerun: bash $QLFM_ROOT/scripts/a1r3_submit.sh --resume (stage 3 skips finished evals and redoes the summary)"
+    # all GPU work is done: do not burn retries on a summary bug
+    exit 3
+  fi
+  touch $A1R3/COMPLETE
+  status 3 "COMPLETE: summary at $A1R3/summary.md"
+  exit 0
+fi
+chain_forward 3
