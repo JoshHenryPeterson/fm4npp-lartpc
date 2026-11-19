@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::WireCellDev
+#PBS -A LArTPC_FM
 #PBS -q debug
 #PBS -l select=1:system=polaris
 #PBS -l walltime=00:15:00
@@ -7,6 +7,7 @@
 #PBS -N r1_mae_demo
 #PBS -j oe
 # Round-1 tech-note MAE input/output demo (scripts/r1_mae_demo.py) on event 786071 with the qlfm-S CL MAE.
-source /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/env.sh
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/env.sh
 cd $QLFM_ROOT
 CUDA_VISIBLE_DEVICES=0 $PY scripts/r1_mae_demo.py $QLFM_WORK/pre/cl_f0.90/ckpt.pt 786071 $QLFM_WORK/round1_demo/mae_786071.npz

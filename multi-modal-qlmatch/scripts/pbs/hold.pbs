@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::WireCellDev
+#PBS -A LArTPC_FM
 #PBS -q debug
 #PBS -l select=1:system=polaris
 #PBS -l walltime=01:00:00
@@ -7,5 +7,6 @@
 #PBS -N qlfm_hold
 #PBS -j oe
 # Holds a node for interactive development: runs scripts/node_agent.sh (file-based command inbox; use scripts/box_run.sh).
-export BOX=/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work/jobs/box
-bash /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/node_agent.sh
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/env.sh
+bash $QLFM_ROOT/scripts/node_agent.sh

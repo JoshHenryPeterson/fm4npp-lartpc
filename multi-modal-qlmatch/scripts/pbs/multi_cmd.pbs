@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::WireCellDev
+#PBS -A LArTPC_FM
 #PBS -r y
 #PBS -l filesystems=home:eagle
 #PBS -j oe

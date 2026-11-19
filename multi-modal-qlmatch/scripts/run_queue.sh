@@ -7,7 +7,7 @@
 # A task that exits with an error (not the deadline timeout) is logged to DIR.fails and skipped after MAX_FAIL errors
 # (delete DIR.fails to retry it).
 # Usage (inside PBS): mpiexec -n NNODES --ppn 1 env RUN_ID=... bash run_queue.sh TASKFILE DEADLINE_EPOCH
-source /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/env.sh
+source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/env.sh"
 TASKS=$1; DEADLINE=$2
 RUN_ID=${RUN_ID:-${PBS_JOBID%%.*}@0}
 STALE_MIN=${STALE_MIN:-15}

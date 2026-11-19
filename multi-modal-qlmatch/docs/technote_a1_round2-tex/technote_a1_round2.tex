@@ -1,0 +1,697 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,array,tabularx}
+\usepackage{xcolor}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{graphicx,float,caption}
+\captionsetup{font=small,labelfont=bf}
+\setlist{itemsep=1pt,topsep=3pt}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\title{\textbf{Tech note: A1 data/sim robustness, round 2 (hit width) and light check round 1}}
+\author{}
+\date{}
+\begin{document}
+\maketitle
+\vspace{-3em}
+Date: 2026-11-12. Inference only, no retraining.
+
+Plans:
+
+\begin{itemize}
+\item \texttt{docs/\allowbreak{}a1\_\allowbreak{}check\_\allowbreak{}round\_\allowbreak{}2\_\allowbreak{}plan.md} (width)
+\item \texttt{docs/\allowbreak{}a1\_\allowbreak{}light\_\allowbreak{}check\_\allowbreak{}round\_\allowbreak{}1\_\allowbreak{}plan.md} (light)
+\end{itemize}
+Raw outputs:
+
+\begin{itemize}
+\item \texttt{fm4npp-lartpc-work/\allowbreak{}a1r2/\allowbreak{}full/\allowbreak{}} (width)
+\item \texttt{fm4npp-lartpc-work/\allowbreak{}a1l1/\allowbreak{}full/\allowbreak{}} (light)
+\end{itemize}
+Each has a \texttt{summary.md} and per-run \texttt{metrics.json}.
+
+\section*{Summary}
+\textbf{Hit width (simulated-$\nu$ hits made data-like).}
+
+\begin{itemize}
+\item \textbf{qlfm-M CL is strongly width-sensitive.}
+\begin{itemize}
+\item The new 3D width factors cost \textbf{0.288 in T1} (charge-weighted F1, 0.919 $\rightarrow$ 0.631) and \textbf{0.328 in the paper's per-event median T1}. That is a third more than the 2D factors of round 1 ($-$0.212). T2 drops 0.055.
+\item Collection (Y only) accounts for $-$0.168 and induction (U+V only) for $-$0.080. These add up to less than the all-plane drop ($-$0.248 vs $-$0.288), so the planes interact.
+\item Per plane, U loses most: $-$0.33 charge-weighted, $-$0.47 per-event median.
+\end{itemize}
+\item \textbf{qlfm-M C + XF is robust.}
+\begin{itemize}
+\item The 3D factors cost 0.038 in T1 (0.046 per-event median) and 0.004 in T2. The plane contributions are additive.
+\end{itemize}
+\item \textbf{Diffusion bracket:} giving the data term its own drift velocity (0.1076 cm/$\mu$s) makes the \texttt{w\_\allowbreak{}diff} bracket slightly milder (CL $-$0.435 $\rightarrow$ $-$0.407). Both are still harsher than the measured 3D factors.
+\end{itemize}
+\textbf{Light (beam-flash light made data-like).}
+
+\begin{itemize}
+\item \textbf{Input corrections hardly matter.}
+\begin{itemize}
+\item \textbf{CL:} the combined correction costs $\leq$ 0.002 in T1. T2 is unchanged.
+\item \textbf{C + XF:} the combined correction costs 0.010 in T1 (0.016 per-event median). T2 is unchanged. That is about a quarter of its width effect.
+\item The 0.80 and 0.82 scales differ by about 0.001.
+\item The late-tail correction alone has no effect.
+\end{itemize}
+\item \textbf{Prompt-only light} (all light at dt $\geq$ 0.5 $\mu$s removed) separates the two models.
+\begin{itemize}
+\item \textbf{CL} barely notices: T1 $-$0.006, and bright-subset T2 actually +0.004. CL does not use the light's time profile.
+\item \textbf{C + XF} loses 0.077 in T1 ($-$0.111 per-event median) and 0.006--0.009 in T2. It relies on the late light.
+\end{itemize}
+\item \textbf{T5 target test:} applying the corrections to the T5 target of simulated-light events shrinks the T5 error gap between $\nu$ events and no-$\nu$ events.
+\begin{itemize}
+\item \textbf{Size of the gap closed:} 10--12\% for the 0.80 scale alone and 18\% (CL) / 22\% (C + XF) for the combined correction.
+\item \textbf{Direction of the head's error:} for C + XF the 0.80 scale brings the $\nu$ total-light bias from $-$0.11 to $-$0.01. For both models the combined correction overshoots, to +0.18--0.26.
+\item \textbf{Reading:} roughly 10--20\% of the $\nu$ / no-$\nu$ T5 gap is attributable to light mismodelling, as a lower bound. Most of the gap reflects $\nu$ events being brighter and harder to predict.
+\end{itemize}
+\end{itemize}
+\textbf{Bottom line:} the sim/data hit-width mismatch is the dominant robustness risk, and it is serious for CL. Light mismodelling has a small effect on T1/T2 for both models. It explains a modest part of the T5 $\nu$ / no-$\nu$ difference.
+
+\section{Setup}
+\begin{itemize}
+\item \textbf{Models:} the existing multi-task runs (yuhw, \texttt{s3/\allowbreak{}mt}), fine-tuned at 1\% labels, seeds 0, 1 and 2:
+\begin{itemize}
+\item \textbf{qlfm-M CL:} light-in-encoder pretraining; light is early-fused.
+\item \textbf{qlfm-M C + XF:} charge-only pretraining, with light added late by cross-attention.
+\end{itemize}
+\item \textbf{Evaluation:} \texttt{qlfm/\allowbreak{}eval\_\allowbreak{}perturb.py}. Each variant perturbs the inputs at inference time; the trained models are unchanged. Width and light are tested separately, each against its own nominal.
+\item \textbf{Metrics:}
+\begin{itemize}
+\item \textbf{T1:} $\nu$/cosmic hit F1. Two definitions:
+\begin{itemize}
+\item charge-weighted global F1, the in-run score;
+\item per-event median F1, the paper definition.
+\end{itemize}
+\item \textbf{T2:} $\nu$-event AUC, all events and the paper's bright subset (native 3--6 $\mu$s PE $\geq$ 200).
+\item \textbf{T5:} light-head MSE.
+\end{itemize}
+\item \textbf{Uncertainties:}
+\begin{itemize}
+\item Values are means $\pm$ seed SD over 3 seeds.
+\item Each seed also gets a paired event-bootstrap 95\% CI with 1000 resamples. The bootstrap CIs are typically $\pm$0.002--0.006, smaller than the seed spread. Per-seed brackets are tabulated in Appendix A.
+\end{itemize}
+\item \textbf{Validation:} each job started with a smoke run and acceptance checks. All checks passed:
+\begin{itemize}
+\item nominal reproduces the stored and round 1 scores within 1e-3;
+\item round 1 deltas reproduce;
+\item each perturbation acts exactly as defined.
+\end{itemize}
+\end{itemize}
+\section{Hit-width test (round 2)}
+\subsection{Variants}
+All variants act on the hits of simulated neutrinos only. \texttt{hit\_\allowbreak{}rms} is multiplied by f(plane, drift).
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LL}
+\toprule
+\textbf{Variant} & \textbf{Definition} \\
+\midrule
+\texttt{w\_\allowbreak{}meas} & 2D measured data/sim width ratio (round 1 table; cathode Y 0.919, V 0.955, U 0.895) \\
+\texttt{w\_\allowbreak{}meas3d} & 3D measured ratio, all planes (cathode Y 0.903, V 0.941, U 0.880) \\
+\texttt{w\_\allowbreak{}meas3d\_\allowbreak{}Y} & 3D ratio on Y only (f = 1 on U, V) \\
+\texttt{w\_\allowbreak{}meas3d\_\allowbreak{}UV} & 3D ratio on U and V only (f = 1 on Y) \\
+\texttt{w\_\allowbreak{}diff} & Diffusion-only bracket: both terms use v = 0.1098 cm/$\mu$s (0.8745 at full drift) \\
+\texttt{w\_\allowbreak{}diff\_\allowbreak{}vd} & Same, but the data term uses v\_data = 0.1076 cm/$\mu$s (cm$^2$ $\rightarrow$ $\mu$s$^2$ conversion only); drift time t and the clamp stay on the sim timescale (0.8823 at full drift) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+The 3D per-bin factors (Sunny, p.13), on drift-bin centres 388 \ldots{} 4271 ticks from the anode:
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LL}
+\toprule
+\textbf{Plane} & \textbf{Factors} \\
+\midrule
+Y & 1.000, 0.967, 0.941, 0.926, 0.915, 0.903 \\
+V & 1.000, 0.980, 0.954, 0.938, 0.942, 0.941 \\
+U & 1.000, 0.960, 0.922, 0.907, 0.892, 0.880 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\subsection{Main results ($\Delta$ vs nominal; nominal = absolute)}
+Mean $\pm$ seed SD (ddof = 1) over 3 seeds. Per-seed bootstrap 95\% CIs of the deltas are in A.1.
+
+\textbf{qlfm-M CL}
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLL}
+\toprule
+\textbf{Variant} & \textbf{T1 charge-wtd} & \textbf{T1 evt-median} & \textbf{T2} \\
+\midrule
+nominal & 0.9185 $\pm$ 0.0002 & 0.9217 $\pm$ 0.0006 & 0.9932 $\pm$ 0.0028 \\
+\texttt{w\_\allowbreak{}meas} (2D) & $-$0.2120 $\pm$ 0.0113 & n/a & $-$0.0337 $\pm$ 0.0046 \\
+\texttt{w\_\allowbreak{}meas3d} & \textbf{$-$0.2877 $\pm$ 0.0164} & \textbf{$-$0.3278 $\pm$ 0.0201} & \textbf{$-$0.0554 $\pm$ 0.0081} \\
+\texttt{w\_\allowbreak{}meas3d\_\allowbreak{}Y} & $-$0.1680 $\pm$ 0.0158 & n/a & $-$0.0229 $\pm$ 0.0070 \\
+\texttt{w\_\allowbreak{}meas3d\_\allowbreak{}UV} & $-$0.0799 $\pm$ 0.0035 & n/a & $-$0.0020 $\pm$ 0.0009 \\
+\texttt{w\_\allowbreak{}diff} & $-$0.4350 $\pm$ 0.0191 & n/a & $-$0.1062 $\pm$ 0.0135 \\
+\texttt{w\_\allowbreak{}diff\_\allowbreak{}vd} & $-$0.4066 $\pm$ 0.0188 & n/a & $-$0.0954 $\pm$ 0.0125 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{qlfm-M C + XF}
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLL}
+\toprule
+\textbf{Variant} & \textbf{T1 charge-wtd} & \textbf{T1 evt-median} & \textbf{T2} \\
+\midrule
+nominal & 0.8593 $\pm$ 0.0017 & 0.8622 $\pm$ 0.0015 & 0.9899 $\pm$ 0.0005 \\
+\texttt{w\_\allowbreak{}meas} (2D) & $-$0.0289 $\pm$ 0.0022 & n/a & $-$0.0027 $\pm$ 0.0002 \\
+\texttt{w\_\allowbreak{}meas3d} & \textbf{$-$0.0375 $\pm$ 0.0030} & \textbf{$-$0.0458 $\pm$ 0.0040} & \textbf{$-$0.0035 $\pm$ 0.0003} \\
+\texttt{w\_\allowbreak{}meas3d\_\allowbreak{}Y} & $-$0.0234 $\pm$ 0.0017 & n/a & $-$0.0022 $\pm$ 0.0003 \\
+\texttt{w\_\allowbreak{}meas3d\_\allowbreak{}UV} & $-$0.0142 $\pm$ 0.0008 & n/a & $-$0.0008 $\pm$ 0.0002 \\
+\texttt{w\_\allowbreak{}diff} & $-$0.0579 $\pm$ 0.0039 & n/a & $-$0.0058 $\pm$ 0.0004 \\
+\texttt{w\_\allowbreak{}diff\_\allowbreak{}vd} & $-$0.0517 $\pm$ 0.0034 & n/a & $-$0.0052 $\pm$ 0.0003 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+The per-event median is computed from saved predictions, which exist only for nominal and \texttt{w\_\allowbreak{}meas3d}.
+
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1r2_width_T1_qwtd_abs.pdf}\caption{Hit-width variants: T1 (charge-weighted F1), absolute (§2.2). Dashed lines: nominal per model.}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1r2_width_T1_qwtd.pdf}\caption{Hit-width variants: $\Delta$ T1 (charge-weighted) vs nominal (§2.2). Mean over 3 seeds; error bars = seed SD.}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1r2_width_T2_abs.pdf}\caption{Hit-width variants: T2 (AUC), absolute (§2.2).}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1r2_width_T2.pdf}\caption{Hit-width variants: $\Delta$ T2 vs nominal (§2.2).}\end{figure}
+\textbf{Additivity (T1 charge-weighted):}
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLL}
+\toprule
+\textbf{Model} & \textbf{$\Delta$Y + $\Delta$UV} & \textbf{$\Delta$all} & \textbf{Per-seed $\Delta$Y + $\Delta$UV $-$ $\Delta$all (s0, s1, s2)} \\
+\midrule
+CL & $-$0.2479 $\pm$ 0.0129 & $-$0.2877 $\pm$ 0.0164 & +0.0323, +0.0467, +0.0404 (all planes together cost more than the sum) \\
+C + XF & $-$0.0376 $\pm$ 0.0024 & $-$0.0375 $\pm$ 0.0030 & +0.0006, $-$0.0007, $-$0.0000 (additive) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\subsection{Per-plane T1 (seed-averaged)}
+$\Delta$ = change vs nominal on the same plane. Mean $\pm$ seed SD.
+
+\textbf{qlfm-M CL}, charge-weighted:
+
+\begin{center}\footnotesize
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLLLL}
+\toprule
+\textbf{Plane} & \textbf{Nominal} & \textbf{\texttt{w\_\allowbreak{}meas3d}} & \textbf{$\Delta$} & \textbf{Y-only $\Delta$} & \textbf{UV-only $\Delta$} \\
+\midrule
+U & 0.9013 $\pm$ 0.0002 & 0.5727 $\pm$ 0.0139 & $-$0.3286 $\pm$ 0.0137 & $-$0.1043 $\pm$ 0.0149 & $-$0.2040 $\pm$ 0.0077 \\
+V & 0.9016 $\pm$ 0.0009 & 0.6451 $\pm$ 0.0116 & $-$0.2566 $\pm$ 0.0119 & $-$0.1234 $\pm$ 0.0129 & $-$0.0616 $\pm$ 0.0066 \\
+Y & 0.9486 $\pm$ 0.0001 & 0.6659 $\pm$ 0.0224 & $-$0.2827 $\pm$ 0.0223 & $-$0.2711 $\pm$ 0.0204 & $-$0.0081 $\pm$ 0.0005 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{qlfm-M CL}, per-event median (paper definition):
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLL}
+\toprule
+\textbf{Plane} & \textbf{Nominal} & \textbf{\texttt{w\_\allowbreak{}meas3d}} & \textbf{$\Delta$} \\
+\midrule
+U & 0.8929 $\pm$ 0.0006 & 0.4230 $\pm$ 0.0147 & \textbf{$-$0.4699 $\pm$ 0.0153} \\
+V & 0.8964 $\pm$ 0.0009 & 0.5990 $\pm$ 0.0138 & $-$0.2974 $\pm$ 0.0138 \\
+Y & 0.9712 $\pm$ 0.0004 & 0.6831 $\pm$ 0.0335 & $-$0.2881 $\pm$ 0.0336 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{qlfm-M C + XF}, charge-weighted:
+
+\begin{center}\footnotesize
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLLLL}
+\toprule
+\textbf{Plane} & \textbf{Nominal} & \textbf{\texttt{w\_\allowbreak{}meas3d}} & \textbf{$\Delta$} & \textbf{Y-only $\Delta$} & \textbf{UV-only $\Delta$} \\
+\midrule
+U & 0.8391 $\pm$ 0.0024 & 0.7920 $\pm$ 0.0049 & $-$0.0471 $\pm$ 0.0056 & $-$0.0150 $\pm$ 0.0014 & $-$0.0313 $\pm$ 0.0029 \\
+V & 0.8435 $\pm$ 0.0032 & 0.8161 $\pm$ 0.0024 & $-$0.0274 $\pm$ 0.0013 & $-$0.0110 $\pm$ 0.0007 & $-$0.0154 $\pm$ 0.0003 \\
+Y & 0.8907 $\pm$ 0.0004 & 0.8522 $\pm$ 0.0022 & $-$0.0385 $\pm$ 0.0025 & $-$0.0413 $\pm$ 0.0034 & +0.0006 $\pm$ 0.0002 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{qlfm-M C + XF}, per-event median (paper definition):
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLL}
+\toprule
+\textbf{Plane} & \textbf{Nominal} & \textbf{\texttt{w\_\allowbreak{}meas3d}} & \textbf{$\Delta$} \\
+\midrule
+U & 0.8191 $\pm$ 0.0021 & 0.7455 $\pm$ 0.0078 & $-$0.0737 $\pm$ 0.0094 \\
+V & 0.8305 $\pm$ 0.0049 & 0.7912 $\pm$ 0.0060 & $-$0.0393 $\pm$ 0.0029 \\
+Y & 0.9334 $\pm$ 0.0012 & 0.8977 $\pm$ 0.0023 & $-$0.0357 $\pm$ 0.0013 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1r2_perplane_T1_qwtd_abs.pdf}\caption{Per-plane T1 (charge-weighted), absolute, for nominal, \texttt{w\_\allowbreak{}meas3d}, Y-only and UV-only (§2.3). Dashed segments: same-plane nominal.}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1r2_perplane_T1_qwtd.pdf}\caption{Per-plane $\Delta$ T1 (charge-weighted) for \texttt{w\_\allowbreak{}meas3d}, Y-only and UV-only (§2.3).}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1r2_perplane_T1_evtmed_abs.pdf}\caption{Per-plane T1 (per-event median), absolute, for nominal and \texttt{w\_\allowbreak{}meas3d} (§2.3).}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1r2_perplane_T1_evtmed.pdf}\caption{Per-plane $\Delta$ T1 (per-event median) for \texttt{w\_\allowbreak{}meas3d} (§2.3); Y-only/UV-only per-event medians were not saved.}\end{figure}
+\begin{itemize}
+\item \textbf{Cross-plane effect in CL:} perturbing Y alone also costs U and V 0.10--0.12, through the model's cross-plane context.
+\item \textbf{Within-plane effect in C + XF:} each plane responds mainly to its own perturbation.
+\item \textbf{U is hit hardest in both models.} Its width factor is the smallest (0.880 at the cathode).
+\end{itemize}
+\subsection{Width findings}
+\begin{enumerate}
+\item The 3D measurement moves the data-like point further from simulation. CL's T1 loss grows from $-$0.21 (2D) to $-$0.29 (3D).
+\item CL's sensitivity is not confined to the plane being perturbed. Y-only and U+V-only perturbations interact, and a Y-only change propagates to U and V.
+\item C + XF's loss is small and additive by plane.
+\item The diffusion bracket is harsher than the measured 3D factors for both models. The data drift velocity changes it only modestly: CL $-$0.435 $\rightarrow$ $-$0.407, C + XF $-$0.058 $\rightarrow$ $-$0.052.
+\end{enumerate}
+\section{Light check (round 1)}
+\subsection{Definitions and variants}
+\begin{itemize}
+\item \textbf{Per event:}
+\begin{itemize}
+\item \textbf{t\_b} is the lower edge of the 0.1 $\mu$s bin with the most ophit PE in 3.4--5.6 $\mu$s.
+\item \textbf{P\_b} is the summed PE in [t\_b $-$ 0.25, t\_b + 0.5) $\mu$s.
+\item \textbf{dt} = t $-$ t\_b.
+\end{itemize}
+\item \textbf{Scope:} variants act on all ophits of events with a flash, because the open files do not mark simulated ophits. Hit width and charge stay native.
+\end{itemize}
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LL}
+\toprule
+\textbf{Variant} & \textbf{Definition} \\
+\midrule
+\texttt{l\_\allowbreak{}scale80} / \texttt{l\_\allowbreak{}scale82} & PE $\times$ 0.80 / 0.82 in dt $\in$ [$-$0.25, 3) $\mu$s (from MicroBooNE sim/data PE/cm 1.25 / 1.22) \\
+\texttt{l\_\allowbreak{}slow} & dt [0.5,1) / [1,1.5) / [1.5,2) / [2,3) $\mu$s $\times$ 0.83/0.65/0.61/0.64 if P\_b < 600, $\times$ 0.82/0.63/0.48/0.45 if P\_b $\geq$ 600 \\
+\texttt{l\_\allowbreak{}tail} & dt $\geq$ 8 $\mu$s $\times$ 0.37 if P\_b $\geq$ 600 \\
+\texttt{l\_\allowbreak{}comb80} / \texttt{l\_\allowbreak{}comb82} & scale + slow + tail combined \\
+\texttt{l\_\allowbreak{}prompt} & all ophits at dt $\geq$ 0.5 $\mu$s removed \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{Diagnostics:}
+
+\begin{itemize}
+\item \textbf{Flash finding:} 23 261 test events; a flash was found in 99.97\% (3.4--5.6 $\mu$s). The t\_b quantiles are 3.6 / 4.0 / 4.4 / 4.8 / 5.1 $\mu$s (5, 25, 50, 75, 95\%).
+\item \textbf{P\_b:} quantiles 10.2 / 98.3 / 573.6 / 1903.9 / 5818.3 PE (5, 25, 50, 75, 95\%). P\_b $\geq$ 600 in 49.13\% of events (49.14\% of flash events).
+\item \textbf{Bright subset} (native 3--6 $\mu$s PE $\geq$ 200, used for T2 bright): 0.7263 of events.
+\item \textbf{t\_b histogram} (22 bins of 0.1 $\mu$s from 3.4 $\mu$s): 80, 70, 1071, 1504, 1352, 1475, 1325, 1374, 1571, 1360, 1573, 1323, 1284, 1547, 1315, 1598, 1327, 1361, 437, 96, 93, 118. The distribution is flat from 3.6 to 5.1 $\mu$s, with small tails at both ends.
+\item \textbf{Measured PE ratios:} summed PE after/before in each dt window (flash events, seed-0 run of the first model) matches the definitions exactly. Dim = P\_b < 600, bright = P\_b $\geq$ 600.
+\end{itemize}
+\begin{center}\footnotesize
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLLLL}
+\toprule
+\textbf{Variant} & \textbf{Class} & \textbf{[$-$0.25, 0.5)} & \textbf{[0.5, 3)} & \textbf{[3, 8)} & \textbf{$\geq$ 8} \\
+\midrule
+\texttt{l\_\allowbreak{}scale80} & dim & 0.8000 & 0.8000 & 1.0000 & 1.0000 \\
+\texttt{l\_\allowbreak{}scale80} & bright & 0.8000 & 0.8000 & 1.0000 & 1.0000 \\
+\texttt{l\_\allowbreak{}scale82} & dim & 0.8200 & 0.8200 & 1.0000 & 1.0000 \\
+\texttt{l\_\allowbreak{}scale82} & bright & 0.8200 & 0.8200 & 1.0000 & 1.0000 \\
+\texttt{l\_\allowbreak{}slow} & dim & 1.0000 & 0.6792 & 1.0000 & 1.0000 \\
+\texttt{l\_\allowbreak{}slow} & bright & 1.0000 & 0.5326 & 1.0000 & 1.0000 \\
+\texttt{l\_\allowbreak{}tail} & dim & 1.0000 & 1.0000 & 1.0000 & 1.0000 \\
+\texttt{l\_\allowbreak{}tail} & bright & 1.0000 & 1.0000 & 1.0000 & 0.3700 \\
+\texttt{l\_\allowbreak{}comb80} & dim & 0.8000 & 0.5434 & 1.0000 & 1.0000 \\
+\texttt{l\_\allowbreak{}comb80} & bright & 0.8000 & 0.4260 & 1.0000 & 0.3700 \\
+\texttt{l\_\allowbreak{}comb82} & dim & 0.8200 & 0.5570 & 1.0000 & 1.0000 \\
+\texttt{l\_\allowbreak{}comb82} & bright & 0.8200 & 0.4367 & 1.0000 & 0.3700 \\
+\texttt{l\_\allowbreak{}prompt} & dim & 1.0000 & 0.0000 & 0.0000 & 0.0000 \\
+\texttt{l\_\allowbreak{}prompt} & bright & 1.0000 & 0.0000 & 0.0000 & 0.0000 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\subsection{Input-light results ($\Delta$ vs nominal)}
+\textbf{qlfm-M CL} (nominal: T1 0.9185 $\pm$ 0.0002 / 0.9217 $\pm$ 0.0006 evt-median, T2 0.9932 $\pm$ 0.0029 all, 0.9881 $\pm$ 0.0035 bright). Per-seed CIs in A.2.
+
+\begin{center}\footnotesize
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLLL}
+\toprule
+\textbf{Variant} & \textbf{T1 charge-wtd} & \textbf{T1 evt-median} & \textbf{T2 all} & \textbf{T2 bright} \\
+\midrule
+\texttt{l\_\allowbreak{}scale80} & $-$0.0004 $\pm$ 0.0001 & $-$0.0009 $\pm$ 0.0002 & +0.0000 $\pm$ 0.0003 & +0.0002 $\pm$ 0.0006 \\
+\texttt{l\_\allowbreak{}scale82} & $-$0.0004 $\pm$ 0.0001 & $-$0.0007 $\pm$ 0.0002 & +0.0000 $\pm$ 0.0002 & +0.0002 $\pm$ 0.0006 \\
+\texttt{l\_\allowbreak{}slow} & $-$0.0003 $\pm$ 0.0000 & $-$0.0005 $\pm$ 0.0003 & +0.0002 $\pm$ 0.0002 & +0.0006 $\pm$ 0.0006 \\
+\texttt{l\_\allowbreak{}tail} & $-$0.0000 $\pm$ 0.0000 & $-$0.0000 $\pm$ 0.0001 & +0.0000 $\pm$ 0.0000 & $-$0.0002 $\pm$ 0.0005 \\
+\texttt{l\_\allowbreak{}comb80} & $-$0.0010 $\pm$ 0.0001 & $-$0.0019 $\pm$ 0.0003 & +0.0001 $\pm$ 0.0003 & +0.0005 $\pm$ 0.0008 \\
+\texttt{l\_\allowbreak{}comb82} & $-$0.0009 $\pm$ 0.0001 & $-$0.0017 $\pm$ 0.0004 & +0.0002 $\pm$ 0.0003 & +0.0005 $\pm$ 0.0008 \\
+\texttt{l\_\allowbreak{}prompt} & $-$0.0059 $\pm$ 0.0007 & $-$0.0058 $\pm$ 0.0008 & +0.0012 $\pm$ 0.0009 & \textbf{+0.0041 $\pm$ 0.0011} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{qlfm-M C + XF} (nominal: T1 0.8593 $\pm$ 0.0017 / 0.8623 $\pm$ 0.0016 evt-median, T2 0.9899 $\pm$ 0.0005 all, 0.9689 $\pm$ 0.0004 bright). Per-seed CIs in A.2.
+
+\begin{center}\footnotesize
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLLL}
+\toprule
+\textbf{Variant} & \textbf{T1 charge-wtd} & \textbf{T1 evt-median} & \textbf{T2 all} & \textbf{T2 bright} \\
+\midrule
+\texttt{l\_\allowbreak{}scale80} & $-$0.0039 $\pm$ 0.0004 & $-$0.0067 $\pm$ 0.0007 & +0.0001 $\pm$ 0.0001 & +0.0001 $\pm$ 0.0003 \\
+\texttt{l\_\allowbreak{}scale82} & $-$0.0032 $\pm$ 0.0004 & $-$0.0057 $\pm$ 0.0006 & +0.0001 $\pm$ 0.0001 & +0.0002 $\pm$ 0.0003 \\
+\texttt{l\_\allowbreak{}slow} & $-$0.0035 $\pm$ 0.0003 & $-$0.0060 $\pm$ 0.0003 & +0.0003 $\pm$ 0.0000 & +0.0007 $\pm$ 0.0002 \\
+\texttt{l\_\allowbreak{}tail} & +0.0001 $\pm$ 0.0001 & +0.0001 $\pm$ 0.0002 & $-$0.0002 $\pm$ 0.0001 & $-$0.0004 $\pm$ 0.0002 \\
+\texttt{l\_\allowbreak{}comb80} & \textbf{$-$0.0099 $\pm$ 0.0002} & \textbf{$-$0.0156 $\pm$ 0.0010} & $-$0.0001 $\pm$ 0.0001 & $-$0.0000 $\pm$ 0.0005 \\
+\texttt{l\_\allowbreak{}comb82} & $-$0.0088 $\pm$ 0.0002 & $-$0.0143 $\pm$ 0.0012 & $-$0.0000 $\pm$ 0.0001 & +0.0000 $\pm$ 0.0004 \\
+\texttt{l\_\allowbreak{}prompt} & \textbf{$-$0.0771 $\pm$ 0.0135} & \textbf{$-$0.1106 $\pm$ 0.0222} & $-$0.0057 $\pm$ 0.0008 & $-$0.0085 $\pm$ 0.0032 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1l1_light_T1_qwtd_abs.pdf}\caption{Input-light variants: T1 (charge-weighted F1), absolute (§3.2).}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1l1_light_T1_qwtd.pdf}\caption{Input-light variants: $\Delta$ T1 (charge-weighted) vs nominal (§3.2). Right panel: \texttt{l\_\allowbreak{}prompt} on its own scale.}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1l1_light_T1_evtmed_abs.pdf}\caption{Input-light variants: T1 (per-event median), absolute (§3.2).}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1l1_light_T1_evtmed.pdf}\caption{Input-light variants: $\Delta$ T1 (per-event median) vs nominal (§3.2).}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1l1_light_T2_all_abs.pdf}\caption{Input-light variants: T2 (all events), absolute (§3.2).}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1l1_light_T2_all.pdf}\caption{Input-light variants: $\Delta$ T2 (all events) vs nominal (§3.2).}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1l1_light_T2_bright_abs.pdf}\caption{Input-light variants: T2 (bright subset), absolute (§3.2).}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1l1_light_T2_bright.pdf}\caption{Input-light variants: $\Delta$ T2 (bright subset) vs nominal (§3.2).}\end{figure}
+\textbf{T2 by native P\_b class} (nominal AUC, then $\Delta$; mean $\pm$ seed SD; per-seed CIs in A.3):
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLL}
+\toprule
+\textbf{Model} & \textbf{Variant} & \textbf{P\_b < 600} & \textbf{P\_b >= 600} \\
+\midrule
+CL & nominal & 0.9874 $\pm$ 0.0055 & 0.9914 $\pm$ 0.0009 \\
+CL & \texttt{l\_\allowbreak{}slow} & $-$0.0001 $\pm$ 0.0004 & +0.0012 $\pm$ 0.0013 \\
+CL & \texttt{l\_\allowbreak{}tail} & +0.0000 $\pm$ 0.0000 & $-$0.0006 $\pm$ 0.0012 \\
+CL & \texttt{l\_\allowbreak{}comb80} & $-$0.0004 $\pm$ 0.0009 & +0.0013 $\pm$ 0.0014 \\
+CL & \texttt{l\_\allowbreak{}comb82} & $-$0.0003 $\pm$ 0.0008 & +0.0013 $\pm$ 0.0014 \\
+CL & \texttt{l\_\allowbreak{}prompt} & +0.0005 $\pm$ 0.0022 & +0.0040 $\pm$ 0.0010 \\
+C + XF & nominal & 0.9869 $\pm$ 0.0010 & 0.9688 $\pm$ 0.0011 \\
+C + XF & \texttt{l\_\allowbreak{}slow} & +0.0000 $\pm$ 0.0001 & +0.0008 $\pm$ 0.0004 \\
+C + XF & \texttt{l\_\allowbreak{}tail} & $-$0.0000 $\pm$ 0.0000 & $-$0.0006 $\pm$ 0.0004 \\
+C + XF & \texttt{l\_\allowbreak{}comb80} & $-$0.0006 $\pm$ 0.0002 & $-$0.0004 $\pm$ 0.0012 \\
+C + XF & \texttt{l\_\allowbreak{}comb82} & $-$0.0005 $\pm$ 0.0002 & $-$0.0003 $\pm$ 0.0012 \\
+C + XF & \texttt{l\_\allowbreak{}prompt} & \textbf{$-$0.0129 $\pm$ 0.0015} & \textbf{$-$0.0076 $\pm$ 0.0026} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+Only \texttt{l\_\allowbreak{}prompt} on C + XF is clearly beyond noise (the CL \texttt{l\_\allowbreak{}prompt} P\_b >= 600 value is positive in all seeds).
+
+\subsection{Input-light findings}
+\begin{enumerate}
+\item \textbf{Total scale (0.80 or 0.82):} negligible for CL and small for C + XF (T1 $-$0.004 / $-$0.007). The two values differ by about 0.001, so the uncertainty in the published factor does not matter here.
+\item \textbf{Slow light vs tail:} for C + XF the slow-light correction matters as much as the scale ($-$0.006 evt-median). The late-tail correction alone does nothing for either model. The combined effect is about the sum of its parts: $-$0.0156 for C + XF, against $-$0.0127 summed.
+\item \textbf{Time profile (\texttt{l\_\allowbreak{}prompt}):}
+\begin{itemize}
+\item CL barely uses light beyond the prompt window. Removing it costs 0.006 in T1 and slightly improves bright-subset T2.
+\item C + XF depends on the late light for T1 ($-$0.08 / $-$0.11), so its time-profile mismodelling is the relevant light risk. The measured corrections cost only 0.010--0.016.
+\end{itemize}
+\item \textbf{CL vs C + XF:} early fusion (CL) is nearly insensitive to light changes. Late fusion (C + XF) is sensitive but stays well below its width sensitivity: $-$0.016 vs $-$0.046 evt-median T1.
+\end{enumerate}
+\section{T5 target test}
+\subsection{Method}
+\begin{itemize}
+\item \textbf{Predictions:} the light head (charge $\rightarrow$ 32 PMTs $\times$ 17 log1p light features) runs once on unperturbed input over its 10 000 test events. CL keeps its trained light-off pass.
+\item \textbf{Targets:} each correction is applied to the target of events with a beam flash, and the MSE is recomputed. The head is unchanged.
+\item \textbf{Groups} (\texttt{evt\_\allowbreak{}nu} class):
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+\textbf{Group} & \textbf{Definition} & \textbf{n} \\
+\midrule
+\texttt{nu} & visible in-AV $\nu$ & 4389 \\
+\texttt{out\_\allowbreak{}av} & $\nu$ outside the AV that still leaves charge & 3251 \\
+\texttt{nonu\_\allowbreak{}flash} & no-$\nu$ with P\_b $\geq$ 20 PE & 992 \\
+\texttt{nonu\_\allowbreak{}dark} & no-$\nu$ with P\_b < 20 PE: the real-light reference, never corrected & 948 \\
+\texttt{other} & low-visibility in-AV $\nu$; excluded & 420 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\item \textbf{Gap} = MSE(\texttt{nu}) $-$ MSE(\texttt{nonu\_\allowbreak{}dark}).
+\item \textbf{Fraction closed} = (gap\_nominal $-$ gap) / gap\_nominal.
+\item \textbf{Bias} = mean (pred $-$ target) of the per-PMT log1p total.
+\item \textbf{Reference definition:} the planned reference was no-$\nu$ events with no flash at all. Only 1 of the 1 940 class-0 test events had none, so every run used the P\_b < 20 PE fallback. The P\_b quantiles for class 0 are 5.7 / 9.7 / 21 / 69 / 1115 PE (5, 25, 50, 75, 95\%). Fraction of class-0 events with P\_b below a threshold (seed 0; flash found in 0.999, P\_b range 0 to 6597 PE):
+\begin{center}\footnotesize
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLLLLL}
+\toprule
+\textbf{P\_b below (PE)} & \textbf{1} & \textbf{5} & \textbf{20} & \textbf{50} & \textbf{100} & \textbf{200} \\
+\midrule
+fraction & 0.001 & 0.032 & 0.489 & 0.688 & 0.806 & 0.871 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\item \textbf{Input-light check:} the input-light variants leave T5 unchanged. |$\Delta$MSE| $\leq$ 1.3e-5, which is bf16 rounding.
+\end{itemize}
+\subsection{Reference MSE (same under every target variant; checked identical in every seed)}
+\begin{center}\footnotesize
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLLL}
+\toprule
+\textbf{Model} & \textbf{MSE(\texttt{nonu\_\allowbreak{}dark})} & \textbf{per-seed (CIs in A.5)} & \textbf{per-PMT-total MSE} & \textbf{total bias} \\
+\midrule
+CL & \textbf{0.2158 $\pm$ 0.0011} & 0.2146, 0.2160, 0.2169 (95\% CI $\pm$0.010) & 0.5710 $\pm$ 0.0059 & +0.2683 $\pm$ 0.0034 \\
+C + XF & \textbf{0.2593 $\pm$ 0.0004} & 0.2588, 0.2595, 0.2596 (95\% CI $\pm$0.012) & 0.8265 $\pm$ 0.0111 & +0.4360 $\pm$ 0.0063 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\subsection{Results}
+Mean $\pm$ seed SD. Group sizes as in 4.1 (nu 4389, out\_av 3251, nonu\_flash 992). The $\Delta$gap columns for \texttt{out\_\allowbreak{}av} and \texttt{nonu\_\allowbreak{}flash} are the change in MSE(group) $-$ MSE(\texttt{nonu\_\allowbreak{}dark}). Per-seed CIs of $\Delta$gap are in A.4.
+
+\textbf{qlfm-M CL}
+
+\begin{center}\scriptsize
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLLLLLLLL}
+\toprule
+\textbf{Target variant} & \textbf{MSE nu} & \textbf{MSE out\_av} & \textbf{MSE nonu\_flash} & \textbf{gap} & \textbf{$\Delta$gap} & \textbf{closed} & \textbf{$\Delta$gap out\_av} & \textbf{$\Delta$gap nonu\_flash} & \textbf{bias nu} \\
+\midrule
+nominal & 0.6717 $\pm$ 0.0007 & 0.4765 $\pm$ 0.0016 & 0.4557 $\pm$ 0.0024 & 0.4559 $\pm$ 0.0015 & 0 & 0 & 0 & 0 & $-$0.0354 $\pm$ 0.0016 \\
+\texttt{t\_\allowbreak{}scale80} & 0.6249 $\pm$ 0.0006 & 0.4430 $\pm$ 0.0016 & 0.4202 $\pm$ 0.0024 & 0.4090 $\pm$ 0.0014 & $-$0.0468 $\pm$ 0.0001 & 10.3\% & $-$0.0335 $\pm$ 0.0001 & $-$0.0355 $\pm$ 0.0001 & +0.0689 $\pm$ 0.0016 \\
+\texttt{t\_\allowbreak{}scale82} & 0.6296 $\pm$ 0.0006 & 0.4463 $\pm$ 0.0016 & 0.4238 $\pm$ 0.0024 & 0.4137 $\pm$ 0.0014 & $-$0.0422 $\pm$ 0.0001 & 9.2\% & $-$0.0302 $\pm$ 0.0001 & $-$0.0319 $\pm$ 0.0001 & +0.0577 $\pm$ 0.0016 \\
+\texttt{t\_\allowbreak{}slow} & 0.6482 $\pm$ 0.0006 & 0.4544 $\pm$ 0.0016 & 0.4250 $\pm$ 0.0023 & 0.4323 $\pm$ 0.0014 & $-$0.0235 $\pm$ 0.0001 & 5.2\% & $-$0.0221 $\pm$ 0.0001 & $-$0.0307 $\pm$ 0.0002 & +0.0404 $\pm$ 0.0016 \\
+\texttt{t\_\allowbreak{}tail} & 0.6453 $\pm$ 0.0008 & 0.4647 $\pm$ 0.0014 & 0.4488 $\pm$ 0.0023 & 0.4294 $\pm$ 0.0015 & $-$0.0264 $\pm$ 0.0001 & 5.8\% & $-$0.0118 $\pm$ 0.0004 & $-$0.0069 $\pm$ 0.0002 & +0.0698 $\pm$ 0.0016 \\
+\texttt{t\_\allowbreak{}comb80} & 0.5883 $\pm$ 0.0006 & 0.4176 $\pm$ 0.0014 & 0.3894 $\pm$ 0.0022 & 0.3724 $\pm$ 0.0013 & \textbf{$-$0.0835 $\pm$ 0.0002} & \textbf{18.3\%} & $-$0.0588 $\pm$ 0.0003 & $-$0.0663 $\pm$ 0.0003 & +0.2563 $\pm$ 0.0016 \\
+\texttt{t\_\allowbreak{}comb82} & 0.5916 $\pm$ 0.0006 & 0.4201 $\pm$ 0.0014 & 0.3923 $\pm$ 0.0022 & 0.3758 $\pm$ 0.0013 & $-$0.0801 $\pm$ 0.0002 & 17.6\% & $-$0.0564 $\pm$ 0.0003 & $-$0.0634 $\pm$ 0.0003 & +0.2451 $\pm$ 0.0016 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{qlfm-M C + XF}
+
+\begin{center}\scriptsize
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLLLLLLLL}
+\toprule
+\textbf{Target variant} & \textbf{MSE nu} & \textbf{MSE out\_av} & \textbf{MSE nonu\_flash} & \textbf{gap} & \textbf{$\Delta$gap} & \textbf{closed} & \textbf{$\Delta$gap out\_av} & \textbf{$\Delta$gap nonu\_flash} & \textbf{bias nu} \\
+\midrule
+nominal & 0.7283 $\pm$ 0.0033 & 0.5451 $\pm$ 0.0023 & 0.4760 $\pm$ 0.0020 & 0.4690 $\pm$ 0.0032 & 0 & 0 & 0 & 0 & $-$0.1118 $\pm$ 0.0053 \\
+\texttt{t\_\allowbreak{}scale80} & 0.6746 $\pm$ 0.0029 & 0.5058 $\pm$ 0.0023 & 0.4431 $\pm$ 0.0020 & 0.4153 $\pm$ 0.0028 & $-$0.0537 $\pm$ 0.0004 & 11.5\% & $-$0.0393 $\pm$ 0.0002 & $-$0.0328 $\pm$ 0.0001 & \textbf{$-$0.0076 $\pm$ 0.0053} \\
+\texttt{t\_\allowbreak{}scale82} & 0.6800 $\pm$ 0.0030 & 0.5098 $\pm$ 0.0023 & 0.4465 $\pm$ 0.0020 & 0.4207 $\pm$ 0.0029 & $-$0.0483 $\pm$ 0.0003 & 10.3\% & $-$0.0354 $\pm$ 0.0002 & $-$0.0295 $\pm$ 0.0001 & $-$0.0187 $\pm$ 0.0053 \\
+\texttt{t\_\allowbreak{}slow} & 0.6957 $\pm$ 0.0028 & 0.5157 $\pm$ 0.0023 & 0.4484 $\pm$ 0.0020 & 0.4364 $\pm$ 0.0027 & $-$0.0327 $\pm$ 0.0005 & 7.0\% & $-$0.0294 $\pm$ 0.0002 & $-$0.0276 $\pm$ 0.0001 & $-$0.0360 $\pm$ 0.0053 \\
+\texttt{t\_\allowbreak{}tail} & 0.6995 $\pm$ 0.0032 & 0.5321 $\pm$ 0.0023 & 0.4685 $\pm$ 0.0021 & 0.4402 $\pm$ 0.0031 & $-$0.0288 $\pm$ 0.0001 & 6.1\% & $-$0.0130 $\pm$ 0.0000 & $-$0.0075 $\pm$ 0.0001 & $-$0.0066 $\pm$ 0.0053 \\
+\texttt{t\_\allowbreak{}comb80} & 0.6268 $\pm$ 0.0024 & 0.4722 $\pm$ 0.0022 & 0.4146 $\pm$ 0.0020 & 0.3675 $\pm$ 0.0023 & \textbf{$-$0.1015 $\pm$ 0.0009} & \textbf{21.6\%} & $-$0.0729 $\pm$ 0.0004 & $-$0.0614 $\pm$ 0.0001 & +0.1799 $\pm$ 0.0053 \\
+\texttt{t\_\allowbreak{}comb82} & 0.6309 $\pm$ 0.0024 & 0.4753 $\pm$ 0.0022 & 0.4172 $\pm$ 0.0020 & 0.3716 $\pm$ 0.0023 & $-$0.0974 $\pm$ 0.0009 & 20.8\% & $-$0.0698 $\pm$ 0.0004 & $-$0.0587 $\pm$ 0.0001 & +0.1687 $\pm$ 0.0053 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+Per-seed paired-bootstrap 95\% CIs on $\Delta$gap are about $\pm$0.001 to $\pm$0.003, and the seed SD on $\Delta$gap is $\leq$ 0.001. Every change is clearly significant.
+
+Per-PMT-total MSE at nominal (nu / \texttt{nonu\_\allowbreak{}dark}): CL 0.3288 $\pm$ 0.0050 / 0.5710 $\pm$ 0.0059; C + XF 0.6394 $\pm$ 0.0217 / 0.8265 $\pm$ 0.0111.
+
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1l1_T5_dgap.pdf}\caption{T5 target test: change in the MSE gap to \texttt{nonu\_\allowbreak{}dark} for each target variant (§4.3). Mean over 3 seeds; error bars = seed SD.}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth,height=0.42\textheight,keepaspectratio]{/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round2/figures/a1l1_T5_mse.pdf}\caption{T5 target test: MSE per event group for nominal and each target variant (§4.3). Dashed lines: MSE(\texttt{nonu\_\allowbreak{}dark}) per model.}\end{figure}
+\subsection{T5 findings}
+\begin{enumerate}
+\item \textbf{The gap shrinks under every correction.} It shrinks most under the total scale (10--12\%), then slow light (5--7\%) and the tail (6\%). The combined correction closes 18\% (CL) and 22\% (C + XF). The parts sum to slightly more than the combination (21\% vs 18\% for CL).
+\item \textbf{The bias shows the direction.} At nominal the head under-predicts $\nu$-event light (bias $-$0.04 CL, $-$0.11 C + XF).
+\begin{itemize}
+\item For C + XF, the 0.80 scale alone brings the bias to $-$0.01, so its head's total-light prediction for $\nu$ events is close to data-like.
+\item For CL, the scale already overshoots (+0.07).
+\item The full combined correction overshoots for both models (+0.18 / +0.26). Applying all three corrections over-corrects these heads.
+\end{itemize}
+\item \textbf{The \texttt{out\_\allowbreak{}av} and \texttt{nonu\_\allowbreak{}flash} groups} (which also have simulated beam-flash light) move the same way, by smaller amounts.
+\item \textbf{Interpretation:} light mismodelling explains about 10--20\% of the $\nu$ / no-$\nu$ T5 gap, as a lower bound. The rest reflects $\nu$ events being brighter with more structured light, not mismodelling.
+\item \textbf{Caveat on the reference:} the \texttt{nonu\_\allowbreak{}dark} events are very dim (P\_b < 20 PE), and the head over-predicts their total light (bias +0.27 / +0.44). Their per-PMT-total MSE (0.57 / 0.83) is higher than for $\nu$ events (0.33 / 0.64). The all-feature gap therefore reflects differences in light \emph{shape} across 16 time bins, not only total yield.
+\end{enumerate}
+\section{Caveats}
+\begin{itemize}
+\item \textbf{The light comparison is not like-for-like.} Real flashes are cosmic muons and simulated flashes are $\nu$ events, and ophits are not labelled sim/real. The corrections act on all ophits in each event's beam-flash windows. Real in-time cosmics are about 1--2\% of events.
+\item \textbf{``No-neutrino'' events are overlays with a sub-threshold $\nu$.} Nearly all of them have some light in the flash window, so the real-light reference is dim events (P\_b < 20 PE), not events without any $\nu$ light.
+\item \textbf{The 3D U and V width factors may still be provisional,} as the 2D ones were. To be confirmed with Sunny.
+\item \textbf{Two T1 definitions disagree in size.} Round 1 reported only the charge-weighted F1. The paper's per-event median shows larger width drops: CL $-$0.33 vs $-$0.29.
+\item \textbf{Inference runs in bf16.} Repeated passes differ by a few bf16 ulps per output. This is irrelevant at the effect sizes here ($\geq$ 1e-3).
+\end{itemize}
+\section{Cost and reproducibility}
+\textbf{Jobs:}
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLL}
+\toprule
+\textbf{Job} & \textbf{What} & \textbf{Walltime} & \textbf{Node-hours} \\
+\midrule
+7837342 & width round 2 (smoke + 6 runs + summary) & 34 min $\times$ 2 nodes & $\approx$ 1.1 \\
+7838867 & light, failed at smoke check (check too strict; fixed) & 20 min $\times$ 2 nodes & $\approx$ 0.7 \\
+7839956 & light (reused smoke run + 6 runs + summary) & 21 min $\times$ 2 nodes & $\approx$ 0.7 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+Total about 2.5 node-hours, in the debug queue.
+
+\textbf{Code} (jpeterso copy; uncommitted):
+
+\begin{itemize}
+\item Evaluation code:
+\begin{itemize}
+\item \texttt{qlfm/\allowbreak{}eval\_\allowbreak{}perturb.py}: 3D tables, plane masks, \texttt{diff\_\allowbreak{}vd}, \texttt{--save-preds}, per-plane bootstrap, light variants, T5 target test.
+\item \texttt{qlfm/\allowbreak{}paper\_\allowbreak{}metrics.py}: adds \texttt{t1\_\allowbreak{}by\_\allowbreak{}plane}.
+\item \texttt{qlfm/\allowbreak{}train\_\allowbreak{}multitask.py}: an optional \texttt{hit\_\allowbreak{}extra} argument in \texttt{predict()}.
+\end{itemize}
+\item Tests: \texttt{tests/\allowbreak{}test\_\allowbreak{}a1r2.py}, \texttt{tests/\allowbreak{}test\_\allowbreak{}a1\_\allowbreak{}light.py}.
+\item Job scripts: \texttt{scripts/\allowbreak{}a1r2\_\allowbreak{}*}, \texttt{scripts/\allowbreak{}a1l1\_\allowbreak{}*}, \texttt{scripts/\allowbreak{}pbs/\allowbreak{}a1r2\_\allowbreak{}all.pbs}, \texttt{scripts/\allowbreak{}pbs/\allowbreak{}a1l1\_\allowbreak{}all.pbs}.
+\item Rerun with \texttt{bash scripts/\allowbreak{}a1r2\_\allowbreak{}submit.sh} or \texttt{bash scripts/\allowbreak{}a1l1\_\allowbreak{}submit.sh}. Both are resumable and skip finished runs.
+\end{itemize}
+\textbf{Inputs:} \texttt{/\allowbreak{}lus/\allowbreak{}eagle/\allowbreak{}projects/\allowbreak{}neutrinoGPU/\allowbreak{}yuhw/\allowbreak{}fm4npp-lartpc-work/\allowbreak{}s3/\allowbreak{}mt/\allowbreak{}qlfm\_\allowbreak{}M\_\allowbreak{}\{CL,C\_\allowbreak{}xf\}/\allowbreak{}finetune/\allowbreak{}f0.01\_\allowbreak{}s\{0,1,2\}}.
+
+\appendix
+\section{Per-seed 95\% confidence intervals}
+Each bracket is the paired event-bootstrap 95\% CI (1000 resamples) of the delta vs nominal, for seeds 0, 1, 2 in order.
+
+\subsection{Width: T1 charge-weighted and T2}
+\textbf{qlfm-M CL}
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+\textbf{Variant} & \textbf{T1 charge-wtd (s0; s1; s2)} & \textbf{T2 (s0; s1; s2)} \\
+\midrule
+\texttt{w\_\allowbreak{}meas} & [-0.207, -0.195]; [-0.217, -0.205]; [-0.230, -0.217] & [-0.033, -0.026]; [-0.043, -0.035]; [-0.036, -0.029] \\
+\texttt{w\_\allowbreak{}meas3d} & [-0.277, -0.263]; [-0.297, -0.282]; [-0.310, -0.295] & [-0.055, -0.045]; [-0.070, -0.059]; [-0.057, -0.047] \\
+\texttt{w\_\allowbreak{}meas3d\_\allowbreak{}Y} & [-0.159, -0.149]; [-0.169, -0.160]; [-0.190, -0.180] & [-0.019, -0.014]; [-0.034, -0.027]; [-0.025, -0.020] \\
+\texttt{w\_\allowbreak{}meas3d\_\allowbreak{}UV} & [-0.086, -0.082]; [-0.081, -0.077]; [-0.079, -0.075] & [-0.002, -0.001]; [-0.004, -0.002]; [-0.002, -0.001] \\
+\texttt{w\_\allowbreak{}diff} & [-0.422, -0.404]; [-0.450, -0.432]; [-0.458, -0.440] & [-0.105, -0.091]; [-0.130, -0.114]; [-0.107, -0.092] \\
+\texttt{w\_\allowbreak{}diff\_\allowbreak{}vd} & [-0.394, -0.377]; [-0.420, -0.403]; [-0.430, -0.412] & [-0.094, -0.081]; [-0.118, -0.102]; [-0.097, -0.083] \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{qlfm-M C + XF}
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+\textbf{Variant} & \textbf{T1 charge-wtd (s0; s1; s2)} & \textbf{T2 (s0; s1; s2)} \\
+\midrule
+\texttt{w\_\allowbreak{}meas} & [-0.032, -0.030]; [-0.028, -0.025]; [-0.030, -0.028] & [-0.003, -0.002]; [-0.003, -0.002]; [-0.003, -0.002] \\
+\texttt{w\_\allowbreak{}meas3d} & [-0.042, -0.039]; [-0.036, -0.033]; [-0.040, -0.037] & [-0.004, -0.003]; [-0.004, -0.003]; [-0.005, -0.003] \\
+\texttt{w\_\allowbreak{}meas3d\_\allowbreak{}Y} & [-0.026, -0.024]; [-0.023, -0.020]; [-0.025, -0.023] & [-0.003, -0.002]; [-0.002, -0.002]; [-0.003, -0.002] \\
+\texttt{w\_\allowbreak{}meas3d\_\allowbreak{}UV} & [-0.016, -0.014]; [-0.014, -0.013]; [-0.015, -0.013] & [-0.001, -0.000]; [-0.001, -0.001]; [-0.001, -0.000] \\
+\texttt{w\_\allowbreak{}diff} & [-0.064, -0.059]; [-0.056, -0.051]; [-0.061, -0.056] & [-0.007, -0.005]; [-0.006, -0.005]; [-0.007, -0.005] \\
+\texttt{w\_\allowbreak{}diff\_\allowbreak{}vd} & [-0.057, -0.053]; [-0.050, -0.046]; [-0.054, -0.050] & [-0.006, -0.004]; [-0.006, -0.004]; [-0.007, -0.005] \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\subsection{Light: input variants, per-event-median T1 and bright-subset T2}
+\textbf{qlfm-M CL}
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+\textbf{Variant} & \textbf{T1 evt-median (s0; s1; s2)} & \textbf{T2 bright (s0; s1; s2)} \\
+\midrule
+\texttt{l\_\allowbreak{}scale80} & [-0.002, -0.001]; [-0.001, -0.000]; [-0.001, -0.000] & [-0.000, +0.003]; [-0.001, +0.000]; [-0.000, +0.000] \\
+\texttt{l\_\allowbreak{}scale82} & [-0.002, -0.000]; [-0.001, -0.000]; [-0.001, -0.000] & [-0.000, +0.003]; [-0.001, +0.000]; [-0.000, +0.000] \\
+\texttt{l\_\allowbreak{}slow} & [-0.001, -0.000]; [-0.001, +0.000]; [-0.001, -0.000] & [+0.000, +0.004]; [-0.000, +0.001]; [-0.000, +0.001] \\
+\texttt{l\_\allowbreak{}tail} & [-0.001, +0.000]; [-0.001, +0.000]; [-0.000, +0.000] & [-0.000, +0.000]; [-0.003, +0.001]; [-0.000, +0.000] \\
+\texttt{l\_\allowbreak{}comb80} & [-0.003, -0.002]; [-0.002, -0.001]; [-0.002, -0.001] & [-0.000, +0.004]; [-0.001, +0.001]; [-0.000, +0.001] \\
+\texttt{l\_\allowbreak{}comb82} & [-0.003, -0.002]; [-0.002, -0.001]; [-0.002, -0.001] & [-0.000, +0.004]; [-0.001, +0.001]; [-0.000, +0.000] \\
+\texttt{l\_\allowbreak{}prompt} & [-0.007, -0.005]; [-0.007, -0.005]; [-0.006, -0.004] & [+0.001, +0.007]; [+0.002, +0.009]; [+0.001, +0.006] \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{qlfm-M C + XF}
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+\textbf{Variant} & \textbf{T1 evt-median (s0; s1; s2)} & \textbf{T2 bright (s0; s1; s2)} \\
+\midrule
+\texttt{l\_\allowbreak{}scale80} & [-0.008, -0.005]; [-0.008, -0.005]; [-0.009, -0.006] & [-0.001, +0.001]; [-0.001, +0.002]; [-0.001, +0.001] \\
+\texttt{l\_\allowbreak{}scale82} & [-0.006, -0.004]; [-0.008, -0.004]; [-0.008, -0.005] & [-0.000, +0.001]; [-0.000, +0.001]; [-0.001, +0.001] \\
+\texttt{l\_\allowbreak{}slow} & [-0.007, -0.004]; [-0.008, -0.004]; [-0.008, -0.005] & [-0.000, +0.002]; [-0.000, +0.002]; [-0.000, +0.001] \\
+\texttt{l\_\allowbreak{}tail} & [-0.001, +0.001]; [-0.001, +0.001]; [-0.001, +0.000] & [-0.001, -0.000]; [-0.000, +0.000]; [-0.001, -0.000] \\
+\texttt{l\_\allowbreak{}comb80} & [-0.017, -0.012]; [-0.018, -0.014]; [-0.019, -0.015] & [-0.001, +0.002]; [-0.001, +0.002]; [-0.002, +0.001] \\
+\texttt{l\_\allowbreak{}comb82} & [-0.015, -0.011]; [-0.016, -0.012]; [-0.018, -0.014] & [-0.001, +0.002]; [-0.001, +0.002]; [-0.002, +0.001] \\
+\texttt{l\_\allowbreak{}prompt} & [-0.106, -0.095]; [-0.100, -0.091]; [-0.142, -0.130] & [-0.010, -0.001]; [-0.013, -0.003]; [-0.017, -0.007] \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\subsection{Light: T2 by native P\_b class}
+\textbf{qlfm-M CL}
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+\textbf{Variant} & \textbf{P\_b < 600 (s0; s1; s2)} & \textbf{P\_b >= 600 (s0; s1; s2)} \\
+\midrule
+\texttt{l\_\allowbreak{}slow} & [-0.000, +0.001]; [-0.001, -0.000]; [-0.000, +0.000] & [+0.000, +0.008]; [+0.000, +0.001]; [+0.000, +0.001] \\
+\texttt{l\_\allowbreak{}tail} & [-0.000, +0.000]; [-0.000, +0.000]; [-0.000, +0.000] & [-0.000, +0.000]; [-0.007, +0.001]; [-0.000, +0.000] \\
+\texttt{l\_\allowbreak{}comb80} & [-0.001, +0.001]; [-0.002, -0.000]; [-0.000, +0.001] & [-0.000, +0.009]; [+0.000, +0.001]; [-0.000, +0.001] \\
+\texttt{l\_\allowbreak{}comb82} & [-0.000, +0.001]; [-0.002, -0.000]; [-0.000, +0.001] & [-0.000, +0.009]; [+0.000, +0.001]; [-0.000, +0.001] \\
+\texttt{l\_\allowbreak{}prompt} & [-0.003, +0.001]; [+0.000, +0.006]; [-0.002, +0.001] & [+0.001, +0.010]; [+0.001, +0.005]; [+0.001, +0.011] \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{qlfm-M C + XF}
+
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+\textbf{Variant} & \textbf{P\_b < 600 (s0; s1; s2)} & \textbf{P\_b >= 600 (s0; s1; s2)} \\
+\midrule
+\texttt{l\_\allowbreak{}slow} & [-0.001, +0.000]; [-0.000, +0.000]; [-0.000, +0.001] & [-0.001, +0.002]; [-0.000, +0.003]; [-0.001, +0.002] \\
+\texttt{l\_\allowbreak{}tail} & [-0.000, +0.000]; [-0.000, +0.000]; [-0.000, +0.000] & [-0.002, -0.000]; [-0.001, +0.000]; [-0.001, -0.000] \\
+\texttt{l\_\allowbreak{}comb80} & [-0.002, +0.000]; [-0.001, +0.000]; [-0.002, +0.000] & [-0.003, +0.001]; [-0.001, +0.004]; [-0.004, +0.001] \\
+\texttt{l\_\allowbreak{}comb82} & [-0.002, +0.000]; [-0.001, +0.000]; [-0.002, +0.000] & [-0.003, +0.001]; [-0.001, +0.004]; [-0.003, +0.001] \\
+\texttt{l\_\allowbreak{}prompt} & [-0.017, -0.010]; [-0.015, -0.008]; [-0.018, -0.010] & [-0.014, -0.002]; [-0.012, +0.003]; [-0.016, -0.004] \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\subsection{T5: change in gap (nu minus nonu\_dark)}
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+\textbf{Variant} & \textbf{CL (s0; s1; s2)} & \textbf{C + XF (s0; s1; s2)} \\
+\midrule
+\texttt{t\_\allowbreak{}scale80} & [-0.048, -0.046]; [-0.047, -0.046]; [-0.047, -0.046] & [-0.054, -0.053]; [-0.055, -0.053]; [-0.054, -0.053] \\
+\texttt{t\_\allowbreak{}scale82} & [-0.043, -0.042]; [-0.043, -0.042]; [-0.043, -0.042] & [-0.049, -0.048]; [-0.049, -0.048]; [-0.049, -0.047] \\
+\texttt{t\_\allowbreak{}slow} & [-0.024, -0.023]; [-0.024, -0.023]; [-0.024, -0.023] & [-0.033, -0.032]; [-0.034, -0.032]; [-0.033, -0.032] \\
+\texttt{t\_\allowbreak{}tail} & [-0.028, -0.025]; [-0.028, -0.025]; [-0.028, -0.025] & [-0.031, -0.027]; [-0.031, -0.027]; [-0.030, -0.027] \\
+\texttt{t\_\allowbreak{}comb80} & [-0.086, -0.082]; [-0.085, -0.082]; [-0.085, -0.081] & [-0.104, -0.099]; [-0.105, -0.100]; [-0.104, -0.099] \\
+\texttt{t\_\allowbreak{}comb82} & [-0.082, -0.079]; [-0.082, -0.078]; [-0.082, -0.078] & [-0.100, -0.095]; [-0.101, -0.096]; [-0.099, -0.095] \\
+\bottomrule
+\end{tabularx}
+\end{center}
+The nominal row is exactly 0 by construction.
+
+\subsection{T5: reference MSE(\texttt{nonu\_\allowbreak{}dark}) per seed}
+\begin{center}\small
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{LLLL}
+\toprule
+\textbf{Model} & \textbf{Seed 0} & \textbf{Seed 1} & \textbf{Seed 2} \\
+\midrule
+CL & 0.2146 [0.2051, 0.2247] & 0.2160 [0.2065, 0.2259] & 0.2169 [0.2076, 0.2275] \\
+C + XF & 0.2588 [0.2471, 0.2711] & 0.2595 [0.2482, 0.2719] & 0.2596 [0.2480, 0.2713] \\
+\bottomrule
+\end{tabularx}
+\end{center}
+n = 948 in every seed and model.
+
+\end{document}

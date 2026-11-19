@@ -24,8 +24,9 @@ from sklearn.metrics import roc_auc_score
 
 from qlfm import geometry as G
 from qlfm.evaluate import _softmax, metrics_for
+from qlfm.paths import REF_WORK
+from qlfm.paths import WORK as W
 
-W = os.environ.get("QLFM_WORK", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work")
 TRUTH = os.environ.get("QLFM_PAPER_TRUTH", os.path.join(W, "paper", "truth.npz"))
 CUTS = G.T2_PE_CUTS        # round-4 grid (r4_light_stats.CUTS); SBND grid in qlfm.geometry
 T4_SHARE, T4_VIS = 0.05, 0.3
@@ -37,7 +38,7 @@ def build_truth(corpus=os.environ.get("QLFM_CORPUS", "$QLFM_WORK/cache/bnb,$QLFM
     from qlfm.data.labels import EV_KEYS, event_labels
     c, sp = Corpus(os.path.expandvars(corpus)), np.load(os.path.expandvars(splits))
     lab = event_labels({k: c.ev_array(k) for k in EV_KEYS})
-    ls = np.load(os.environ.get("QLFM_LIGHT_STATS", os.path.join(W, "r4", "light", "light_stats.npz")))
+    ls = np.load(os.environ.get("QLFM_LIGHT_STATS", os.path.join(REF_WORK, "r4", "light", "light_stats.npz")))
     pe_win = ls["pe_win"]
     # T2 light cut on val (same procedure as r4_light_stats, which used test)
     elig, y = lab["evt_nu"]
@@ -103,6 +104,20 @@ def t1(z, thr=0.5):
     eff, pur = tpq / max(ntq, 1e-9), tpq / max(nsq, 1e-9)
     return dict(score=float(np.median(f1)), f1_evt_med=float(np.median(f1)), f1_evt_mean=float(f1.mean()),
                 n_events=int(ok.sum()), n_no_true=int((nt == 0).sum()), f1_q=float(2 * eff * pur / max(eff + pur, 1e-9)))
+
+
+def t1_by_plane(z, thr=0.5):
+    """t1() per readout plane (0 = U, 1 = V, 2 = Y) from preds with a hit_plane column (eval_perturb --save-preds).
+    Returns {"U"|"V"|"Y": t1 dict} (per-event median F1 = score, and charge-weighted f1_q); events without hits
+    on the plane are skipped by t1."""
+    plane = np.asarray(z["hit_plane"])
+    cols = {k: np.asarray(z[k]) for k in ("pred", "hit_tgt", "hit_q", "hit_evt")}
+    gidx = np.asarray(z["gidx"])
+    out = {}
+    for p, name in ((0, "U"), (1, "V"), (2, "Y")):
+        m = plane == p
+        out[name] = t1({**{k: v[m] for k, v in cols.items()}, "gidx": gidx}, thr)
+    return out
 
 
 def t2(r):

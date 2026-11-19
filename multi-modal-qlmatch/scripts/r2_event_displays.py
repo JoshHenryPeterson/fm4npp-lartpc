@@ -21,8 +21,8 @@ from matplotlib.patches import Rectangle
 from qlfm.data.dataset import Corpus
 from qlfm.data.h5reader import OpenSampleFile
 from qlfm.geometry import AV, N_WIRES, PMT_YZ
+from qlfm.paths import WORK as W
 
-W = "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"
 FMS = ["qlfm_M_CL", "qlfm_S_CL", "panda", "polarmae", "fm4npp", "qlfm_SD_CL"]
 LABEL = {"qlfm_M_CL": "qlfm-M CL", "qlfm_S_CL": "qlfm-S CL", "panda": "Panda", "polarmae": "PoLAr-MAE",
          "fm4npp": "FM4NPP", "qlfm_SD_CL": "qlfm-SD CL", "pandora_direct": "Pandora", "pandora_bdt": "Pandora+BDT",

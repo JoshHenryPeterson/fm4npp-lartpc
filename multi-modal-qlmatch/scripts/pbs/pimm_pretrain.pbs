@@ -1,17 +1,17 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::WireCellDev
+#PBS -A LArTPC_FM
 #PBS -r y
 #PBS -l select=1:system=polaris
 #PBS -l walltime=01:00:00
 #PBS -l filesystems=home:eagle
 #PBS -j oe
 # qsub -q debug -N pre_panda -v CFG=panda_uboone,OUT=$QLFM_WORK/pre/panda pimm_pretrain.pbs
-export QLFM_WORK=/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work
-export PIMM_ROOT=$QLFM_WORK/tools/pimm TMPDIR=/tmp OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4
-R=/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/env.sh
+export TMPDIR=/tmp OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4
 mkdir -p $OUT
-cd $R
+cd $QLFM_ROOT
 WALL=$(qstat -f $PBS_JOBID | awk -F'= ' '/Resource_List.walltime/{split($2,a,":"); print a[1]*3600+a[2]*60+a[3]}')
 timeout $((WALL - 180)) $PIMM_ROOT/.venv/bin/torchrun --standalone --nproc_per_node 4 qlfm/ref/pimm_train.py \
-  --config-file $R/qlfm/ref/pimm_configs/$CFG.py --options save_path=$OUT ${OPTS} 2>&1 | grep -v -i -E "warn|bind: warning" > $OUT/stdout_${PBS_JOBID%%.*}.log
+  --config-file $QLFM_ROOT/qlfm/ref/pimm_configs/$CFG.py --options save_path=$OUT ${OPTS} 2>&1 | grep -v -i -E "warn|bind: warning" > $OUT/stdout_${PBS_JOBID%%.*}.log
 ls $OUT/model 2>/dev/null

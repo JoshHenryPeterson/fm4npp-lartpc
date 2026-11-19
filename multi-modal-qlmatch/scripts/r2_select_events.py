@@ -11,17 +11,20 @@ order); picks are spread over truth classes (T4: energy bins).
 Usage: r2_select_events.py OUT.json
 """
 import json
+import os
 import sys
 
 import numpy as np
 
-W = "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from qlfm.paths import REF_WORK  # noqa: E402
+
 FMS = ["qlfm_M_CL", "qlfm_S_CL", "panda", "polarmae", "fm4npp", "qlfm_SD_CL"]
 N_PICK = 10
 
 
 def load(bb, task):
-    return np.load(f"{W}/r2p/{bb}/{task}/frozen/f0.01_s0/preds_test.npz")
+    return np.load(f"{REF_WORK}/r2p/{bb}/{task}/frozen/f0.01_s0/preds_test.npz")
 
 
 def event_level(task, pnd):
@@ -72,7 +75,7 @@ def pick(order, cls, n, rng):
 def main():
     rng = np.random.default_rng(0)
     rng_b = np.random.default_rng(1)          # boundary picks (separate stream: easy/hard picks unchanged)
-    pnd = np.load(f"{W}/round2/displays/pandora_event_preds.npz")
+    pnd = np.load(f"{REF_WORK}/round2/displays/pandora_event_preds.npz")
     sel = {}
     for task in ("evt_nu", "flavor", "energy"):
         g, y, preds, correct = event_level(task, pnd)

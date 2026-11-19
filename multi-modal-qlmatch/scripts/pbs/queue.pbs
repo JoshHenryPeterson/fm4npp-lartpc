@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::WireCellDev
+#PBS -A LArTPC_FM
 #PBS -r y
 #PBS -l filesystems=home:eagle
 #PBS -j oe
@@ -7,8 +7,9 @@
 # qsub -q preemptable -l select=1:system=polaris -l walltime=24:00:00 -v TASKS=/path/tasks.txt queue.pbs
 # SBND corpora: add QLFM_DETECTOR=sbnd to -v (qlfm.geometry)
 # -r y: a preempted job is requeued and rerun; run_queue.sh then reclaims the task locks of the killed run (RUN_ID).
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
 T0=$(/bin/date +%s)
 DEADLINE=$(( T0 + $(qstat -f $PBS_JOBID | awk -F'= ' '/Resource_List.walltime/{split($2,a,":"); print a[1]*3600+a[2]*60+a[3]}') ))
 NN=$(wc -l < $PBS_NODEFILE)
 mpiexec -n $NN --ppn 1 --cpu-bind none env RUN_ID="${PBS_JOBID%%.*}@$T0" QLFM_DETECTOR=${QLFM_DETECTOR:-uboone} \
-  bash /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/run_queue.sh $TASKS $DEADLINE
+  bash $QLFM_ROOT/scripts/run_queue.sh $TASKS $DEADLINE

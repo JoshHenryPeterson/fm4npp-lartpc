@@ -175,6 +175,32 @@ Weaknesses:
 
 **Verdict.** Early fusion in one stream is the strongest architectural decision in the project, and I would keep it. The most promising addition is a physics-informed alignment cue between drift time and flash time, not a different fusion topology.
 
+### 3.5 Ophit information discarded by the light tokens
+
+**Problem.** The light token uses only `peaktime` and `pe` of each ophit (`tokenize_light`, `qlfm/tokenize.py:113-128`; the loader reads `OPH = ("ch", "t", "pe")`, `qlfm/data/dataset.py:11`). Discarded:
+- **Pulse width.** `width` is converted and stored (`qlfm/data/convert.py:96,177`) but never loaded, so it cannot reach the model.
+- **Sub-bin timing.** Ophits are binned in 16 bins of 0.5–5 µs width (`TokCfg.light_edges`), so timing inside a bin is lost. Inside the 0.5 µs flash bins it is invisible to the model.
+- **Individual pulses.** The histogram sums PE, so the number of ophits and the PE of each cannot be recovered. One 10 PE hit and ten 1 PE hits in a bin look the same.
+- **Sign and range of PE.** Negative PE is clamped to 0, and in-window filtering drops about 1% of ophits (t < 0 or beyond 24 µs).
+- Pulse area versus amplitude: the converter reads only four ophit fields (`hit_channel`, `peaktime`, `width`, `pe`; `qlfm/data/convert.py:169`), so no area or amplitude is available in the converted data. I did not check the raw HDF5 for other columns.
+
+**Impact (balanced).**
+- Width is mostly set by the PMT and shaping response and by the hit finder, so for an isolated pulse it adds little beyond PE and time.
+- It can flag piled-up or merged pulses, saturated PMTs and extended late light. These cases are rare in the beam window but matter for bright flashes and cosmic-dense events.
+- The model already reaches T2 AUC 0.999 from PE and time alone (§3.3), which bounds what extra light information could add for neutrino versus cosmic.
+- **Verdict:** a minor loss, low priority, but cheap to test.
+
+**Options to add it.**
+- **(a) Extra histogram channels.** Per time bin, add the PE-weighted mean width (and/or an area-to-amplitude ratio) next to the PE histogram. The feature count grows from 17 to 33 (`LightEmbed.proj`, `TokCfg`). Cheapest, and keeps the fixed-size layout.
+- **(b) Per-ophit mini-PointNet.** A shared MLP on [time offset within the token, PE, width, ...], then max and mean pooling, replacing or augmenting the histogram. This mirrors `ChargeEmbed` and keeps sub-bin timing, but costs more compute and needs the ophit-to-token index passed through.
+- **(c) Per-token summary statistics.** Append the ophit count and the PE-weighted mean and standard deviation of width, as the charge tokens carry `tok_stat`.
+- **(d) Input only or also target.** Adding width to the MAE target (`lt.feat` is both input and target, `qlfm/models/fm.py:175`, `light_target` in `qlfm/train_downstream.py:126`) asks the model to predict it too. Starting with input-only needs a separate target definition.
+
+**Caveats.**
+- **Normalization.** Width is stored as float16 and spans a wide range, so use a log or a fixed scale, and set bins with no hits to 0.
+- **Loader.** `OPH` and the batch collation (`qlfm/data/dataset.py:102-113`) must include `width`.
+- **Ablation.** Compare T-task metrics (T2 AUC, T5 MSE) with and without width on the same pretraining budget. Because `light_target` shares the feature layout, T5 numbers are only comparable if the target stays the 17-value profile.
+
 ---
 
 ## 4. Positional encoding

@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::WireCellDev
+#PBS -A LArTPC_FM
 #PBS -q debug
 #PBS -l select=1:system=polaris
 #PBS -l walltime=00:30:00
@@ -7,7 +7,8 @@
 #PBS -N r2_infer_hits
 #PBS -j oe
 # Per-hit nu probabilities of the 6 frozen@1% hit models on the round-2 display events (scripts/infer_hits.py).
-source /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/env.sh
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/env.sh
 cd $QLFM_ROOT
 D=$QLFM_WORK/round2/displays
 G=${G:-$D/selection_gidx.npy}

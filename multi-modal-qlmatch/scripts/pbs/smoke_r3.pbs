@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::WireCellDev
+#PBS -A LArTPC_FM
 #PBS -q debug
 #PBS -l select=1:system=polaris
 #PBS -l walltime=00:30:00
@@ -7,7 +7,8 @@
 #PBS -N smoke_r3
 #PBS -j oe
 # Round-3 smoke tests: strong late fusion (--late-light 2), --hit-feat raw/none, FM4NPP without hit cap, FM4NPP m4 memory.
-source /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/env.sh
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/env.sh
 cd $QLFM_ROOT
 S=$QLFM_WORK/r3_smoke; P=$QLFM_WORK/pre
 PIMM=$QLFM_WORK/tools/pimm/.venv/bin/python; MAMBA=$QLFM_WORK/tools/venv-mamba/bin/python

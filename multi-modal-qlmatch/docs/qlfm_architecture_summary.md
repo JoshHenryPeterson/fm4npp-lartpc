@@ -2,6 +2,8 @@
 
 This summarizes the native **qlfm** model in this repo: a charge + light foundation model for MicroBooNE LArTPC data. Code references point to files, classes, and functions under `qlfm/`. Defaults are the code defaults unless stated otherwise.
 
+Notation: `d` is the model width, i.e. the length of each token vector in the transformer (default 256; qlfm-M: 384). A "128-dimensional feature" is a single vector of 128 numbers per hit (not a matrix).
+
 ```
  HDF5 open samples ──convert──▶ .npy column cache ──collate (packed, no padding)──▶ batch
                                                                                    │
@@ -40,7 +42,7 @@ This summarizes the native **qlfm** model in this repo: a charge + light foundat
 | Modality | Source table | Fields used | Stored as |
 |---|---|---|---|
 | **Charge**: TPC wire hits (2D per plane; not 3D spacepoints) | `hit_table` | `local_plane`, `local_wire`, `local_time`, `integral`, `rms` | plane uint8, wire int16, time uint16 (1/8 tick), integral and rms float16 |
-| **Light**: PMT optical hits | `ophit_table` | `hit_channel`, `peaktime` (µs, beam-window clock), `width`, `pe` | ch uint8, t float32, width and pe float16 |
+| **Light**: PMT optical hits | `ophit_table` | `hit_channel`, `peaktime` (µs, beam-window clock), `pe`; `width` is converted and stored but never loaded or tokenized (`OPH = ("ch", "t", "pe")`, `data/dataset.py`) | ch uint8, t float32, width and pe float16 |
 
 Detector constants are in `qlfm/geometry.py`:
 - TPC: 3 planes with 2400 / 2400 / 3456 wires and 0.3 cm wire pitch.
@@ -79,7 +81,7 @@ Tokenization runs on the GPU on the packed batch. It uses a fixed wire × time g
 
 ### Charge tokens (`tokenize_charge`)
 - **One token = one occupied (event, plane, wire-cell, time-cell) cell.**
-  - The default cell is **16 wires × 64 ticks** (`cell_wires`, `cell_ticks`).
+  - A **cell** is a 16-wire × 64-tick region on one plane of one event (`cell_wires`, `cell_ticks`; `qlfm/tokenize.py:16-17`). Each hit is assigned to the cell containing its wire and tick. Only occupied cells become charge tokens (max 4096 per event, randomly subsampled above that), and one cell = one charge token.
   - Occupied cells are found with `torch.unique` on a combined key, so the token count varies per event.
 - **Cap:** `max_tokens = 4096` per event. Tokens above the cap are randomly dropped, and their hits get `hit2tok = −1`.
 - **Points per token:** variable (all hits in the cell).
@@ -91,21 +93,30 @@ Tokenization runs on the GPU on the packed batch. It uses a fixed wire × time g
   - Hit-to-token index `hit2tok`.
   - Per-token stats (`log n_hits`, `log1p(Σq/200)`).
   - Charge-weighted centroid.
-  - MAE target `tok_target`: a **4 × 8 sub-grid** (wire × tick) of `log1p(Σq/200)` inside the cell. With the 2 token stats added, the target has 34 values.
+  - MAE target `tok_target`: a **4 × 8 grid of sub-cells** (wire × tick) of `log1p(Σq/200)` inside the cell. Each element is a 4-wire × 8-tick **sub-cell**. With the 2 token stats added, the target has 34 values.
 
 ### Light tokens (`tokenize_light`)
 - **Exactly 32 tokens per event, one per PMT**, always present (including PMTs with no light).
 - **Features (17):** `log1p(PE)` in 16 time bins, plus `log1p(total PE)`.
   - The bin edges (µs) are 0, 1, 2, 3, 3.5, 4, 4.5, 5, 5.5, 6, 7, 8, 10, 12, 15, 19, 24. Bins are finest around the expected beam flash at about 3–6 µs.
 - About 1% of ophits fall outside the window and are dropped.
+- **What a light token is:** the PE-weighted time histogram of all ophits on one PMT in one event (`scatter_add` of PE into (event, PMT, time bin), then `log1p`). Only `peaktime` and `pe` enter; negative PE is clamped to 0.
+- **Why histogram the ophits inside a token:**
+  - **Fixed size from a variable-length set.** A PMT has anywhere from zero to many ophits per event. Binning gives a fixed 17-dimensional vector without padding or an ordering, the light-side analogue of pooling the hits of a charge cell into one token.
+  - **Permutation invariant, and the time profile survives.** The bins separate prompt light (the beam flash at about 3–6 µs) from later light and out-of-time cosmic light. The fast (about 6 ns) and slow (about 1.5 µs) scintillation components are far below or comparable to the bin widths, so the histogram resolves the flash timing but not the pulse shape.
+  - **PE weighting.** Each ophit adds its PE, so the bins track light yield (deposited energy) and the total-PE feature is preserved.
+  - **Robust to ophit-finder choices.** If the finder splits or merges a pulse, the PE stays in the same bin, so the histogram changes little.
+  - **Natural MAE target.** Masked light tokens are predicted as the same 17 values (`head_l`, MSE in `models/fm.py`; the T5 target is `light_target` in `train_downstream.py`).
 
 ---
 
 ## 3. How tokens enter the backbone (`qlfm/models/encoder.py`, `qlfm/models/fm.py`)
 
 ### Charge embedding (`ChargeEmbed`, a mini-PointNet)
-1. `hit_mlp`: MLP 4 → 64 → 128 (GELU), applied to each hit. This per-hit 128-d vector is also exported as `h_hit` for the T1 head.
-2. `pointnet_pool`: concatenates max-pool and mean-pool over the hits in the cell (256-d), then appends the 2 token stats (258-d).
+PointNet applies one shared MLP to each point of an unordered set independently, then combines the results with a symmetric pooling, so the output does not depend on point order (C. R. Qi, H. Su, K. Mo, L. J. Guibas, "PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation," CVPR 2017, arXiv:1612.00593). Here the points are the hits in one cell. "Mini" = a single small per-hit MLP and one pooling stage (the original has deeper MLPs, alignment sub-networks, and 1024-dimensional pooling).
+
+1. `hit_mlp`: MLP 4 → 64 → 128 (GELU), applied to each hit. This per-hit 128-dimensional vector is also exported as `h_hit` for the T1 head.
+2. `pointnet_pool`: max-pool and mean-pool are each taken over all hits in the cell, each giving a 128-dimensional vector. They are concatenated (2 × 128 = 256-dimensional), then the 2 token stats are appended (258-dimensional). There is no 128 → 256 layer; the 256 comes from the concatenation.
 3. `proj`: MLP 258 → d → d.
 4. Positional embedding is added (`pos_embed`). The default `pos_mode="centroid"` sums:
    - A plane embedding (`Embedding(3, d)`).
@@ -204,7 +215,7 @@ How the three planes are tied together:
 | Type | Pre-LN Transformer | same |
 | Width d | 256 | 384 |
 | Depth | 8 | 12 |
-| Heads | 8 (32-d each) | 6 (64-d each) |
+| Heads | 8 (32-dimensional each) | 6 (64-dimensional each) |
 | MLP | ratio 4, GELU | same |
 | Params | ≈6.6M | ≈21M |
 
@@ -216,17 +227,19 @@ Details shared by both configurations:
 - **No final LayerNorm** (`final_norm=False`, following PoLAr-MAE). Heads apply their own LayerNorm.
 
 ### Pretraining objective: multi-modal MAE (`MAE`, `MAECfg`)
-- **Charge masking:** 60% of tokens. Half of that budget is cross-plane **drift-time strips** 256 ticks wide, shared across planes in an event; the rest are random tokens.
+- **Charge masking:** 60% of tokens. Half of that budget is cross-plane **drift-time strips** 256 ticks wide (4 cells in time), shared across planes in an event; the rest are random tokens.
+  - Masking is per whole token (cell); cells are never partly masked. The 4 × 8 sub-cell grid (32 values) is the regression target per masked token (plus 2 token stats = 34 values), not a masking unit.
+  - Ratio: 60% follows the point-cloud MAE convention (Point-MAE, Pang et al., ECCV 2022, found 60% best). Image MAE (He et al., CVPR 2022) uses 75%, and ~90% is typical for video (VideoMAE, Tong et al., NeurIPS 2022), where frames are highly redundant.
 - **Light masking**, chosen per event:
   - 40%: mask all 32 PMTs (forces charge → light prediction).
   - 40%: mask a random 50% of PMTs.
   - 20%: mask none.
 - **Decoder:**
   - `enc2dec` Linear d → 192, then learned `mask_c` / `mask_l` tokens and a projected copy of the encoder positional embedding.
-  - *Design choice:* masked charge tokens keep their full position embedding, including the cell's own charge-weighted centroid and in-cell offset (`pos_mode="centroid"`). This follows the Point-MAE / PoLAr-MAE convention of placing patch centres on the data. The decoder therefore predicts the amount and shape of charge given where it sits, not where tracks are. See `qlfm_architecture_critique.md` §1.1.
-  - 3 Transformer blocks (d = 192, 6 heads) over the visible and mask tokens of both modalities, followed by LayerNorm.
+  - *Design choice:* masked charge tokens keep their full position embedding, including the cell's own charge-weighted centroid and in-cell offset (`pos_mode="centroid"`). This follows the Point-MAE / PoLAr-MAE convention of placing each cell's token position on the data. The decoder therefore predicts the amount and shape of charge given where it sits, not where tracks are. See `qlfm_architecture_critique.md` §1.1.
+  - 3 Transformer blocks (decoder width 192, distinct from `d`; 6 heads) over the visible and mask tokens of both modalities, followed by LayerNorm.
 - **Heads and losses:**
-  - `head_c` → 34 outputs (4 × 8 charge sub-grid + 2 token stats). The targets are standardized per batch, and the loss is MSE on masked charge tokens only.
+  - `head_c` → 34 outputs (4 × 8 charge sub-cells + 2 token stats). The targets are standardized per batch, and the loss is MSE on masked charge tokens only.
   - `head_l` → 17 outputs. The loss is MSE on masked PMT tokens only.
   - Total loss = `loss_c + 1.0·loss_l`.
 - **Optimizer:**
@@ -256,7 +269,7 @@ These variants are mainly for comparison:
   ```
   z       = cat[zc, zl]                    # charge first so hit2tok indices stay valid
   evt     = cat[charge tok_evt, light evt] # event index per token
-  h_hit   = per-hit 128-d PointNet features
+  h_hit   = per-hit 128-dimensional PointNet features
   hit2tok = hit → charge-token index (−1 if dropped by the token cap)
   ```
 - Event-level heads therefore pool over both the charge and the light tokens.
@@ -280,9 +293,10 @@ Other settings:
   - 1: `LateLight` appends 32 PMT tokens at the head.
   - 2: `XFusion` cross-attention.
 - **T1 per-hit input:** `--hit-feat`:
-  - `native`: `h_hit`.
-  - `raw`: a `RawHit` MLP 7 → 64 → 64.
+  - `native`: qlfm's own 128-dimensional `h_hit` (qlfm only).
+  - `raw`: ignores the backbone's own per-hit embedding and uses a shared trainable adapter `RawHit` (`qlfm/models/heads.py:120-136`), MLP 7 → 64 → 64. Its 7 inputs come straight from raw hit fields: plane one-hot (3), wire/N_WIRES, tick/N_TICKS, log1p(charge/200), rms/5. Purpose: fairness, so every backbone gets the same per-hit information.
   - `none`: no per-hit input.
+  - The option exists in both `train_downstream.py` and `train_multitask.py`.
 
 ---
 

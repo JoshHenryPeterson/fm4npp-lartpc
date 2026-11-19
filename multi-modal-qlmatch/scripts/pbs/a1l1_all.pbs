@@ -1,0 +1,42 @@
+#!/bin/bash
+#PBS -A LArTPC_FM
+#PBS -N a1l1_all
+#PBS -q debug
+#PBS -l select=2:system=polaris
+#PBS -l walltime=01:00:00
+#PBS -l filesystems=home:eagle
+#PBS -j oe
+#PBS -r n
+# A1 light check round 1 in ONE job (the debug queue allows only one queued job per user, so no afterok chain):
+#   stage 1 smoke (qlfm_M_CL s0, n-boot 200) + unit tests + acceptance checks -> abort if any fails
+#   stage 2 full (6 runs over 2 nodes x 4 GPUs) -> stage 3 summary.md.
+# Resumable: smoke/PASSED skips stage 1; finished tasks (metrics.json) are skipped. Submit via scripts/a1l1_submit.sh.
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/a1l1_common.sh
+export JOB_T0=$(/bin/date +%s)
+make_tasks
+status "job started ($PBS_JOBID)"
+if [ ! -f $A1L1/smoke/PASSED ]; then
+  status "smoke started"
+  watch_tasks $A1L1/tasks/smoke.txt & W=$!
+  run_tasks $A1L1/tasks/smoke.txt 35      # smoke must finish within the first ~25 min
+  kill $W 2>/dev/null
+  ( $PY $QLFM_ROOT/tests/test_a1_light.py && $PY $QLFM_ROOT/tests/test_a1r2.py ) > $A1L1/logs/smoke_unit.log 2>&1 || { status "smoke FAILED: unit tests (see logs/smoke_unit.log); full not run"; exit 1; }
+  $PY $QLFM_ROOT/scripts/a1l1_check_smoke.py $A1L1/smoke/s3_mt_qlfm_M_CL_finetune_f0.01_s0 --ref $R2_METRICS --ref $R1_METRICS \
+    > $A1L1/logs/smoke_check.log 2>&1
+  rc=$?; cat $A1L1/logs/smoke_check.log
+  if [ $rc -ne 0 ]; then status "smoke FAILED: acceptance checks rc=$rc (see logs/smoke_check.log); full not run"; exit 1; fi
+  touch $A1L1/smoke/PASSED; status "smoke passed"
+fi
+status "full started"
+watch_tasks $A1L1/tasks/full.txt & W=$!
+run_tasks $A1L1/tasks/full.txt 8          # leave 8 min of walltime for the summary
+kill $W 2>/dev/null
+ndone=$(ls $A1L1/full/*/metrics.json 2>/dev/null | wc -l)
+status "GPU tasks finished: $ndone/6 metrics.json present; running summary"
+$PY $QLFM_ROOT/scripts/a1l1_summarize.py $A1L1/full > $A1L1/logs/summarize.log 2>&1
+rc=$?; cat $A1L1/logs/summarize.log
+if [ $rc -ne 0 ]; then status "summary FAILED rc=$rc (see logs/summarize.log); rerun: $PY $QLFM_ROOT/scripts/a1l1_summarize.py $A1L1/full"; exit 2; fi
+status "summary done: $A1L1/full/summary.md ($ndone/6 runs)"
+[ $ndone -eq 6 ] || { status "INCOMPLETE: rerun scripts/a1l1_submit.sh to finish the remaining runs"; exit 3; }
+status "ALL DONE"

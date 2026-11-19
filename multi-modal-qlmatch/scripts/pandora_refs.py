@@ -19,8 +19,8 @@ from sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostin
 from qlfm.data.dataset import Corpus
 from qlfm.data.labels import EV_KEYS, event_labels
 from qlfm.evaluate import metrics_for
+from qlfm.paths import WORK as W
 
-W = os.environ.get("QLFM_WORK", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work")
 
 
 def pick(idx, n, seed):     # identical to train_downstream's val/test subset selection

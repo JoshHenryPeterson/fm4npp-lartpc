@@ -25,8 +25,9 @@ from sklearn.metrics import roc_auc_score
 
 from qlfm.data.dataset import Corpus
 from qlfm.data.labels import EV_KEYS, event_labels
+from qlfm.paths import REF_WORK
+from qlfm.paths import WORK as W
 
-W = os.environ.get("QLFM_WORK", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work")
 MODELS = [("qlfm-M CL", "qlfm_M_CL"), ("qlfm-M C", "qlfm_M_C"), ("Panda", "panda")]
 # (mode, label fraction, short name); fine-tune and no-light controls only at 1 % labels
 CONFIGS = [("frozen_xf", "0.01", "XF 1\\%"), ("frozen", "0.01", "LL 1\\%"), ("finetune", "0.01", "FT 1\\%"),
@@ -37,7 +38,7 @@ HIT_DISPLAY_N = 6                 # events per display category
 
 def run_dir(key, task, mode, lf):
     for root in ("r3", "r2p"):
-        d = f"{W}/{root}/{key}/{task}/{mode}/f{lf}_s0"
+        d = f"{REF_WORK}/{root}/{key}/{task}/{mode}/f{lf}_s0"
         if os.path.exists(f"{d}/preds_test.npz"):
             return d
     return None
@@ -148,8 +149,8 @@ def main():
     c = Corpus(f"{W}/cache/bnb,{W}/cache/nue")
     sp = np.load(f"{W}/cache/splits_all.npz")
     lab = event_labels({k: c.ev_array(k) for k in EV_KEYS})
-    ls = np.load(f"{W}/r4/light/light_stats.npz")
-    cut = json.load(open(f"{W}/r4/light/light_cut.json"))["cut"]
+    ls = np.load(f"{REF_WORK}/r4/light/light_stats.npz")
+    cut = json.load(open(f"{REF_WORK}/r4/light/light_cut.json"))["cut"]
     pe_win = ls["pe_win"]
     res = {"cut_pe": cut}
 

@@ -1,12 +1,13 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::WireCellDev
+#PBS -A LArTPC_FM
 #PBS -r y
 #PBS -l filesystems=home:eagle
 #PBS -j oe
 # Several 2-node pretraining runs in one allocation.
 # qsub -q debug-scaling -l select=10:system=polaris -l walltime=01:00:00 -v RUNS_FILE=/path/runs.txt pretrain_multi.pbs
 # RUNS_FILE lines: OUTDIR ARGS...
-source /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/env.sh
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/env.sh
 cd $QLFM_ROOT
 NPG=${NODES_PER_RUN:-2}
 WALL=$(qstat -f $PBS_JOBID | awk -F'= ' '/Resource_List.walltime/{split($2,a,":"); print a[1]*60+a[2]}')

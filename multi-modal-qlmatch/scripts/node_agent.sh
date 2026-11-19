@@ -2,7 +2,7 @@
 # File-based command runner for interactive development inside a batch job.
 # Drop executable scripts into $BOX/inbox/<name>.sh; output goes to $BOX/out/<name>.log,
 # and $BOX/out/<name>.done holds the exit code. Scripts run concurrently in the background.
-BOX=${BOX:-/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work/jobs/box}
+source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/env.sh"
 mkdir -p $BOX/inbox $BOX/out $BOX/taken
 hostname > $BOX/host
 END=$(( $(date +%s) + ${HOLD_SECONDS:-3500} ))

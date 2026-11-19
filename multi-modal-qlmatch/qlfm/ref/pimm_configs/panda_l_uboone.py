@@ -7,9 +7,11 @@ Changes from panda_uboone.py:
   * PMT points go through the same views, crops, masks and distillation as hits (early fusion in a point cloud)
   * batch 24 events (6/GPU; ~3x the points of a single-plane cloud); length set by the 20 nh budget
 """
-_base_ = ["/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work/tools/pimm/configs/_base_/default_runtime.py"]
+import os as __os   # names starting with "__" are dropped by pimm's Config loader (no module left in cfg)
 
-W = "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"     # pimm configs cannot import modules
+_base_ = [__os.environ.get("PIMM_ROOT", __os.path.join(__os.environ.get("QLFM_WORK", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"), "tools/pimm")) + "/configs/_base_/default_runtime.py"]
+
+W = __os.environ.get("QLFM_WORK", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work")
 batch_size = 24
 num_worker = 28
 batch_size_val = 32

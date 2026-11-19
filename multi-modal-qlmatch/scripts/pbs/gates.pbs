@@ -1,12 +1,13 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::WireCellDev
+#PBS -A LArTPC_FM
 #PBS -q debug
 #PBS -l select=1:system=polaris
 #PBS -l walltime=00:20:00
 #PBS -l filesystems=home:eagle
 #PBS -N gates
 #PBS -j oe
-source /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/env.sh
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/env.sh
 T=$QLFM_WORK/tools; G=$QLFM_ROOT/scripts/gates
 echo "== mamba"; CUDA_VISIBLE_DEVICES=0 $T/venv-mamba/bin/python $G/gate_mamba.py 2>&1 | grep -v -i warn &
 echo "== pimm"; ( unset PYTHONPATH; CUDA_VISIBLE_DEVICES=1 $T/pimm/.venv/bin/python $G/gate_pimm.py 2>&1 | grep -v -i warn ) &

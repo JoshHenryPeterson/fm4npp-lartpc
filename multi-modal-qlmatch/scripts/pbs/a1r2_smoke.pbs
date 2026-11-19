@@ -1,0 +1,27 @@
+#!/bin/bash
+#PBS -A LArTPC_FM
+#PBS -N a1r2_smoke
+#PBS -q debug
+#PBS -l select=1:system=polaris
+#PBS -l walltime=00:40:00
+#PBS -l filesystems=home:eagle
+#PBS -j oe
+#PBS -r n
+# A1 round 2 smoke: one run (qlfm_M_CL s0, n-boot 200) + acceptance checks. Exits nonzero if any check fails, so the
+# afterok-dependent full job never starts. Submit through scripts/a1r2_submit.sh.
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/a1r2_common.sh
+make_tasks
+status "smoke started (job $PBS_JOBID)"
+watch_tasks $A1R2/tasks/smoke.txt & W=$!
+run_tasks $A1R2/tasks/smoke.txt 5
+kill $W 2>/dev/null
+$PY $QLFM_ROOT/tests/test_a1r2.py > $A1R2/logs/smoke_unit.log 2>&1 || { status "smoke FAILED: unit tests (see logs/smoke_unit.log)"; exit 1; }
+$PY $QLFM_ROOT/scripts/a1r2_check_smoke.py $A1R2/smoke/s3_mt_qlfm_M_CL_finetune_f0.01_s0 --ref $R1_METRICS \
+  > $A1R2/logs/smoke_check.log 2>&1
+rc=$?
+cat $A1R2/logs/smoke_check.log
+if [ $rc -ne 0 ]; then status "smoke FAILED: acceptance checks rc=$rc (see logs/smoke_check.log); full job will not start"; exit 1; fi
+touch $A1R2/smoke/PASSED
+status "smoke passed"
+exit 0

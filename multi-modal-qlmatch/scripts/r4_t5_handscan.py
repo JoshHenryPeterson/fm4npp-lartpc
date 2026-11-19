@@ -28,8 +28,8 @@ from r2_event_displays import CH0, HIT_NU_EDEP_MEV, frame, load_event  # noqa: E
 from qlfm.data.dataset import Corpus
 from qlfm.geometry import AV, PMT_YZ, in_volume
 from qlfm.tokenize import TokCfg
+from qlfm.paths import WORK as W
 
-W = "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"
 MODELS = [("qlfm-M CL", "qlfm_M_CL_pre0.90", "tab:red"), ("qlfm-S CL", "qlfm_S_CL_pre0.90", "tab:orange"),
           ("qlfm-M C", "qlfm_M_C_pre0.90", "tab:blue"), ("Panda", "panda_pre0.90", "tab:green")]
 EDGES = np.array(TokCfg().light_edges)

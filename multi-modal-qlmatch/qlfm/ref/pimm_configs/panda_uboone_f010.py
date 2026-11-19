@@ -11,9 +11,11 @@ the data or the compute-matched protocol):
   * backbone size-matched to qlfm-21M: depths (2,2,2,4,2), channels (32,64,128,256,320)
   * batch 64 (16/GPU x 4), length set so the run fits the equal-node-hour budget (~4 node-hours)
 """
-_base_ = ["/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work/tools/pimm/configs/_base_/default_runtime.py"]
+import os as __os   # names starting with "__" are dropped by pimm's Config loader (no module left in cfg)
 
-W = "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"     # pimm configs cannot import modules
+_base_ = [__os.environ.get("PIMM_ROOT", __os.path.join(__os.environ.get("QLFM_WORK", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"), "tools/pimm")) + "/configs/_base_/default_runtime.py"]
+
+W = __os.environ.get("QLFM_WORK", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work")
 batch_size = 64
 num_worker = 28
 batch_size_val = 32

@@ -1,7 +1,8 @@
 #!/bin/bash
 # Emit "INPUT OUTDIR PART NPARTS" lines for all downloaded shards.
-D=/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-data
-W=/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work/cache
+source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/env.sh"
+D=$QLFM_DATA
+W=$QLFM_WORK/cache
 NP_BNB=${NP_BNB:-6}
 for f in $D/bnb_nowire/BNB_All_NoWire_*.h5; do
   b=$(basename $f .h5)

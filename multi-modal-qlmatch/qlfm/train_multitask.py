@@ -179,8 +179,9 @@ def task_losses(out, b, lab, class_w):
 
 
 @torch.no_grad()
-def predict(model, loader, dev, sets, lab_np):
-    """Predictions of every task on its own subset (sets[t]: sorted gidx array) of the union loader."""
+def predict(model, loader, dev, sets, lab_np, hit_extra=None):
+    """Predictions of every task on its own subset (sets[t]: sorted gidx array) of the union loader.
+    hit_extra: optional {name: fn(batch) -> per-hit tensor}, returned as extra hit columns."""
     model.eval()
     acc = {t: {"pred": [], "gidx": [], "hit_q": [], "hit_pnd": [], "hit_evt": [], "hit_tgt": [], "light_tgt": []}
            for t in sets}
@@ -203,6 +204,8 @@ def predict(model, loader, dev, sets, lab_np):
                 a["hit_pnd"].append(b["hit_pnd_nu"][mh].cpu())
                 a["hit_tgt"].append((b["hit_nu_edep"][mh] > HIT_NU_EDEP_MEV).cpu())
                 a["hit_evt"].append(g[b["hit_evt"]][mh].cpu())
+                for k, fn in (hit_extra or {}).items():
+                    a.setdefault(k, []).append(fn(b)[mh].cpu())
             elif t == "light":
                 a["pred"].append(o[sel].half().cpu())
                 a["light_tgt"].append(light_target(b)[sel].half().cpu())

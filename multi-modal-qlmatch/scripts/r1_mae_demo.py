@@ -18,8 +18,8 @@ from qlfm.data.dataset import Corpus, EventDataset, collate, to_device
 from qlfm.models.encoder import pack
 from qlfm.models.fm import FM, MAE, FMCfg, MAECfg
 from qlfm.tokenize import TokCfg
+from qlfm.paths import WORK as W
 
-W = "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"
 
 
 def main():

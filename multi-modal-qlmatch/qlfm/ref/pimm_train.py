@@ -7,11 +7,13 @@ import glob
 import os
 import sys
 
-PIMM_ROOT = os.environ.get("PIMM_ROOT", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work/tools/pimm")
 QLFM_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-for p in (PIMM_ROOT, QLFM_ROOT):
-    if p not in sys.path:
-        sys.path.insert(0, p)
+if QLFM_ROOT not in sys.path:
+    sys.path.insert(0, QLFM_ROOT)
+from qlfm.paths import PIMM_ROOT  # noqa: E402
+
+if PIMM_ROOT not in sys.path:
+    sys.path.insert(0, PIMM_ROOT)
 
 import pimm.datasets  # noqa: E402,F401
 import qlfm.ref.pimm_ext  # noqa: E402,F401  (registers MicroBooNEPlaneDataset)

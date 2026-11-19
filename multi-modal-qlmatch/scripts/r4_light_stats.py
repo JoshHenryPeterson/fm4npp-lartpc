@@ -24,8 +24,8 @@ from sklearn.metrics import roc_auc_score, roc_curve
 from qlfm import geometry as G
 from qlfm.data.dataset import Corpus
 from qlfm.data.labels import EV_KEYS, event_labels
+from qlfm.paths import WORK as W
 
-W = os.environ.get("QLFM_WORK", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work")
 WIN_LO, WIN_HI = G.BEAM_WINDOW_US   # MicroBooNE 3-6 us: truth nu time 3.1-4.7 us + 0.48 us flash lag, with margin
 T_LO, T_HI = G.LIGHT_EDGES[0], G.LIGHT_EDGES[-1]   # light-token window (MicroBooNE 0-24 us)
 CUTS = G.T2_PE_CUTS

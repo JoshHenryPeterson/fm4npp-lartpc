@@ -17,7 +17,8 @@ import sys
 import torch
 import torch.nn as nn
 
-PIMM_ROOT = os.environ.get("PIMM_ROOT", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work/tools/pimm")
+from qlfm.paths import PIMM_ROOT  # noqa: E402
+
 if PIMM_ROOT not in sys.path:
     sys.path.insert(0, PIMM_ROOT)
 

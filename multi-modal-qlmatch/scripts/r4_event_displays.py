@@ -22,8 +22,9 @@ sys.path.insert(0, os.path.dirname(__file__))
 from r2_event_displays import CH0, HIT_NU_EDEP_MEV, frame, light_panel, load_event, nu_boxes  # noqa: E402
 
 from qlfm.data.dataset import Corpus
+from qlfm.paths import REF_WORK
+from qlfm.paths import WORK as W
 
-W = "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"
 FMS = [("qlfm-M CL", "r3/qlfm_M_CL/hit/frozen_xf/f0.01_s0"), ("qlfm-M C", "r3/qlfm_M_C/hit/frozen_xf/f0.01_s0"),
        ("Panda", "r3/panda/hit/frozen_xf/f0.01_s0")]
 KIND = {"pnd_wrong_slice": "Pandora selects a cosmic slice", "pnd_low_purity": "Pandora ν slice absorbs cosmic hits",
@@ -35,7 +36,7 @@ def preds(g, q):
     out = {}
     for name, d in FMS:
         if name not in _P:
-            r = np.load(f"{W}/{d}/preds_test.npz")
+            r = np.load(f"{REF_WORK}/{d}/preds_test.npz")
             o = np.argsort(r["hit_evt"], kind="stable")
             _P[name] = (r["hit_evt"][o], r["pred"][o], r["hit_q"][o])
         evt, p, hq = _P[name]

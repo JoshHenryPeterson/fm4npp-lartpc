@@ -7,9 +7,12 @@ backbones cost 10-30x more per step than qlfm cell tokens. Long runs first.
 
 Usage: make_tasks_r2.py OUT_ROOT BACKBONE_KEY [BACKBONE_KEY ...] > tasks.txt
 """
+import os
 import sys
 
-W = "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from qlfm.paths import WORK as W  # noqa: E402
+
 BACKBONES = {   # key: (prefix, --backbone, checkpoint)
     "qlfm_S_C": ("", "qlfm", f"{W}/pre/c_f0.90/fm.pt"),
     "qlfm_S_CL": ("", "qlfm", f"{W}/pre/cl_f0.90/fm.pt"),

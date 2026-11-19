@@ -1,0 +1,27 @@
+#!/bin/bash
+#PBS -A LArTPC_FM
+#PBS -N a1r2_full
+#PBS -q debug
+#PBS -l select=1:system=polaris
+#PBS -l walltime=01:00:00
+#PBS -l filesystems=home:eagle
+#PBS -j oe
+#PBS -r n
+# A1 round 2 full: 6 runs on 4 GPUs (run_queue.sh), then per-plane T1 postprocessing + summary.md, all in this job.
+# Submitted by scripts/a1r2_submit.sh with -W depend=afterok:<smoke>. Resumable: finished tasks (metrics.json) are skipped.
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/a1r2_common.sh
+make_tasks
+status "full started (job $PBS_JOBID)"
+watch_tasks $A1R2/tasks/full.txt & W=$!
+run_tasks $A1R2/tasks/full.txt 15       # leave 15 min of the walltime for the postprocessing
+kill $W 2>/dev/null
+ndone=$(ls $A1R2/full/*/metrics.json 2>/dev/null | wc -l)
+status "GPU tasks finished: $ndone/6 metrics.json present; running summary"
+$PY $QLFM_ROOT/scripts/a1r2_summarize.py $A1R2/full > $A1R2/logs/summarize.log 2>&1
+rc=$?
+cat $A1R2/logs/summarize.log
+if [ $rc -ne 0 ]; then status "summary FAILED rc=$rc (see logs/summarize.log); rerun: $PY $QLFM_ROOT/scripts/a1r2_summarize.py $A1R2/full"; exit 2; fi
+status "summary done: $A1R2/full/summary.md ($ndone/6 runs)"
+[ $ndone -eq 6 ] || exit 3
+exit 0

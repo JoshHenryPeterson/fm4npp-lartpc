@@ -1,12 +1,13 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::WireCellDev
+#PBS -A LArTPC_FM
 #PBS -q debug
 #PBS -l select=1:system=polaris
 #PBS -l walltime=00:30:00
 #PBS -l filesystems=home:eagle
 #PBS -N qlfm_smoke
 #PBS -j oe
-source /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/env.sh
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/env.sh
 cd $QLFM_ROOT
 T=$QLFM_WORK/test; O=$T/smoke_$(date +%s); mkdir -p $O
 nvidia-smi -L

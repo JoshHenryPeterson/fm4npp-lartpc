@@ -9,9 +9,11 @@ masking, Chamfer + per-point energy loss). Changes forced by the data / protocol
     (10 m x 3.5 m, ~26 long cosmic tracks) would need ~2k groups at 1.5 cm
   * schedule length set by the equal-node-hour budget (~4 node-hours)
 """
-_base_ = ["/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work/tools/pimm/configs/_base_/default_runtime.py"]
+import os as __os   # names starting with "__" are dropped by pimm's Config loader (no module left in cfg)
 
-W = "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"
+_base_ = [__os.environ.get("PIMM_ROOT", __os.path.join(__os.environ.get("QLFM_WORK", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"), "tools/pimm")) + "/configs/_base_/default_runtime.py"]
+
+W = __os.environ.get("QLFM_WORK", "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work")
 SCALE = 600.0
 batch_size = 64
 num_worker = 28

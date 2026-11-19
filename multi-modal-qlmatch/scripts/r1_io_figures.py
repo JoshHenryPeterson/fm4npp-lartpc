@@ -24,8 +24,8 @@ from matplotlib.patches import Rectangle
 from qlfm import geometry as G
 from qlfm.data.dataset import Corpus, EventDataset, collate
 from qlfm.tokenize import TokCfg, tokenize_charge, tokenize_light
+from qlfm.paths import WORK as W
 
-W = "/lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work"
 CFG = TokCfg()
 PL = "UVY"
 

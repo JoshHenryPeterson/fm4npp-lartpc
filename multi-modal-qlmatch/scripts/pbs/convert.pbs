@@ -1,11 +1,13 @@
 #!/bin/bash
-#PBS -A neutrinoGPU::WireCellDev
+#PBS -A LArTPC_FM
 #PBS -q debug
 #PBS -l select=2:system=polaris
 #PBS -l walltime=01:00:00
 #PBS -l filesystems=home:eagle
 #PBS -N qlfm_convert
 #PBS -j oe
-cd /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc-work
+QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
+source $QLFM_ROOT/scripts/env.sh
+cd $QLFM_WORK
 NN=$(sort -u $PBS_NODEFILE | wc -l)
-mpiexec -n $NN --ppn 1 --cpu-bind none env QLFM_DETECTOR=${QLFM_DETECTOR:-uboone} CONVERT_TASKS=${CONVERT_TASKS:-} bash /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/convert_node.sh
+mpiexec -n $NN --ppn 1 --cpu-bind none env QLFM_DETECTOR=${QLFM_DETECTOR:-uboone} CONVERT_TASKS=${CONVERT_TASKS:-} bash $QLFM_ROOT/scripts/convert_node.sh
