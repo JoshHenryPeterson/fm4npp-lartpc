@@ -1,0 +1,48 @@
+#!/bin/bash
+#PBS -A LArTPC_FM
+#PBS -l filesystems=home:eagle
+#PBS -j oe
+# Domain-shift study (#13), whole D side in one prod allocation (10 nodes):
+#   A. pretrain qlfm-M CL in D on 4 nodes (16 GPUs, --bs 16 -> same global batch 256 as the 1-node recipe)
+#      while the other 6 nodes run the S-side evaluations (EVAL_S task file);
+#   B. the D fine-tunes (FT_D task file) on every node as it frees up;
+#   C. the D-side evaluations (EVAL_D task file).
+# All phases share one RUN_ID, so run_queue.sh never hands a task to two phases.
+# qsub -q prod -l select=10:system=polaris -l walltime=03:00:00 -v PRE_OUT=...,PRE_ARGS=...,EVAL_S=...,FT_D=...,EVAL_D=... dshift_prod.pbs
+source /lus/eagle/projects/neutrinoGPU/yuhw/fm4npp-lartpc/multi-modal-qlmatch/scripts/env.sh
+cd $QLFM_ROOT
+T0=$(/bin/date +%s)
+WALL=$(qstat -f $PBS_JOBID | awk -F'= ' '/Resource_List.walltime/{split($2,a,":"); print a[1]*3600+a[2]*60+a[3]}')
+DEADLINE=$(( T0 + WALL - 300 ))
+RUN_ID="${PBS_JOBID%%.*}@$T0"
+mapfile -t NODES < <(sort -u $PBS_NODEFILE)
+P=( "${NODES[@]:0:4}" ); E=( "${NODES[@]:4}" )
+hp=$PBS_O_WORKDIR/hosts_${PBS_JOBID%%.*}_pre; printf "%s\n" "${P[@]}" > $hp
+he=$PBS_O_WORKDIR/hosts_${PBS_JOBID%%.*}_eval; printf "%s\n" "${E[@]}" > $he
+log(){ echo "[$(/bin/date +%T)] $*"; }
+rq(){   # rq HOSTFILE NNODES TASKFILE
+  mpiexec -n $2 --ppn 1 --hostfile $1 --cpu-bind none env RUN_ID="$RUN_ID" QLFM_DETECTOR=uboone \
+    bash $QLFM_ROOT/scripts/run_queue.sh $3 $DEADLINE
+}
+# A. pretraining (stops in time for the fine-tunes) + S-side evaluations
+TL=$(( (WALL - 80*60) / 60 ))
+mkdir -p $PRE_OUT
+log "A: pretrain on ${P[*]} (time limit $TL min); eval S on ${E[*]}"
+( export MASTER_ADDR=${P[0]} MASTER_PORT=29611
+  mpiexec -n 16 --ppn 4 --hostfile $hp --cpu-bind depth -d 8 env QLFM_DETECTOR=uboone \
+    $PY -u -m qlfm.train_pretrain --out $PRE_OUT --time-limit $TL $(cat $PRE_ARGS) 2>&1 \
+    | grep -v -E "Warn|bind: warning" > $PRE_OUT/stdout_${PBS_JOBID%%.*}.log ) &
+PRE_PID=$!
+rq $he ${#E[@]} $EVAL_S & EV_PID=$!
+wait $PRE_PID
+[ -f $PRE_OUT/done ] || { log "pretraining not done ($(tail -1 $PRE_OUT/stdout_${PBS_JOBID%%.*}.log)); stop after eval S"; wait $EV_PID; exit 1; }
+log "pretraining done: $(cat $PRE_OUT/done) steps"
+# B. D fine-tunes: pretraining nodes now, evaluation nodes when their queue is empty
+rq $hp ${#P[@]} $FT_D & B1=$!
+( wait $EV_PID 2>/dev/null; rq $he ${#E[@]} $FT_D ) & B2=$!
+wait $B1 $B2
+log "B: fine-tunes finished"
+# C. D-side evaluations on every node
+printf "%s\n" "${NODES[@]}" > $PBS_O_WORKDIR/hosts_${PBS_JOBID%%.*}_all
+rq $PBS_O_WORKDIR/hosts_${PBS_JOBID%%.*}_all ${#NODES[@]} $EVAL_D
+log "C: evaluations finished"

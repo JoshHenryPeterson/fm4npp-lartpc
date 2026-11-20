@@ -7,6 +7,8 @@
 # qsub -q debug-scaling -l select=8:system=polaris -l walltime=01:00:00 -N pre_cl -v OUT=...,ARGS="..." pretrain.pbs
 QLFM_ROOT=${QLFM_ROOT:-/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc/multi-modal-qlmatch}
 source $QLFM_ROOT/scripts/env.sh
+# ARGS with commas (e.g. a multi-sample --corpus) cannot go through qsub -v: put them in ARGS_FILE instead
+[ -n "$ARGS_FILE" ] && ARGS=$(cat $ARGS_FILE)
 cd $QLFM_ROOT
 NN=$(wc -l < $PBS_NODEFILE)
 WALL=$(qstat -f $PBS_JOBID | awk -F'= ' '/Resource_List.walltime/{split($2,a,":"); print a[1]*60+a[2]}')

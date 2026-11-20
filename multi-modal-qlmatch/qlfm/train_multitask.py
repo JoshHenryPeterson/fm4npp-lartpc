@@ -51,12 +51,22 @@ def get_args(argv=None):
     ap.add_argument("--late-light", type=int, default=0, help="as train_downstream (2 = strong late fusion)")
     ap.add_argument("--hit-feat", default="native", choices=["native", "raw", "none"])
     ap.add_argument("--pimm-prep", default="matched", choices=["matched", "legacy"])
-    ap.add_argument("--width", default="native", choices=["native", "meas", "const"],
+    ap.add_argument("--width", default="native", choices=["native", "meas", "meas3d", "const"],
                     help="hit widths in training and evaluation (#9): meas = simulated nu hits rescaled to data "
-                         "(qlfm.eval_perturb w_meas), const = every hit the same width (no width information)")
+                         "(qlfm.eval_perturb w_meas; meas3d = Sunny's 3D factors), const = every hit the same width "
+                         "(no width information)")
     ap.add_argument("--domain", default="sim", choices=["sim", "real", "real_noVnorm"],
                     help="input domain in training and evaluation (A1 round 3; qlfm.eval_perturb.DOMAINS): real = "
                          "w_meas3d widths + l_comb80 light. Exclusive with --width. T5 targets stay native.")
+    ap.add_argument("--labels", default="truth", choices=["truth", "wc"],
+                    help="wc (#10, D5): train/test on Wire-Cell labels of a corpus with WC columns (real data): "
+                         "T1 = hit in WC's in-time main cluster of a WC generic-nu event, T2 = WC generic nu; "
+                         "events need wc_in_nusel; tasks hit, evt_nu, light only; needs --width native")
+    ap.add_argument("--freeze-blocks", type=int, default=-1,
+                    help="finetune mode (#13): freeze the backbone embeddings (layer 0) and blocks 1..K; -1 = none")
+    ap.add_argument("--lp-ft", type=int, default=0,
+                    help="finetune mode (#13): train only the heads for the first N optimizer steps, then fine-tune "
+                         "(LP-FT, Kumar et al. 2022)")
     ap.add_argument("--max-hits", type=int, default=None)
     ap.add_argument("--max-tokens", type=int, default=None)
     ap.add_argument("--label-frac", type=float, default=0.01)
@@ -120,7 +130,7 @@ class MultiTaskModel(nn.Module):
         return self
 
     def _bb(self, b):
-        frozen_all = self.mode == "frozen" and not any(p.requires_grad for p in self.backbone.parameters())
+        frozen_all = not any(p.requires_grad for p in self.backbone.parameters())
         with torch.no_grad() if frozen_all else contextlib.nullcontext():
             return self.backbone(b)
 
@@ -249,6 +259,13 @@ def main(argv=None):
     sp = np.load(args.splits)
     ev = {k: corpus.ev_array(k) for k in EV_KEYS}
     lab_np = event_labels(ev)
+    if args.labels == "wc":
+        assert set(tasks) <= {"hit", "evt_nu", "light"}, "--labels wc supports hit, evt_nu, light"
+        assert args.width == "native", "--labels wc: real-data hits are already data-like (use --width native)"
+        wc_ok = corpus.ev_array("wc_in_nusel") == 1
+        gen = (corpus.ev_array("wc_generic_nu") == 1).astype(np.int64)
+        lab_np["hit"] = (wc_ok, None)
+        lab_np["evt_nu"] = (wc_ok, gen)
     lab_np["light"] = (lab_np["light"][0], None)
     lab_np["hit"] = (lab_np["hit"][0], None)
     lab = {t: (torch.from_numpy(lab_np[t][0]).to(dev),
@@ -276,7 +293,12 @@ def main(argv=None):
         backbone.eval()
     lr = args.lr or {"finetune": 2e-4, "frozen": 1e-3}[args.mode]
     if args.mode == "finetune":
+        if args.freeze_blocks >= 0:              # partial freezing: embeddings + the first K blocks stay fixed
+            for n_, p in backbone.named_parameters():
+                if backbone.layer_id(n_) <= args.freeze_blocks:
+                    p.requires_grad_(False)
         opt = torch.optim.AdamW(layer_groups(model, lr, args.layer_decay), lr=lr)
+        tunable = [p for p in backbone.parameters() if p.requires_grad]
     else:
         opt = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=lr, weight_decay=0.05)
         for g in opt.param_groups:
@@ -290,7 +312,8 @@ def main(argv=None):
             class_w[t] = torch.tensor((cnt.sum() / np.maximum(cnt, 1) / 3) ** 0.5, dtype=torch.float32, device=dev)
 
     mk = lambda idx, shuffle, bs: torch.utils.data.DataLoader(
-        EventDataset(corpus, idx, truth=True), batch_size=bs, shuffle=shuffle, collate_fn=collate,
+        EventDataset(corpus, idx, truth=True, wc_labels=args.labels == "wc"), batch_size=bs, shuffle=shuffle,
+        collate_fn=collate,
         num_workers=args.workers, pin_memory=True, drop_last=shuffle, persistent_workers=shuffle)
     mbs = max(1, args.bs // args.accum)
     trl = mk(tr, True, max(1, min(args.bs, max(2, len(tr) // 2)) // args.accum))
@@ -323,6 +346,9 @@ def main(argv=None):
         micro = 0
         for b in trl:
             b = to_device(b, dev)
+            if args.lp_ft and args.mode == "finetune":     # LP-FT: heads only for the first lp_ft steps
+                for p in tunable:
+                    p.requires_grad_(step >= args.lp_ft)
             if micro == 0:
                 for g in opt.param_groups:
                     w = min(1.0, (step + 1) / max(1, steps // 20))

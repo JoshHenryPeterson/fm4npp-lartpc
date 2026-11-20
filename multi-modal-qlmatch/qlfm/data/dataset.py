@@ -69,11 +69,14 @@ class Corpus:
 class EventDataset(torch.utils.data.Dataset):
     """Returns raw hits/ophits for one event (+ truth columns if `truth`)."""
 
-    def __init__(self, corpus: Corpus, indices, truth=False, ev_keys=()):
+    def __init__(self, corpus: Corpus, indices, truth=False, ev_keys=(), wc_labels=False):
         self.c = corpus
         self.idx = np.asarray(indices, dtype=np.int64)
         self.truth = truth
         self.ev_keys = ev_keys
+        # wc_labels (issue #10, D5): the T1 target column hit_nu_edep is replaced by the Wire-Cell nu label,
+        # hit in WC's in-time main cluster & event passes WC generic nu (1.0 = nu hit), for training on real data
+        self.wc_labels = wc_labels
 
     def __len__(self):
         return len(self.idx)
@@ -88,6 +91,9 @@ class EventDataset(torch.utils.data.Dataset):
         cols = HIT_FEAT + (("tpc",) if sh.has_tpc else ()) + (HIT_TRUTH if self.truth else ())
         for k in cols:
             out["hit_" + k] = np.asarray(sh.hit(k)[h0:h0 + hn])
+        if self.wc_labels:
+            gen = bool(sh.ev("wc_generic_nu")[j]) and bool(sh.ev("wc_in_nusel")[j])
+            out["hit_nu_edep"] = (np.asarray(sh.hit("wc_main")[h0:h0 + hn]) > 0).astype(np.float16) * float(gen)
         for k in OPH:
             out["oph_" + k] = np.asarray(sh.oph(k)[o0:o0 + on])
         for k in self.ev_keys:
