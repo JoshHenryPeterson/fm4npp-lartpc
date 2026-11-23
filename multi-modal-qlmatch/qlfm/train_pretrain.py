@@ -60,6 +60,10 @@ def get_args(argv=None):
     ap.add_argument("--seed", type=int, default=0)
     # reference methods (round 2)
     ap.add_argument("--method", default="mae", choices=["mae", "fm4npp", "fm4npp_l", "sd", "jepa"])
+    ap.add_argument("--width", default="native", choices=["native", "meas", "meas3d", "const"],
+                    help="hit-width domain for pretraining (#13): meas/meas3d = simulated nu hits rescaled to data "
+                         "(qlfm.eval_perturb, the data-like domain D). The per-hit nu deposit is loaded only to pick "
+                         "the simulated hits; it is never a target.")
     ap.add_argument("--lr-abs", type=float, default=None, help="absolute lr (no batch scaling)")
     ap.add_argument("--clip", type=float, default=1.0)
     ap.add_argument("--max-hits", type=int, default=16384)
@@ -77,7 +81,10 @@ def get_args(argv=None):
                     help="JEPA: position input of masked charge tokens to the predictor")
     ap.add_argument("--budget-h", type=float, default=None,
                     help="training-hour budget: after 200 steps the measured rate fixes --steps (kept on resume)")
-    return ap.parse_args(argv)
+    args = ap.parse_args(argv)
+    if args.width != "native" and args.domain != "sim":
+        ap.error("--width and --domain are exclusive")
+    return args
 
 
 def build(args):
@@ -122,16 +129,20 @@ def lr_at(step, args, base):
     return base * 0.5 * (1 + math.cos(math.pi * min(1.0, p)))
 
 
-def to_domain(b, domain):
-    """Apply the input domain to an on-device batch (needs hit_nu_edep: the loaders use truth=True for domain != sim)."""
-    if domain == "sim":
+def to_domain(b, domain, width="native"):
+    """Apply the input domain (--domain, A1 round 3) or hit-width domain (--width, #13) to an on-device batch
+    (needs hit_nu_edep: the loaders use truth=True when either is set). native/sim = unchanged."""
+    if domain != "sim":
+        from qlfm.eval_perturb import DOMAINS, perturb
+        return perturb(b, DOMAINS[domain], 0.0)
+    if width == "native":
         return b
-    from qlfm.eval_perturb import DOMAINS, perturb
-    return perturb(b, DOMAINS[domain], 0.0)
+    from qlfm.eval_perturb import perturb
+    return perturb(b, "w_" + width, 0.0)
 
 
 @torch.no_grad()
-def validate(mae, loader, dev, n_batches, domain="sim"):
+def validate(mae, loader, dev, n_batches, domain="sim", width="native"):
     mae.eval()
     state = torch.cuda.get_rng_state()
     torch.cuda.manual_seed(1234)                      # identical masks every validation
@@ -140,7 +151,7 @@ def validate(mae, loader, dev, n_batches, domain="sim"):
         if i >= n_batches:
             break
         with torch.autocast("cuda", dtype=torch.bfloat16):
-            out = mae(to_domain(to_device(b, dev), domain))
+            out = mae(to_domain(to_device(b, dev), domain, width))
         for key, v in out.items():
             if key.startswith("loss"):
                 acc[key] = acc.get(key, 0.0) + float(v)
@@ -193,9 +204,25 @@ def main(argv=None):
         if dist.is_main():
             print(f"already done ({step} steps)", flush=True)
         return
+    # single writer per output dir: a second job (e.g. a resubmission racing a running one) finds a fresh lock
+    # (heartbeat < 10 min, refreshed at every log step) and exits without touching the checkpoint
+    lock = os.path.join(args.out, "train.lock")
+    me = f"{os.environ.get('PBS_JOBID', 'nojob').split('.')[0]}@{os.uname().nodename}"
+    busy = torch.zeros(1, device=dev)
+    if dist.is_main() and os.path.exists(lock) and time.time() - os.path.getmtime(lock) < 600:
+        owner = open(lock).read().strip()
+        if owner.split("@")[0] != me.split("@")[0]:
+            print(f"output dir in use by {owner} (lock {lock}); exiting", flush=True)
+            busy += 1
+    if world > 1:
+        torch.distributed.broadcast(busy, 0)
+    if busy.item():
+        return
+    if dist.is_main():
+        open(lock, "w").write(me + "\n")
     model = DDP(mae, device_ids=[dev.index], find_unused_parameters=True) if world > 1 else mae
 
-    truth = args.domain != "sim"                      # perturb() reads hit_nu_edep
+    truth = args.domain != "sim" or args.width != "native"                      # perturb() reads hit_nu_edep
     ds = EventDataset(corpus, train_idx, truth=truth)
     loader = torch.utils.data.DataLoader(
         ds, batch_size=args.bs, sampler=InfiniteSampler(len(ds), args.seed * 1000 + rank * 7 + step),
@@ -237,7 +264,7 @@ def main(argv=None):
     model.train()
     it = iter(loader)
     while step < args.steps:
-        b = to_domain(to_device(next(it), dev), args.domain)
+        b = to_domain(to_device(next(it), dev), args.domain, args.width)
         for g in opt.param_groups:
             g["lr"] = lr_at(step, args, base_lr)
         if args.budget_h and steps_final is None:
@@ -277,9 +304,10 @@ def main(argv=None):
                 print(json.dumps(rec), flush=True)
                 logf.write(json.dumps(rec) + "\n")
                 logf.flush()
+                os.utime(lock)                         # heartbeat for the single-writer lock
             t_log, ev_log, acc, acc_n = time.time(), 0, {}, {}
         if step % args.val_every == 0 or step == args.steps:
-            v = validate(mae, vloader, dev, n_val_batches, args.domain)
+            v = validate(mae, vloader, dev, n_val_batches, args.domain, args.width)
             if dist.is_main():
                 rec = {"step": step, **{"val_" + k: x for k, x in v.items()}}
                 print(json.dumps(rec), flush=True)
@@ -295,6 +323,8 @@ def main(argv=None):
     save()
     if dist.is_main():
         print(f"stopped at step {step}", flush=True)
+        if os.path.exists(lock):
+            os.remove(lock)
         if step >= args.steps:
             open(os.path.join(args.out, "done"), "w").write(f"{step}\n")
     dist.barrier()
