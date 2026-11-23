@@ -12,18 +12,42 @@ TASKS=$1; DEADLINE=$2
 RUN_ID=${RUN_ID:-${PBS_JOBID%%.*}@0}
 STALE_MIN=${STALE_MIN:-15}
 MAX_FAIL=${MAX_FAIL:-2}
+# Claiming is atomic: `mkdir` is the only way to create a lock. Reclaiming a stale lock is serialized by a second mkdir
+# mutex (LOCKDIR.reclaim), so only one worker at a time can remove a stale lock and re-create it; a worker that loses
+# any step just skips the task. After a claim the owner file is written and re-read: if it cannot be written or does not
+# contain our token (our lock was removed/replaced under us), the claim is abandoned.
+claim_own() {   # claim_own LOCKDIR: lock dir was just created by us; record + verify the owner token
+  local lk=$1 tok="$RUN_ID $(hostname) $BASHPID"
+  echo "$tok" > $lk/owner 2>/dev/null && [ "$(cat $lk/owner 2>/dev/null)" = "$tok" ] && return 0
+  return 1      # lock vanished or was replaced: do not run the task
+}
 claim() {   # claim() LOCKDIR: 0 if we now own it
   local lk=$1
-  mkdir $lk 2>/dev/null && { echo "$RUN_ID $(hostname)" > $lk/owner; return 0; }
+  if mkdir $lk 2>/dev/null; then claim_own $lk; return; fi
   local own=$(cat $lk/owner 2>/dev/null | cut -d' ' -f1)
   local hb=$lk/owner; [ -f $hb ] || hb=$lk
   if { [ -n "$own" ] && [ "${own%@*}" = "${RUN_ID%@*}" ] && [ "$own" != "$RUN_ID" ]; } || \
      [ -n "$(find $hb -maxdepth 0 -mmin +$STALE_MIN 2>/dev/null)" ]; then
-    local tmp=$lk.stale.$$.$RANDOM
-    mv $lk $tmp 2>/dev/null || return 1      # another worker got there first
-    rm -rf $tmp
-    echo "[$(hostname) $(/bin/date +%T)] reclaimed stale lock $lk (owner ${own:-unknown})"
-    mkdir $lk 2>/dev/null && { echo "$RUN_ID $(hostname)" > $lk/owner; return 0; }
+    local mx=$lk.reclaim
+    # a reclaim mutex left behind by a killed worker is itself stale after 5 min
+    [ -n "$(find $mx -maxdepth 0 -mmin +5 2>/dev/null)" ] && mv $mx $mx.old.$BASHPID.$RANDOM 2>/dev/null
+    mkdir $mx 2>/dev/null || return 1           # another worker is reclaiming this lock
+    local ok=1
+    # re-check under the mutex: the lock may have been reclaimed/released and re-created since we looked
+    local own2=$(cat $lk/owner 2>/dev/null | cut -d' ' -f1)
+    local hb2=$lk/owner; [ -f $hb2 ] || hb2=$lk
+    if [ -d $lk ] && [ "$own2" = "$own" ] && \
+       { { [ -n "$own2" ] && [ "${own2%@*}" = "${RUN_ID%@*}" ] && [ "$own2" != "$RUN_ID" ]; } || \
+         [ -n "$(find $hb2 -maxdepth 0 -mmin +$STALE_MIN 2>/dev/null)" ]; }; then
+      local tmp=$lk.stale.$BASHPID.$RANDOM
+      if mv $lk $tmp 2>/dev/null; then
+        rm -rf $tmp
+        echo "[$(hostname) $(/bin/date +%T)] reclaimed stale lock $lk (owner ${own:-unknown})"
+        mkdir $lk 2>/dev/null && claim_own $lk && ok=0
+      fi
+    fi
+    rmdir $mx 2>/dev/null
+    return $ok
   fi
   return 1
 }
@@ -51,7 +75,7 @@ worker() {
         "@mamba "*) py=$QLFM_WORK/tools/venv-mamba/bin/python; cmd=${line#@mamba } ;;
       esac
       ( while sleep 120; do touch $out.lock/owner; done ) & local hb=$!; disown $hb
-      CUDA_VISIBLE_DEVICES=$gpu PIMM_ROOT=$QLFM_WORK/tools/pimm timeout $((left*60)) $py -m $cmd --time-limit $((left-5)) > $out/run.log 2>&1
+      CUDA_VISIBLE_DEVICES=$gpu PIMM_ROOT=$QLFM_WORK/tools/pimm timeout $((left*60)) $py -m $cmd --time-limit $((left-5)) < /dev/null > $out/run.log 2>&1
       local rc=$?
       kill $hb 2>/dev/null
       if [ $rc -ne 0 ] && [ $rc -ne 124 ] && [ ! -f $out/metrics.json ]; then

@@ -17,7 +17,14 @@ PRE_IDS="sim_cl real_cl sim_c real_c"
 
 # ---- per-stage PBS resources (overridable: QUEUE_STAGE{0..3}, NODES_STAGE{n}, WALL_STAGE{n}, MAX_RETRY_S{n}) --------
 stage_queue() { local v=QUEUE_STAGE$1 d=preemptable; [ $1 -eq 0 ] && d=debug; echo ${!v:-$d}; }
-stage_nodes() { local v=NODES_STAGE$1; local -a d=(2 4 6 4); echo ${!v:-${d[$1]}}; }
+stage_nodes() {
+  local v=NODES_STAGE$1; local -a d=(2 4 6 4)
+  if [ -n "${!v}" ]; then echo ${!v}; return; fi
+  if [ $1 -eq 1 ]; then   # one node per unfinished pretrain (min 1): retries/resumes do not hold idle nodes
+    local r=$(( $(echo $PRE_IDS | wc -w) - $(n_pre_done) )); [ $r -lt 1 ] && r=1; echo $r; return
+  fi
+  echo ${d[$1]}
+}
 stage_wall()  {   # debug* queues: 1 h segments
   local v=WALL_STAGE$1; local -a d=(01:00:00 03:30:00 02:00:00 01:30:00)
   if [ -n "${!v}" ]; then echo ${!v}; elif [[ "$(stage_queue $1)" == debug* ]]; then echo 01:00:00; else echo ${d[$1]}; fi
