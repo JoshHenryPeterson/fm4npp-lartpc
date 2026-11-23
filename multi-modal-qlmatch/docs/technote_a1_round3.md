@@ -88,6 +88,10 @@ noVnorm − `w_meas3d` (all planes): T1 charge-weighted −0.1334 ± 0.0054, T2 
 
 noVnorm − `w_meas3d` (all planes): T1 charge-weighted −0.0203 ± 0.0010, T2 −0.0017 ± 0.0002. V-only, noVnorm − normalised: T1 −0.0219 ± 0.0005, T2 −0.0008 ± 0.0002.
 
+![Part 1: absolute T1 (charge-weighted and per-event median) and T2 (all events) for nominal, `w_meas3d` and `w_meas3d_noVnorm` (§2.2). Dashed lines: nominal per model. T2 bright is not shown. Mean over 3 seeds; error bars = seed SD.](/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round3/figures/a1r3_noVnorm_abs.pdf)
+
+![Part 1: Δ T1 and Δ T2 vs nominal for `w_meas3d` and `w_meas3d_noVnorm` (§2.2). T2 bright is not shown. Mean over 3 seeds; error bars = seed SD.](/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round3/figures/a1r3_noVnorm_delta.pdf)
+
 ### 2.3 Per-plane T1 charge-weighted (Δ vs nominal on the plane)
 
 **qlfm-M CL**
@@ -116,6 +120,14 @@ Per-plane per-event-median T1 (paper definition), absolute for `w_meas3d_noVnorm
 | C + XF | U | 0.7495 ± 0.0065 | 0.8191 ± 0.0021 | 0.7455 ± 0.0078 |
 | C + XF | V | 0.6784 ± 0.0046 | 0.8305 ± 0.0049 | 0.7912 ± 0.0060 |
 | C + XF | Y | 0.8987 ± 0.0019 | 0.9334 ± 0.0012 | 0.8977 ± 0.0023 |
+
+![Per-plane T1 (charge-weighted), absolute, for nominal, `w_meas3d` and `w_meas3d_noVnorm` (§2.3). Dashed segments: same-plane nominal. Mean over 3 seeds; error bars = seed SD.](/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round3/figures/a1r3_perplane_T1_qwtd_abs.pdf)
+
+![Per-plane Δ T1 (charge-weighted) vs nominal for `w_meas3d` and `w_meas3d_noVnorm` (§2.3). Δ is paired per seed from the per-run `by_plane` scores; error bars = seed SD of the paired Δ (mean over 3 seeds).](/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round3/figures/a1r3_perplane_T1_qwtd_delta.pdf)
+
+![Per-plane T1 (per-event median), absolute, for nominal and `w_meas3d` (round 2) and `w_meas3d_noVnorm` (§2.3, third table). Dashed segments: same-plane nominal. Mean over 3 seeds; error bars = seed SD as printed in the table.](/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round3/figures/a1r3_perplane_T1_evtmed_abs.pdf)
+
+![Per-plane Δ T1 (per-event median) vs nominal for `w_meas3d` (round 2) and `w_meas3d_noVnorm` (§2.3, third table). Δ = variant minus the round-2 nominal on the same plane, paired per seed (a1r2 `t1_npz.json` and the round-3 `t1_npz` files); error bars = seed SD of the paired Δ (mean over 3 seeds).](/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round3/figures/a1r3_perplane_T1_evtmed_delta.pdf)
 
 ### 2.4 Part 1 findings
 
@@ -285,6 +297,8 @@ The existing models were pretrained on `pre_f0.90`, which overlaps the downstrea
 | sim → sim | 0.6061 ± 0.0000 | 0.7259 ± 0.0000 | 0.8292 ± 0.0000 |
 | existing (sim) → sim | 0.7146 ± 0.0055 | 0.7638 ± 0.0040 | 0.8742 ± 0.0020 |
 
+![Part 2, finetune: real-domain T1 (charge-weighted and per-event median) and T2 (all events) by pretrain → downstream arm, for CL (§3.2) and C + XF (§3.4), 'Primary' tables. Mean ± seed SD over the seeds present; single-seed arms have no error bar.](/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round3/figures/a1r3_part2_finetune_primary.pdf)
+
 ### 3.5 C + XF, frozen
 
 **Primary: real-domain scores**
@@ -326,6 +340,8 @@ The existing models were pretrained on `pre_f0.90`, which overlaps the downstrea
 | real → sim | 0.4885 ± 0.0147 | 0.5682 ± 0.0153 | 0.7417 ± 0.0164 |
 | sim → sim | 0.3506 ± 0.0000 | 0.4320 ± 0.0000 | 0.6852 ± 0.0000 |
 | existing (sim) → sim | 0.3733 ± 0.0000 | 0.4588 ± 0.0000 | 0.6872 ± 0.0000 |
+
+![Part 2, frozen: real-domain T1 (charge-weighted and per-event median) and T2 (all events) by pretrain → downstream arm, for CL (§3.3) and C + XF (§3.5), 'Primary' tables. Mean ± seed SD over the seeds present; single-seed arms have no error bar.](/lus/eagle/projects/LArTPC_FM/jpeterso/fm4npp-lartpc-work/a1_round3/figures/a1r3_part2_frozen_primary.pdf)
 
 ### 3.6 Part 2 findings
 
