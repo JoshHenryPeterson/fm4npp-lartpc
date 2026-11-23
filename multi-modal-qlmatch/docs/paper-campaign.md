@@ -127,4 +127,12 @@ The Mamba-2 + L multi-task fine-tune smoke test ran out of GPU memory (bs 32, 40
 | 2026-11-07 | JEPA variant test + probes (7820819, 3 nodes) | 1.6 |
 | 2026-11-07 | Sec. 3 multi-task FT (7820653; ≈2 nh of work, ≈7 nh lost to the OOM retry loop) | 9.2 |
 | 2026-11-09 | A1 data/sim width + charge test (#9): smoke 7831006 (0.17), full grid 7831163 (2 × 0.82) | 1.8 |
-| | **total so far** | **14.5** |
+| 2026-11-12 | A1 round 2 width (7837342, 2 nodes × 34 min; debug) | 1.1 |
+| 2026-11-12 | A1 light round 1: 7838867 failed at the smoke check (0.7), 7839956 full run (0.7); debug | 1.4 |
+| 2026-11-19 | A1 round 3 (account `LArTPC_FM`) stage 0, 7862003, debug, 2 nodes × 0.35 h | 0.70 |
+| 2026-11-20 | A1 round 3 stage 1a, 7862258, preemptable, 4 nodes × 2.07 h (3 of 4 pretrains; launch bug, fixed) | 8.27 |
+| 2026-11-21 | A1 round 3 stage 1b, 7869665, preemptable, 4 nodes × 4.69 h incl. requeues (1 pretrain) | 18.74 |
+| 2026-11-22 | A1 round 3 stage 2, 7873432, preemptable, 6 nodes × 2.36 h (24 downstream runs, one requeue) | 14.17 |
+| 2026-11-22 | A1 round 3 stage 3, 7875850, preemptable, 4 nodes × 1.28 h (32 evals + summary) | 5.13 |
+| 2026-11-23 | A1 round 3 rerun of `cl_sim2real_finetune_s1` and `cl_real2sim_finetune_s0` (lock-race duplicates): stage 2 7880513 (debug, 1 node × 0.81 h, 0.80) + retry 7880705 (1 × 0.30 h, 0.30) + stage 3 7880812 (1 × 0.18 h, 0.18) | 1.28 |
+| | **total so far** (round 3 ≈ 48.3 nh incl. 1.28 rerun, vs ≈ 22 nh planned) | **65.3** |
