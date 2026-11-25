@@ -31,22 +31,32 @@ class QLFMBackbone(nn.Module):
         z, evt = o["zc"], o["ct"].tok_evt
         if o["zl"] is not None:                           # charge tokens first, so hit2tok stays valid
             z, evt = torch.cat([z, o["zl"]]), torch.cat([evt, o["lt"].evt])
+        if o.get("zb") is not None:                       # then the 3D blob tokens (#16)
+            z, evt = torch.cat([z, o["zb"]]), torch.cat([evt, o["bt"].tok_evt])
         return dict(z=z, evt=evt, h_hit=o["h_hit"], hit2tok=o["ct"].hit2tok)
 
 
 def build(name, args, ckpt):
     if ckpt is None:
-        tok = TokCfg(cell_wires=args.cell_wires, cell_ticks=args.cell_ticks, max_tokens=args.max_tokens or 8192)
+        g = lambda k, d: getattr(args, k, d)
+        tok = TokCfg(cell_wires=args.cell_wires, cell_ticks=args.cell_ticks, max_tokens=args.max_tokens or 8192,
+                     blob_voxel=g("blob_voxel", 10.0), max_blob_tokens=g("max_blob_tokens", 4096))
         fm = FM(FMCfg(d=args.d, depth=args.depth, heads=args.heads, use_light=bool(args.light), tok=tok,
-                      pos_mode=args.pos_mode, pos_freq=args.pos_freq))
+                      pos_mode=args.pos_mode, pos_freq=args.pos_freq, charge_stem=g("charge_stem", "mlp"),
+                      pos3d=bool(g("pos3d", 0)), light_tok=g("light_tok", "pmt"), pmt_pos=g("pmt_pos", "v1"),
+                      use_blobs=bool(g("blobs", 0))))
     else:
         s = torch.load(ckpt, map_location="cpu", weights_only=False)
         a = s["args"]
         # token cap as in pretraining unless overridden (audit #5: was 8192 downstream vs 4096 in pretraining)
         tok = TokCfg(cell_wires=a["cell_wires"], cell_ticks=a["cell_ticks"],
-                     max_tokens=args.max_tokens or a.get("max_tokens", 4096))
+                     max_tokens=args.max_tokens or a.get("max_tokens", 4096),
+                     blob_voxel=a.get("blob_voxel", 10.0), max_blob_tokens=a.get("max_blob_tokens", 4096))
         fm = FM(FMCfg(d=a["d"], depth=a["depth"], heads=a["heads"], use_light=bool(a["light"]), tok=tok,
-                      pos_mode=a.get("pos_mode", "fourier"), pos_freq=a.get("pos_freq", 16)))
+                      pos_mode=a.get("pos_mode", "fourier"), pos_freq=a.get("pos_freq", 16),
+                      charge_stem=a.get("charge_stem", "mlp"), pos3d=bool(a.get("pos3d", 0)),
+                      light_tok=a.get("light_tok", "pmt"), pmt_pos=a.get("pmt_pos", "v1"),
+                      use_blobs=bool(a.get("blobs", 0))))
         sd, own = s["fm"], fm.state_dict()
         # cross-detector transfer (e.g. a MicroBooNE checkpoint on SBND): the per-PMT light embedding and PMT
         # positions depend on the detector and stay freshly initialised; everything else must load

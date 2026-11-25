@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -N h5-06-test1k
+#PBS -A neutrinoGPU::WireCell_aurora
+#PBS -q debug
+#PBS -l select=1
+#PBS -l walltime=01:00:00
+#PBS -l filesystems=flare:home
+#PBS -j oe
+# fm4npp #16: sbnd-h5maker 0.6 test sample = BNB CV parts 0000 + 0001 of the 0.5 (wcl1116) rebuild (20 units, ~1,060 events).
+# A: blob dumps (wct/blobdump.sh, WCT 0.38.0) per unit; B: h5 per part; C: check_h5 + value compare with the 0.5 twin.
+set -u
+module load apptainer >/dev/null 2>&1
+Y=/lus/flare/projects/neutrinoGPU/yuhw; H=$Y/production-prep/h5-0.6; R=$Y/fm4npp-lartpc/multi-modal-qlmatch/sbnd-h5maker
+P=$Y/production-prep/sim-h5-wcl1116/bnb/parts; D=$H/dumps/bnb; O=$Y/fm4npp-lartpc-data/sbnd-bnb-cv/v06test
+WRAP=$Y/sbnd-wirecell-production/aurora/env/aurora/in-aurora-sl7.sh; mkdir -p $D $O; export Y H R D WRAP
+echo "$(/bin/date -u '+%F %T') START ${PBS_JOBID:-} code $(git -C $R rev-parse --short HEAD)$(git -C $R diff --quiet -- . || echo +dirty)"
+dump() { u=$1; t0=$(/bin/date +%s)
+  SL7_SETUP=$Y/production-prep/WCLocal2026Nov16/scripts/setup-0.38.0.sh $WRAP $R/wct/blobdump.sh $u $D sim > $D/$(basename $u).dump.log 2>&1
+  echo "dump $(basename $u) rc $? wall $(( $(/bin/date +%s) - t0 ))"; }
+export -f dump
+cat $P/part-0000.txt $P/part-0001.txt | xargs -P 20 -n 1 bash -c 'dump "$@"' _
+echo "$(/bin/date -u '+%F %T') dumps done"
+for p in 0000 0001; do
+  ( SL7_SETUP=$R/env.sh /usr/bin/time -v -o $O/sbnd_bnb_cv_$p.h5.time $WRAP bash -c "cd $R && python sbnd_h5maker.py $O/sbnd_bnb_cv_$p.h5 --units-file $P/part-$p.txt --blob-dir $D" > $O/sbnd_bnb_cv_$p.h5.log 2>&1
+    echo "h5 $p rc $? wall $(awk -F': ' '/Elapsed/{print $2}' $O/sbnd_bnb_cv_$p.h5.time) rss_kb $(awk -F': ' '/Maximum resident/{print $2}' $O/sbnd_bnb_cv_$p.h5.time)" ) &
+done; wait
+for p in 0000 0001; do f=$O/sbnd_bnb_cv_$p.h5
+  $Y/tools/py311-uproot/bin/python $R/check_h5.py $f --json $f.check.json > /dev/null 2>&1; echo "check $p rc $?"
+  echo "cmp $p $($Y/tools/py311-uproot/bin/python $H/cmp-nonwc.py $Y/fm4npp-lartpc-data/sbnd-bnb-cv/wcl1116/sbnd_bnb_cv_$p.h5 $f 2>&1 | tail -1)"
+done
+echo "$(/bin/date -u '+%F %T') DONE"

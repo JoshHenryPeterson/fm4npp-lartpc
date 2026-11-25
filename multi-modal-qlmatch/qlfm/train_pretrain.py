@@ -45,6 +45,18 @@ def get_args(argv=None):
     ap.add_argument("--cell-wires", type=int, default=16)
     ap.add_argument("--cell-ticks", type=int, default=64)
     ap.add_argument("--max-tokens", type=int, default=4096)
+    # #16: new tokenizers and 3D blobs (defaults = models before #16)
+    ap.add_argument("--charge-stem", default="mlp", choices=["mlp", "cnn"], help="cnn: sparse-conv stem (pimm venv)")
+    ap.add_argument("--pos3d", type=int, default=0, help="3D position embedding of charge tokens from blobs")
+    ap.add_argument("--light-tok", default="pmt", choices=["pmt", "flash", "pmt_flash"])
+    ap.add_argument("--pmt-pos", default="v1", choices=["v1", "v2"])
+    ap.add_argument("--blobs", type=int, default=0, help="3D Wire-Cell blob voxel tokens")
+    ap.add_argument("--blob-voxel", type=float, default=10.0)
+    ap.add_argument("--max-blob-tokens", type=int, default=4096)
+    ap.add_argument("--blob-mask-ratio", type=float, default=0.6)
+    ap.add_argument("--blob-weight", type=float, default=1.0)
+    ap.add_argument("--aux3d-weight", type=float, default=0.0, help="> 0: auxiliary 3D-position head (P3a)")
+    ap.add_argument("--aux3d-dims", default="yz", choices=["yz", "xyz"], help="P3a target coordinates")
     ap.add_argument("--mask-ratio", type=float, default=0.6)
     ap.add_argument("--light-weight", type=float, default=1.0)
     ap.add_argument("--strip-frac", type=float, default=0.5)
@@ -60,7 +72,7 @@ def get_args(argv=None):
     ap.add_argument("--seed", type=int, default=0)
     # reference methods (round 2)
     ap.add_argument("--method", default="mae", choices=["mae", "fm4npp", "fm4npp_l", "sd", "jepa"])
-    ap.add_argument("--width", default="native", choices=["native", "meas", "meas3d", "const"],
+    ap.add_argument("--width", default="native", choices=["native", "meas", "meas3d", "const", "sbnd"],
                     help="hit-width domain for pretraining (#13): meas/meas3d = simulated nu hits rescaled to data "
                          "(qlfm.eval_perturb, the data-like domain D). The per-hit nu deposit is loaded only to pick "
                          "the simulated hits; it is never a target.")
@@ -96,14 +108,17 @@ def build(args):
         from qlfm.ref.fm4npp_light import FM4NPPLightPretrain, MambaGPTLight
         net = MambaGPTLight(d=args.d, n_layers=args.depth, d_state=args.d_state, klen=args.klen, dropout=args.dropout)
         return net, FM4NPPLightPretrain(net, args.max_hits, light_weight=args.light_weight)
-    tok = TokCfg(cell_wires=args.cell_wires, cell_ticks=args.cell_ticks, max_tokens=args.max_tokens)
+    tok = TokCfg(cell_wires=args.cell_wires, cell_ticks=args.cell_ticks, max_tokens=args.max_tokens,
+                 blob_voxel=args.blob_voxel, max_blob_tokens=args.max_blob_tokens)
     fm = FM(FMCfg(d=args.d, depth=args.depth, heads=args.heads, use_light=bool(args.light), tok=tok,
-                  pos_mode=args.pos_mode, pos_freq=args.pos_freq))
+                  pos_mode=args.pos_mode, pos_freq=args.pos_freq, charge_stem=args.charge_stem,
+                  pos3d=bool(args.pos3d), light_tok=args.light_tok, pmt_pos=args.pmt_pos, use_blobs=bool(args.blobs)))
     if args.method == "sd":
         from qlfm.models.sd import SelfDistill
         return fm, SelfDistill(fm)
     mcfg = MAECfg(mask_ratio=args.mask_ratio, light_weight=args.light_weight, strip_frac=args.strip_frac,
-                  target_norm=bool(args.target_norm))
+                  target_norm=bool(args.target_norm), blob_mask_ratio=args.blob_mask_ratio,
+                  blob_weight=args.blob_weight, aux3d_weight=args.aux3d_weight, aux3d_dims=args.aux3d_dims)
     if args.method == "jepa":
         from qlfm.models.jepa import JEPA
         return fm, JEPA(fm, mcfg, momentum=(args.jepa_ema, 1.0), target_layers=args.jepa_layers,
@@ -222,7 +237,8 @@ def main(argv=None):
         open(lock, "w").write(me + "\n")
     model = DDP(mae, device_ids=[dev.index], find_unused_parameters=True) if world > 1 else mae
 
-    truth = args.domain != "sim" or args.width != "native"                      # perturb() reads hit_nu_edep
+    # perturb() reads hit_nu_edep to pick the simulated hits; the aux 3D head (#16) needs the per-hit truth position
+    truth = args.domain != "sim" or args.width != "native" or args.aux3d_weight > 0
     ds = EventDataset(corpus, train_idx, truth=truth)
     loader = torch.utils.data.DataLoader(
         ds, batch_size=args.bs, sampler=InfiniteSampler(len(ds), args.seed * 1000 + rank * 7 + step),

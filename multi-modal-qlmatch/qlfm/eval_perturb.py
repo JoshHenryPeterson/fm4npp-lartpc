@@ -58,12 +58,15 @@ US_PER_TICK, V_DRIFT_CM_US, MAX_DRIFT_CM = 0.5, 0.1098, 256.35
 V_DRIFT_DATA_CM_US = 0.1076                                      # drift velocity measured in data (round 2, diff_vd)
 D_DATA, D_SIM, S0_US2 = 3.74e-6, 6.40e-6, 1.9                    # cm2/us, cm2/us, us2
 WIDTH_CONST = 4.0                                                # ticks, about the median hit rms
+# SBND (#14, E3 first look): median hit RMS beam-on data / BNB CV simulation per plane U, V, Y, flat in drift
+F_SBND = {0: 1.007, 1: 0.970, 2: 0.956}
 
 VARIANTS = {"nominal": (None, 0.0, ()), "w_meas": ("meas", 0.0, ()), "w_diff": ("diff", 0.0, ()),
             "q-5": (None, -0.05, ()), "q-2": (None, -0.02, ()), "q+2": (None, 0.02, ()), "q+5": (None, 0.05, ()),
             "w_meas_q-5": ("meas", -0.05, ()), "w_meas_q+5": ("meas", 0.05, ()),
             "w_inv": ("inv", 0.0, ()), "w_c98": ("c0.98", 0.0, ()), "w_c95": ("c0.95", 0.0, ()), "w_meas_all": ("meas_all", 0.0, ()),
             "w_const": ("const", 0.0, ()),
+            "w_sbnd": ("sbnd_all", 0.0, ()),   # SBND (#14): every hit is simulated (CORSIKA cosmics)
             # round 2 (3D factors, plane subsets, data drift velocity in the diffusion bracket)
             "w_meas3d": ("meas3d", 0.0, ()), "w_meas3d_Y": ("meas3d@2", 0.0, ()), "w_meas3d_UV": ("meas3d@0,1", 0.0, ()),
             "w_diff_vd": ("diff_vd", 0.0, ()), "w_inv3d": ("inv3d", 0.0, ()),
@@ -80,7 +83,7 @@ VARIANTS = {"nominal": (None, 0.0, ()), "w_meas": ("meas", 0.0, ()), "w_diff": (
 DOMAINS = {"sim": "nominal", "real": "d_real", "real_noVnorm": "d_real_noVnorm"}   # train/pretrain/eval --domain
 ROUND3_VARIANTS = ["w_meas3d_noVnorm", "w_meas3d_V", "w_meas3d_noVnorm_V", "d_real", "d_real_noVnorm"]
 LIGHT_VARIANTS = [v for v, x in VARIANTS.items() if x[2] and x[0] is None and not x[1]]   # pure-light (round 1); d_* are composite
-WIDTH_VARIANTS = [v for v, x in VARIANTS.items() if not x[2] and v not in ROUND3_VARIANTS]   # --variants all (round-1/2)
+WIDTH_VARIANTS = [v for v, x in VARIANTS.items() if not x[2] and v not in ROUND3_VARIANTS + ["w_sbnd"]]   # --variants all (round-1/2)
 # T5 target variants: the same components applied to the light target of has_flash events (no l_prompt counterpart)
 T5_TARGETS = {"t_scale80": ("scale80",), "t_scale82": ("scale82",), "t_slow": ("slow",), "t_tail": ("tail",),
               "t_comb80": ("scale80", "slow", "tail"), "t_comb82": ("scale82", "slow", "tail")}
@@ -113,6 +116,11 @@ def width_factor(plane, tick, kind):
     d = tick.float() - ANODE_TICK
     if kind.startswith("inv"):                      # simulated widths divided by the measured factor
         return 1 / width_factor(plane, tick, "meas" + kind[3:])
+    if kind == "sbnd":
+        f = torch.ones_like(d)
+        for p, v in F_SBND.items():
+            f[plane == p] = v
+        return f
     if kind.startswith("c"):
         return torch.full_like(d, float(kind[1:]))
     base, _, sub = kind.partition("@")
@@ -538,7 +546,7 @@ def load_run(run, dev, absolute_domain=False):
     for k, v in a.items():
         if hasattr(ns, k) and k not in ("n_test", "n_val"):
             setattr(ns, k, v)
-    backbone = build_backbone(ns.backbone, ns, ns.fm if ns.mode != "scratch" else None)
+    backbone = build_backbone(ns.backbone, ns, ns.fm if ns.mode != "scratch" and ns.fm != "none" else None)  # --fm none: from scratch
     if multitask:
         model = MultiTaskModel(backbone, list(a["tasks"]), ns.mode, ns.late_light, ns.hit_feat)
         model.width = a.get("width", "native")       # widths the model was trained with (applied in its forward)

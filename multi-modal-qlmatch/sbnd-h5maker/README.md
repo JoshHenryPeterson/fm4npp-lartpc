@@ -17,6 +17,37 @@ open data (`HDF5Maker`, uboone/hdf5maker branch `opensamples`; zenodo 8370883).
 | `relabel_wc.py` | Rewrites `wc_hit_table` of an existing file from the Wire-Cell footprints (h5py + uproot, no ROOT). Used to fix 0.3 files. |
 | `pbs/run.pbs` | Aurora PBS job: one converter process over a list of aurora-r2 unit directories. |
 
+## Real data (0.5)
+
+`--data` reads no truth product: the truth tables are written with zero rows and the `event_table` truth columns stay at their defaults. Read the FrameShift copy of the reco1 file: its `sbnd::timing::FrameShiftInfo` goes to `event_table.frame_*_ns`, and light times on the beam clock are `peaktime + frame_apply_at_caf_ns / 1000`. Recipe, checks and the Aurora test: `docs/sbnd-realdata.md` (#14).
+
+```bash
+python sbnd_h5maker.py out.h5 --data --reco1 <reco1>_frameshift.root --wc-dir <tracking-pr dir>/pr/all
+```
+
+0.5 also adds to MC and data: `event_table` `time_s`, `has_frameshift`, `timing_type`, `frame_*_ns`, `wc_n_bundle`, `wc_n_bundle_cosmic`; `wc_event_table` `cosmict_flag` (the cosmic-tagger verdict; `cosmic_flag` is only its flag-9 BDT input) and `matched_flash_gid`; the attributes `is_data` and `wc_label_notes`. Existing columns are unchanged (test10, compared by value).
+
+## Wire-Cell 3D blobs (0.6)
+
+Spec and plan: `docs/plan-3d-blobs.md` (#16). Two steps per Wire-Cell unit (or data pair):
+
+1. **Blob dump** (`wct/blobdump.sh`, WCT 0.38.0 run environment): reads the unit's step-1 tar (`ql/<seg>/qlpctree.tar.gz`), runs only step 2's cluster-splitting visitors (`switch_scope`, `unmerge_bundle`, `unmerge_assoc`, `steiner`, `fiducialutils`, the TGM/STM/FC taggers, `protect_bundle`; no neutrino tagger, DL vertex or tracking), and writes the point-cloud tree as `<unit>.blobs.tar.gz`. Its cluster idents are step 2's: on a 49-event BNB unit, every cluster had the same id and point count as the production `T_cluster`. The blobs keep the step-1 `TensorSetLabeler` truth (MC), and the tar carries the labeler's `truthtrack` table.
+2. **h5** with `--blob-dir <dir of dumps>` (units) or `--blob-dump <tar> ...`.
+
+```bash
+wct/blobdump.sh <unit dir | qlpctree.tar.gz> <dump dir> sim|data [name]
+python sbnd_h5maker.py out.h5 --units-file part.txt --blob-dir <dump dir>
+```
+
+New tables: `wc_blob_table` (every blob of every cluster), `wc_cluster_table` (every step-2 cluster; flags from `T_cluster`, labels only), `wc_hit_blob_table` (hit ↔ blob, many-to-many), `track_table` (MC), `hit_truth_table` (MC; written with or without blobs: `true_x/y/z`, `app_x/y/z`, `energy`). New `event_table` columns: `wc_blob_status`, `wc_n_blobs`. Attributes: `wc_blob_notes` (the conventions), `wc_blob_hit_rule`, `wc_blob_dumps`. Every 0.5 dataset is unchanged.
+
+Conventions:
+- **wire index**: `u/v/w_wire_index_min/max` are half-open and equal `hit_table.local_wire` (LArSoft `WireID.Wire`) in both TPCs. Not the order of the Wire-Cell wires file: it is reversed in TPC 1.
+- **slices**: `slice_index_min/max` in TPC ticks, half-open, 4 ticks each; tick 0 = hit tick 0 (`wc_tick_offset` 0).
+- **positions**: blob centres in cm, Wire-Cell imaging frame: x not t0-corrected, no SCE correction. `center_x_t0cor` adds the blob's mean `x_t0cor − x` (the cluster-t0 shift).
+- **hit in blob**: same TPC, `slice_index_min ≤ floor(local_time) < slice_index_max`, `wire_min ≤ local_wire < wire_max` on the hit's plane; `weight` = 1 / number of blobs holding the hit.
+- **trackid**: `|TrackId|`, the `particle_table.g4_id` convention (1e7 offsets per generator); −1 in data.
+
 ## Run (Aurora)
 
 ```bash

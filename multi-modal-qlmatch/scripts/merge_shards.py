@@ -18,7 +18,9 @@ from multiprocessing import Pool
 
 import numpy as np
 
-OFFSETS = {"ev_hit_off.npy": "n_hits", "ev_oph_off.npy": "n_ophits"}
+OFFSETS = {"ev_hit_off.npy": "n_hits", "ev_oph_off.npy": "n_ophits",
+           # sbnd-h5maker 0.6 (#16): blobs, hit-blob pairs, G4 tracks (their own indices stay event-local)
+           "ev_blob_off.npy": "n_blobs", "ev_hb_off.npy": "n_hit_blob", "ev_trk_off.npy": "n_tracks"}
 
 
 def merge(job):
@@ -45,6 +47,9 @@ def merge(job):
                 min_ophit_t=min(m.get("min_ophit_t", 0) for m in metas),
                 max_ophit_t=max(m.get("max_ophit_t", 0) for m in metas),
                 merged_from=[os.path.abspath(s) for s in srcs], sources=[m.get("source") for m in metas])
+    for k in ("n_blobs", "n_hit_blob", "n_tracks"):                   # sbnd-h5maker 0.6 (#16)
+        if any(k in m for m in metas):
+            meta[k] = sum(m.get(k, 0) for m in metas)
     json.dump(meta, open(os.path.join(tmp, "meta.json"), "w"), indent=1)
     os.rename(tmp, dst)
     return dst, meta["n_events"]

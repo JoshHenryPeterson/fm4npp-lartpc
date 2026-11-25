@@ -51,17 +51,23 @@ def get_args(argv=None):
     ap.add_argument("--late-light", type=int, default=0, help="as train_downstream (2 = strong late fusion)")
     ap.add_argument("--hit-feat", default="native", choices=["native", "raw", "none"])
     ap.add_argument("--pimm-prep", default="matched", choices=["matched", "legacy"])
-    ap.add_argument("--width", default="native", choices=["native", "meas", "meas3d", "const"],
+    ap.add_argument("--width", default="native", choices=["native", "meas", "meas3d", "const", "sbnd"],
                     help="hit widths in training and evaluation (#9): meas = simulated nu hits rescaled to data "
                          "(qlfm.eval_perturb w_meas; meas3d = Sunny's 3D factors), const = every hit the same width "
-                         "(no width information)")
+                         "(no width information), sbnd = every SBND hit rescaled per plane to data (#14, F_SBND)")
     ap.add_argument("--domain", default="sim", choices=["sim", "real", "real_noVnorm"],
                     help="input domain in training and evaluation (A1 round 3; qlfm.eval_perturb.DOMAINS): real = "
                          "w_meas3d widths + l_comb80 light. Exclusive with --width. T5 targets stay native.")
-    ap.add_argument("--labels", default="truth", choices=["truth", "wc"],
+    ap.add_argument("--labels", default="truth", choices=["truth", "wc", "wc_sbnd", "wc0_sbnd"],
                     help="wc (#10, D5): train/test on Wire-Cell labels of a corpus with WC columns (real data): "
                          "T1 = hit in WC's in-time main cluster of a WC generic-nu event, T2 = WC generic nu; "
-                         "events need wc_in_nusel; tasks hit, evt_nu, light only; needs --width native")
+                         "events need wc_in_nusel; tasks hit, evt_nu, light only; needs --width native. "
+                         "wc_sbnd / wc0_sbnd (#14): SBND real data, T1 = hit on a WC nu-candidate footprint "
+                         "(wc0: candidates passing the PR cosmic tagger), T2 = event has such a hit (ev_wc_any / "
+                         "ev_wc0_any)")
+    ap.add_argument("--init", default=None,
+                    help="start from a finished multi-task run (RUN_DIR/best.pt: backbone and the heads of the "
+                         "tasks trained here), e.g. a simulation fine-tune before fine-tuning on real data (#14)")
     ap.add_argument("--freeze-blocks", type=int, default=-1,
                     help="finetune mode (#13): freeze the backbone embeddings (layer 0) and blocks 1..K; -1 = none")
     ap.add_argument("--lp-ft", type=int, default=0,
@@ -93,6 +99,14 @@ def get_args(argv=None):
     ap.add_argument("--depth", type=int, default=8)
     ap.add_argument("--heads", type=int, default=8)
     ap.add_argument("--pos-mode", default="centroid")
+    # #16: new tokenizers and 3D blobs (defaults = models before #16)
+    ap.add_argument("--charge-stem", default="mlp", choices=["mlp", "cnn"], help="cnn: sparse-conv stem (pimm venv)")
+    ap.add_argument("--pos3d", type=int, default=0, help="3D position embedding of charge tokens from blobs")
+    ap.add_argument("--light-tok", default="pmt", choices=["pmt", "flash", "pmt_flash"])
+    ap.add_argument("--pmt-pos", default="v1", choices=["v1", "v2"])
+    ap.add_argument("--blobs", type=int, default=0, help="3D Wire-Cell blob voxel tokens")
+    ap.add_argument("--blob-voxel", type=float, default=10.0)
+    ap.add_argument("--max-blob-tokens", type=int, default=4096)
     ap.add_argument("--pos-freq", type=int, default=10)
     ap.add_argument("--cell-wires", type=int, default=16)
     ap.add_argument("--cell-ticks", type=int, default=64)
@@ -266,6 +280,12 @@ def main(argv=None):
         gen = (corpus.ev_array("wc_generic_nu") == 1).astype(np.int64)
         lab_np["hit"] = (wc_ok, None)
         lab_np["evt_nu"] = (wc_ok, gen)
+    if args.labels in ("wc_sbnd", "wc0_sbnd"):
+        assert set(tasks) <= {"hit", "evt_nu", "light"}, "--labels wc_sbnd supports hit, evt_nu, light"
+        assert args.width == "native", "--labels wc_sbnd: real-data hits are already data-like (use --width native)"
+        anyw = corpus.ev_array("wc_any" if args.labels == "wc_sbnd" else "wc0_any").astype(np.int64)
+        lab_np["hit"] = (np.ones(len(anyw), bool), None)
+        lab_np["evt_nu"] = (np.ones(len(anyw), bool), anyw)
     lab_np["light"] = (lab_np["light"][0], None)
     lab_np["hit"] = (lab_np["hit"][0], None)
     lab = {t: (torch.from_numpy(lab_np[t][0]).to(dev),
@@ -287,6 +307,14 @@ def main(argv=None):
     backbone = build_backbone(args.backbone, args, None if args.fm == "none" else args.fm)
     model = MultiTaskModel(backbone, tasks, args.mode, args.late_light, args.hit_feat).to(dev)
     model.width, model.domain = args.width, args.domain
+    if args.init:
+        sd = torch.load(os.path.join(args.init, "best.pt"), map_location=dev)
+        own = model.state_dict()
+        use = {k: v for k, v in sd.items() if k in own and own[k].shape == v.shape}
+        missing = [k for k in own if k not in use]
+        assert not [k for k in missing if k.startswith("backbone.")], f"--init: backbone keys missing {missing[:5]}"
+        model.load_state_dict(use, strict=False)
+        print(f"init from {args.init}: {len(use)} tensors, not loaded {missing[:8]}", flush=True)
     if args.mode == "frozen":
         for n_, p in backbone.named_parameters():
             p.requires_grad_("adapter_" in n_)
@@ -312,7 +340,8 @@ def main(argv=None):
             class_w[t] = torch.tensor((cnt.sum() / np.maximum(cnt, 1) / 3) ** 0.5, dtype=torch.float32, device=dev)
 
     mk = lambda idx, shuffle, bs: torch.utils.data.DataLoader(
-        EventDataset(corpus, idx, truth=True, wc_labels=args.labels == "wc"), batch_size=bs, shuffle=shuffle,
+        EventDataset(corpus, idx, truth=True, wc_labels={"wc": True, "wc_sbnd": "pnd_nu", "wc0_sbnd": "pnd_nu_ct0"}
+                     .get(args.labels, False)), batch_size=bs, shuffle=shuffle,
         collate_fn=collate,
         num_workers=args.workers, pin_memory=True, drop_last=shuffle, persistent_workers=shuffle)
     mbs = max(1, args.bs // args.accum)

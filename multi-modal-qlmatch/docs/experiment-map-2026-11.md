@@ -48,8 +48,8 @@ How the categories fit together:
 | D2 | Real-data check of every new model | H | 4. Validate on real data | planned (#13 phase 3; suggested for J) | <1 nh |
 | D3 | MicroBooNE round 2: more beam-on/EXT, clean overlay | FNAL session | 4. Validate on real data | awaiting approval | FNAL side |
 | D4 | Pretraining on real data | – | 4. Real data in training | future (after #13) | TBD |
-| D5 | Fine-tune on real data with Wire-Cell labels (D-pretrained M CL; 90% train / 10% test, 10 folds) | H | 4. Real data in training | queued (2026-11-20) | ~1 nh |
-| D6 | If D5 works: more WC-labelled real data, data-scaling curve | H / FNAL | 4. Real data in training | planned (needs D3) | TBD |
+| D5 | Fine-tune on real data with Wire-Cell labels (D-pretrained M CL; 90% train / 10% test, 10 folds) | H | 4. Real data in training | done 2026-11-20: not successful (both backbones) | ~1 nh |
+| D6 | If D5 works: more WC-labelled real data, data-scaling curve | H / FNAL | 4. Real data in training | on hold (D5 not successful) | TBD |
 | E1 | SBND 10k pipeline tests | H | 5. New detector | done (#11) | ~3 nh |
 | E2 | SBND full: pretrain M CL and M C, 13 fine-tunes | H | 5. New detector | running (7862256) | ~11 nh |
 | F1 | Fair width comparison: PTv3 with width, or no width anywhere | – | 6. Paper fairness | proposed (#12) | ~3 nh |
@@ -221,7 +221,7 @@ Everything in categories 1–3 uses a *modelled* data domain. These items check 
 - **Procedure:** produce more beam-on/EXT; overlay from public files missing from the published HDF5 (BNB) and the two unused νe files.
 - **Possible outcomes:** firmer real-data numbers, and a real-data pool large enough for fine-tuning with Wire-Cell labels.
 
-### D5. Fine-tune on real data with Wire-Cell labels, queued (2026-11-20)
+### D5. Fine-tune on real data with Wire-Cell labels, done 2026-11-20: not successful
 - **Purpose:** use the Wire-Cell-labelled real data directly as a training set. Does a model fine-tuned on real events reproduce Wire-Cell's ν selection on held-out real events, where simulation-trained models found only 9–34% of Wire-Cell's ν charge?
 - **Procedure:**
   - Events: the 2,097 real beam-on/EXT events with Wire-Cell output (98 Wire-Cell ν candidates).

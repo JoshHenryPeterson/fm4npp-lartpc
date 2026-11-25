@@ -1,0 +1,28 @@
+#!/bin/bash
+#PBS -N h5-data-test
+#PBS -A neutrinoGPU::WireCell_aurora
+#PBS -q debug
+#PBS -l select=1
+#PBS -l walltime=00:30:00
+#PBS -l filesystems=flare:home
+#PBS -j oe
+# fm4npp-lartpc #14: sbnd-h5maker 0.5 --data on the selected real-data events with aurora-r2 output (sbnd-wirecell-production #7),
+# plus a 0.5 MC regression on test10 (compared with the 0.4 file by values afterwards).
+set -u
+Y=/lus/flare/projects/neutrinoGPU/yuhw
+H=$Y/fm4npp-lartpc/multi-modal-qlmatch/sbnd-h5maker
+O=${O:-$Y/production-prep/realdata-h5/test}
+SR=$Y/production-prep/selected-r2/full
+D=$Y/sbnd-gen2-data
+mkdir -p $O
+export SL7_SETUP=$H/env.sh
+WRAP=$Y/sbnd-wirecell-production/aurora/env/aurora/in-aurora-sl7.sh
+echo "$(/bin/date -u '+%F %T') START $(hostname) ${PBS_JOBID:-} code $(git -C $H rev-parse --short HEAD)$(git -C $H diff --quiet -- . || echo +dirty)"
+cd $H
+run() { local out=$1; shift; /usr/bin/time -v -o $out.time "$WRAP" python sbnd_h5maker.py $out "$@" > $out.log 2>&1; echo "$(/bin/date -u '+%F %T') $out rc $? wall $(awk -F': ' '/Elapsed/{print $2}' $out.time)"; }
+run $O/nuecc_data.h5 --data --reco1 $D/nuecc-lynn/filtered-reco1/data_filtered_decoded_reco1-fe6033f3-07a0-4971-cea5-16ce59269fba_eventidfiltered_frameshift.root --wc-dir $SR/nuecc/pr/c{0,1,2,3,4} --scan-offsets 48 &
+run $O/ncsb_data.h5 --data --reco1 $D/nc-sideband-lynn/filtered-reco1/nc-sideband_filtered_frameshift.root --wc-dir $SR/ncsb/pr/c{0,1} --scan-offsets 19 &
+run $O/mc_test10_v05.h5 --units-file $Y/fm4npp-lartpc-data/sbnd-bnb-cv/test10/units.txt --max-events 10 &
+wait
+for f in nuecc_data ncsb_data mc_test10_v05; do "$WRAP" python check_h5.py $O/$f.h5 --json $O/$f.check.json > /dev/null 2>&1; echo "$f check rc $?"; done
+echo "$(/bin/date -u '+%F %T') DONE"

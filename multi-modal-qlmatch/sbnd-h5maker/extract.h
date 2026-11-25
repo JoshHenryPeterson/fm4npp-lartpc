@@ -5,6 +5,8 @@
 // SBND differences: two TPCs (hit tpc), two flash collections (opflashtpc0/1), and simulated cosmics
 // (CORSIKA): every particle carries its MCTruth origin (1 beam nu, 2 cosmic, 0 unknown).
 #include <algorithm>
+#include <array>
+#include <limits>
 #include <cmath>
 #include <map>
 #include <set>
@@ -27,6 +29,10 @@
 #include "lardataobj/Simulation/SimChannel.h"
 #include "lardataobj/Simulation/SimEnergyDeposit.h"
 #include "TFile.h"
+#if __has_include("sbnobj/SBND/Timing/FrameShiftInfo.hh")
+#include "sbnobj/SBND/Timing/FrameShiftInfo.hh"
+#define SBNDH5_HAVE_FRAMESHIFT 1
+#endif
 #include "TH3F.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
@@ -53,6 +59,8 @@ struct Labels {
   // Fallback when neither the assns nor the SimChannels carry deposits (the Gen2 MC): project the Geant4
   // deposits (before SCE) through the forward SCE map and the drift onto (channel, tick); see Geo.
   std::string sed = "ionandscint:priorSCE";
+  // real data (0.5): sbnd::timing::FrameShiftInfo written by the sbndcode FrameShift producer (absent in MC)
+  std::string frameshift = "frameshift";
 };
 
 // Geometry for the deposit projection.  Six wire planes (tpc*3 + plane), each linear:
@@ -91,7 +99,8 @@ inline double sce_interp(TH3F* h, double x, double y, double z) {
   return h->Interpolate(clamp(h->GetXaxis(), x), clamp(h->GetYaxis(), y), clamp(h->GetZaxis(), z));
 }
 
-struct Dep { float tick; float e, ne; int tid; };
+// x/y/z: true deposit midpoint (cm, before SCE); ax/ay/az: the SCE-displaced (apparent) position used for the projection
+struct Dep { float tick; float e, ne; int tid; float x, y, z, ax, ay, az; };
 
 // deposits per channel, sorted by tick
 inline void project_seds(gallery::Event& ev, const Labels& L, const Geo& g,
@@ -103,6 +112,7 @@ inline void project_seds(gallery::Event& ev, const Labels& L, const Geo& g,
     if (d.NumElectrons() <= 0) continue;
     auto m = d.MidPoint();
     double x = m.X(), y = m.Y(), z = m.Z();
+    const float tx = x, ty = y, tz = z;
     int tpc = x < 0 ? 0 : 1;
     if (g.use_sce) {
       double dx = sce_interp(g.sce[tpc][0], x, y, z), dy = sce_interp(g.sce[tpc][1], x, y, z),
@@ -120,7 +130,7 @@ inline void project_seds(gallery::Event& ev, const Labels& L, const Geo& g,
       if (iw < 0 || iw >= g.n[k]) continue;
       int ch = g.ch0[k] + g.step[k] * iw;
       float tick = g.trig_tick + (t_us + dist / g.drift_v) / g.tick_us + g.dt[k];
-      bych[ch].push_back({tick, (float)d.Energy(), (float)d.NumElectrons(), d.TrackID()});
+      bych[ch].push_back({tick, (float)d.Energy(), (float)d.NumElectrons(), d.TrackID(), tx, ty, tz, (float)x, (float)y, (float)z});
     }
   }
   for (auto& kv : bych)
@@ -147,6 +157,9 @@ struct Out {
   // edep (hit -> particle)
   std::vector<int> e_hit, e_g4, e_origin, e_maxide, e_nu;
   std::vector<float> e_energy, e_frac, e_nelec;
+  // hit_truth_table (0.6): per hit, the energy-weighted mean and RMS of the true (pre-SCE) position of its projected
+  // deposits, the mean apparent (SCE-displaced) position, and the summed energy; NaN / 0 for hits with no deposit
+  std::vector<float> t_x, t_y, t_z, t_sx, t_sy, t_sz, t_ax, t_ay, t_az, t_e;
   // particle_table
   std::vector<int> p_g4, p_pdg, p_parent, p_cat, p_inst, p_origin, p_nu;
   std::vector<float> p_mom, p_start, p_end, p_t;
@@ -164,13 +177,63 @@ struct Out {
   long n_sed = 0;
   double sed_e_nu = 0, sed_e_nu_matched = 0;   // projected nu deposit energy (collection plane), and on hits
   long n_assns_hit_truth = -1, n_assns_mcp_truth = -1;
+  // event time (EventAuxiliary, unix s) and FrameShiftInfo [ns]; has_frameshift = 0 when the product is absent
+  double time_s = 0;
+  int has_frameshift = 0, timing_type = 99;
+  double fs_apply_at_caf = 0, fs_hlt_beamgate = 0, fs_hlt_crtt1 = 0, fs_tdc_crtt1 = 0, fs_tdc_bes = 0, fs_tdc_rwm = 0;
 };
+
+// FrameShiftInfo (real data) and the event time; MC keeps the defaults.
+inline void fill_timing(gallery::Event& ev, Out& o, const Labels& L) {
+  auto const& aux = ev.eventAuxiliary();
+  o.time_s = aux.time().timeHigh() + 1e-9 * aux.time().timeLow();
+#ifdef SBNDH5_HAVE_FRAMESHIFT
+  gallery::Handle<sbnd::timing::FrameShiftInfo> fs;
+  if (!L.frameshift.empty() && ev.getByLabel(art::InputTag(L.frameshift), fs)) {
+    o.has_frameshift = 1;
+    o.timing_type = fs->TimingType();
+    o.fs_apply_at_caf = fs->FrameApplyAtCaf();
+    o.fs_hlt_beamgate = fs->FrameHltBeamGate();
+    o.fs_hlt_crtt1 = fs->FrameHltCrtt1();
+    o.fs_tdc_crtt1 = fs->FrameTdcCrtt1();
+    o.fs_tdc_bes = fs->FrameTdcBes();
+    o.fs_tdc_rwm = fs->FrameTdcRwm();
+  }
+#endif
+}
+
+inline void fill_optical(gallery::Event& ev, Out& o, const Labels& L);
 
 struct BtPart {
   int category;
   std::vector<unsigned int> tids;
   int nhits = 0;
 };
+
+// 0.6 track_table: MCParticle kinematics for the given G4 track ids (|TrackId|, the labeler's trackid).
+// Per id, 12 floats: start px py pz E, end t, end px py pz E, start t, end x, mass (GeV, ns, cm) and the status
+// code; NaN / -1 for an id with no saved MCParticle (dropped by the G4 keep policy).
+inline void track_kin(gallery::Event& ev, const Labels& L, const std::vector<int>& ids, std::vector<float>& out,
+                      std::vector<int>& status) {
+  const float NaN = std::numeric_limits<float>::quiet_NaN();
+  out.assign(ids.size() * 12, NaN);
+  status.assign(ids.size(), -1);
+  auto mcp = ev.getValidHandle<std::vector<simb::MCParticle>>(art::InputTag(L.mcparticle));
+  std::map<int, const simb::MCParticle*> by;
+  for (auto const& p : *mcp) by[std::abs(p.TrackId())] = &p;
+  for (size_t i = 0; i < ids.size(); ++i) {
+    auto it = by.find(std::abs(ids[i]));
+    if (it == by.end()) continue;
+    auto const& p = *it->second;
+    const int n = p.NumberTrajectoryPoints();
+    if (n == 0) continue;
+    float* q = &out[i * 12];
+    q[0] = p.Px(0); q[1] = p.Py(0); q[2] = p.Pz(0); q[3] = p.E(0);
+    q[4] = p.T(n - 1); q[5] = p.Px(n - 1); q[6] = p.Py(n - 1); q[7] = p.Pz(n - 1); q[8] = p.E(n - 1);
+    q[9] = p.T(0); q[10] = p.Vx(n - 1); q[11] = p.Mass();
+    status[i] = p.StatusCode();
+  }
+}
 
 inline void fill(gallery::Event& ev, Out& o, const Labels& L, const Geo& G) {
   o = Out();
@@ -272,6 +335,8 @@ inline void fill(gallery::Event& ev, Out& o, const Labels& L, const Geo& G) {
   // per hit: (kept track id, energy, fraction, is max, electrons)
   struct M { int tid; float e, frac, ne; int ismax; };
   std::vector<std::vector<M>> match(nh);
+  const float NaN = std::numeric_limits<float>::quiet_NaN();
+  std::vector<std::array<float, 10>> txyz(nh, {NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, 0.f});
   if (o.n_assns_hit_truth > 0) {
     o.truth_source = 1;
     art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData> fmh(hits, ev, art::InputTag(L.hit_truth));
@@ -309,13 +374,24 @@ inline void fill(gallery::Event& ev, Out& o, const Labels& L, const Geo& G) {
       auto const& v = it->second;
       auto lo = std::lower_bound(v.begin(), v.end(), t0, [](const Dep& a, double t) { return a.tick < t; });
       std::map<int, std::pair<double, double>> acc;
-      double etot = 0;
+      double etot = 0, sp[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
       for (auto d = lo; d != v.end() && d->tick <= t1; ++d) {
         int k = kept_tid(d->tid);
         if (k == 0) { ++o.n_ide_unmapped; k = -std::abs(d->tid); }
         acc[k].first += d->e;
         acc[k].second += d->ne;
         etot += d->e;
+        const double e = d->e;
+        sp[0] += e * d->x; sp[1] += e * d->y; sp[2] += e * d->z;
+        sp[3] += e * d->x * d->x; sp[4] += e * d->y * d->y; sp[5] += e * d->z * d->z;
+        sp[6] += e * d->ax; sp[7] += e * d->ay; sp[8] += e * d->az;
+      }
+      if (etot > 0) {
+        double mx = sp[0] / etot, my = sp[1] / etot, mz = sp[2] / etot;
+        txyz[ih] = {(float)mx, (float)my, (float)mz,
+                    (float)std::sqrt(std::max(0., sp[3] / etot - mx * mx)), (float)std::sqrt(std::max(0., sp[4] / etot - my * my)),
+                    (float)std::sqrt(std::max(0., sp[5] / etot - mz * mz)),
+                    (float)(sp[6] / etot), (float)(sp[7] / etot), (float)(sp[8] / etot), (float)etot};
       }
       double emax = 0;
       for (auto const& kv : acc) emax = std::max(emax, kv.second.first);
@@ -366,6 +442,12 @@ inline void fill(gallery::Event& ev, Out& o, const Labels& L, const Geo& G) {
     o.h_integral.push_back(h.Integral());
     o.h_rms.push_back(h.RMS());
     o.h_amp.push_back(h.PeakAmplitude());
+    {
+      auto const& q = txyz[ih];
+      o.t_x.push_back(q[0]); o.t_y.push_back(q[1]); o.t_z.push_back(q[2]);
+      o.t_sx.push_back(q[3]); o.t_sy.push_back(q[4]); o.t_sz.push_back(q[5]);
+      o.t_ax.push_back(q[6]); o.t_ay.push_back(q[7]); o.t_az.push_back(q[8]); o.t_e.push_back(q[9]);
+    }
     for (auto const& m : match[ih]) {
       if (m.tid > 0) g4id.insert(m.tid);
       o.e_hit.push_back(ih);
@@ -499,6 +581,11 @@ inline void fill(gallery::Event& ev, Out& o, const Labels& L, const Geo& G) {
     o.p_eproc.push_back(p.EndProcess());
   }
 
+  fill_timing(ev, o, L);
+  fill_optical(ev, o, L);
+}
+
+inline void fill_optical(gallery::Event& ev, Out& o, const Labels& L) {
   // ---- optical hits (PMTs)
   {
     gallery::Handle<std::vector<recob::OpHit>> oh;
@@ -540,6 +627,31 @@ inline void fill(gallery::Event& ev, Out& o, const Labels& L, const Geo& G) {
       ++fid;
     }
   }
+}
+
+// Real data (0.5): no truth products are read.  Hits, ophits, flashes, FrameShiftInfo and the event time only.
+inline void fill_data(gallery::Event& ev, Out& o, const Labels& L) {
+  o = Out();
+  auto const& aux = ev.eventAuxiliary();
+  o.run = aux.run();
+  o.subrun = aux.subRun();
+  o.event = aux.event();
+  o.nu_dir.assign(3, 0.f);
+  o.nu_vtx.assign(3, -9999.f);
+  auto hits = ev.getValidHandle<std::vector<recob::Hit>>(art::InputTag(L.hit));
+  for (auto const& h : *hits) {
+    auto const& w = h.WireID();
+    o.h_tpc.push_back(w.TPC);
+    o.h_plane.push_back(w.Plane);
+    o.h_wire.push_back(w.Wire);
+    o.h_channel.push_back(h.Channel());
+    o.h_time.push_back(h.PeakTime());
+    o.h_integral.push_back(h.Integral());
+    o.h_rms.push_back(h.RMS());
+    o.h_amp.push_back(h.PeakAmplitude());
+  }
+  fill_timing(ev, o, L);
+  fill_optical(ev, o, L);
 }
 
 // Fraction-of-hits-with-IDEs vs tdc offset, to pin the tick -> TDC convention on real events.

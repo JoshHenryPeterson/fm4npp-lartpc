@@ -51,6 +51,12 @@ PMT_YZ = np.array([
 
 PMT_CH = np.arange(N_PMT)      # OpChannel of each light token (index = token / PMT id)
 PMT_Y_SHIFT = 65.0             # added to PMT y for the Fourier position embedding (scale 130 cm)
+PMT_SIDE = np.zeros(N_PMT, dtype=np.int64)   # PMT plane: 0 for MicroBooNE; SBND 0 = TPC 0 (x < 0), 1 = TPC 1 (x > 0)
+PMT_POS_SCALE = (130.0, 1100.0)              # (y + PMT_Y_SHIFT, z) extent, cm, for the "v2" PMT position embedding
+# 3D extent (x, y, z), cm, for the 3D position embeddings (blob tokens, 3D-lifted charge tokens); x is the
+# drift coordinate of the blob centre, y and z the AV
+POS3D_SCALE = (260.0, 240.0, 1040.0)
+POS3D_MIN = (0.0, -116.5, 0.0)                # AV minimum corner; 3D embeddings see (xyz - POS3D_MIN) / POS3D_SCALE
 # PMT time bins (us on the beam-gate clock); fine around the expected neutrino flash (3-6 us in MicroBooNE)
 LIGHT_EDGES = (0.0, 1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0, 8.0, 10.0, 12.0, 15.0, 19.0, 24.0)
 BEAM_WINDOW_US = (3.0, 6.0)
@@ -59,7 +65,8 @@ T2_PE_CUTS = (10, 20, 50, 100, 200, 500)   # beam-window PE grid for the T2 brig
 
 def _load_sbnd(path):
     global N_WIRES, N_TICKS, TRIG_TICK, TICK_TO_CM, CATHODE_TICK, WIRE_PITCH_CM, AV, N_PMT, PMT_YZ, PMT_CH
-    global PMT_Y_SHIFT, LIGHT_EDGES, BEAM_WINDOW_US, T2_PE_CUTS, N_TPC, TPC1_FLIP_TICK
+    global PMT_Y_SHIFT, LIGHT_EDGES, BEAM_WINDOW_US, T2_PE_CUTS, N_TPC, TPC1_FLIP_TICK, PMT_SIDE, PMT_POS_SCALE
+    global POS3D_SCALE, POS3D_MIN
     d = json.load(open(path))
     assert d["detector"] == "SBND", path
     N_TPC = len(d["tpcs"])
@@ -77,6 +84,10 @@ def _load_sbnd(path):
     PMT_CH = np.array([o["channel"] for o in pmts])
     PMT_YZ = np.array([(o["y"], o["z"]) for o in pmts], dtype=np.float32)
     PMT_Y_SHIFT = -AV["y"][0]                                          # y + shift in [0, ~410] cm
+    PMT_SIDE = np.array([int(o["x"] > 0) for o in pmts], dtype=np.int64)
+    PMT_POS_SCALE = (AV["y"][1] - AV["y"][0], AV["z"][1] - AV["z"][0])   # ~(407, 501) cm
+    POS3D_SCALE = (AV["x"][1] - AV["x"][0], AV["y"][1] - AV["y"][0], AV["z"][1] - AV["z"][0])
+    POS3D_MIN = (AV["x"][0], AV["y"][0], AV["z"][0])
     # SBND OpHit::PeakTime is relative to the trigger; the BNB flash comes at ~0.3-1.7 us. The MicroBooNE bins are
     # shifted by -3 us, so the beam window (3-6 us there) becomes 0-3 us and the bin layout stays the same.
     LIGHT_EDGES = tuple(e - 3.0 for e in LIGHT_EDGES)
